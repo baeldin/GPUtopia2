@@ -67,8 +67,8 @@ namespace mainView
         static ImVec2 mainViewportSize = ImGui::GetContentRegionAvail();
         static bool needGlewInit = true;
         static std::vector<color> textureColors((int)(mainViewportSize.x * mainViewportSize.y));
-        glfwGetCurrentContext();
-        GLFWwindow* window = glfwGetCurrentContext();
+        //glfwGetCurrentContext();
+        //GLFWwindow* window = glfwGetCurrentContext();
 
         if (mainViewportSize.x != ImGui::GetContentRegionAvail().x ||
             mainViewportSize.y != ImGui::GetContentRegionAvail().y) {
@@ -85,16 +85,16 @@ namespace mainView
         glViewport(0, 0, mainViewportSize.x, mainViewportSize.y);
         // TODO: make a buffer to use in a compute shader and fill the image vector with data
         // from the buffer (is that even the right way of saying it??)
-        //if (needFrameBuffer) {
-        //    // this was needed to prevent a crash, but it causes the main window to go black
-        //    if (needGlewInit) {
-        //        glewInit();
-        //        needGlewInit = false;
-        //    }
-        //    //glGenFramebuffers(1, &frameBufferID2);
-        //    //glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID2);
-        //    needFrameBuffer = false;
-        //}
+        if (needFrameBuffer) {
+            // this was needed to prevent a crash, but it causes the main window to go black
+            //if (needGlewInit) {
+            //    glewInit();
+            //    needGlewInit = false;
+            //}
+            glGenFramebuffers(1, &frameBufferID2);
+            glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID2);
+            needFrameBuffer = false;
+        }
         if (needBogusImg) {
             drawBogusImg(textureColors, mainViewportSize.x, mainViewportSize.y);
             needBogusImg = false;
