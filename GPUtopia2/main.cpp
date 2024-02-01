@@ -3,8 +3,7 @@
 // If you are new to Dear ImGui, read documentation from the docs/ folder + read the top of imgui.cpp.
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
-#include "GL\glew.h"
-
+#include "glewGuard.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -21,6 +20,24 @@
 #if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
+
+void __stdcall GLErrorCallback(GLenum source, GLenum type, GLuint id,
+    GLenum severity, GLsizei length,
+    const GLchar* message,
+    const void* userParam) {
+    if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) return;
+
+    const char* severityStr = severity == GL_DEBUG_SEVERITY_NOTIFICATION
+        ? "Notification"
+        : severity == GL_DEBUG_SEVERITY_LOW ? "Low"
+        : severity == GL_DEBUG_SEVERITY_MEDIUM ? "Med"
+        : severity == GL_DEBUG_SEVERITY_HIGH ? "High"
+        : "";
+    fprintf(stderr, " -- GL: %s type = 0x%x, severity = %s, \n message = %s\n",
+        (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type,
+        severityStr, message);
+    __debugbreak();
+}
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -58,10 +75,15 @@ int main(int, char**)
 #endif
 
     // Create window with graphics context
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
     GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
     if (window == NULL)
         return 1;
     glfwMakeContextCurrent(window);
+    glewInit();
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(GLErrorCallback, 0);
     glfwSwapInterval(1); // Enable vsync
 
     // Setup Dear ImGui context
@@ -126,7 +148,7 @@ int main(int, char**)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
+        ImGui::DockSpaceOverViewport();
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);

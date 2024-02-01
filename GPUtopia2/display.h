@@ -1,14 +1,17 @@
 #pragma once
 
 #include <cmath>
+#include <iostream>
+#include <string>
 
 #include <vector>
-#include "gl/glew.h"
+#include "glewGuard.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "GLFW\glfw3.h"
-//#include "load_shaders.h"
+
+using std::string;
 
 struct color;
 void prepTexture(GLuint& texture);

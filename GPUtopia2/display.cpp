@@ -83,34 +83,38 @@ namespace mainView
             textureColors.resize((int)(mainViewportSize.x * mainViewportSize.y));
         }
         glViewport(0, 0, mainViewportSize.x, mainViewportSize.y);
-        // TODO: make a buffer to use in a compute shader and fill the image vector with data
-        // from the buffer (is that even the right way of saying it??)
-        if (needFrameBuffer) {
-            // this was needed to prevent a crash, but it causes the main window to go black
-            //if (needGlewInit) {
-            //    glewInit();
-            //    needGlewInit = false;
-            //}
-            glGenFramebuffers(1, &frameBufferID2);
-            glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID2);
-            needFrameBuffer = false;
-        }
+        // first draw the image
         if (needBogusImg) {
             drawBogusImg(textureColors, mainViewportSize.x, mainViewportSize.y);
             needBogusImg = false;
         }
+        // create texture from the image
         if (needTexture) {
             glDeleteTextures(1, &textureID);
             makeTexture(textureID, mainViewportSize.x, mainViewportSize.y, textureColors);
-            //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureID, 0);
+            needTexture = false;
         }
+        // ??
+        // generate frameBuffer, then bind it, then add color attachment
+        if (needFrameBuffer) {
+            glGenFramebuffers(1, &frameBufferID2);
+            glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID2);
+            // this should add the blue/green image
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureID, 0);
+            needFrameBuffer = false;
+        }
+
         ImVec2 vpPos = ImGui::GetCursorScreenPos();
+        // this draws the font table instead of the blue/green image
         ImGui::GetWindowDrawList()->AddImage(
-            (void*)textureID,
+            (void*)frameBufferID2,
             ImVec2(vpPos.x, vpPos.y),
             ImVec2(vpPos.x + mainViewportSize.x, vpPos.y + mainViewportSize.y),
             ImVec2(0, 1),
             ImVec2(1, 0));
 		ImGui::End();
+        // bind default framebuffer again
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	}
 };

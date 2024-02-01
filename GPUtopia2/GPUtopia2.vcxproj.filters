@@ -63,6 +63,9 @@
     <ClInclude Include="key_callbacks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="glewGuard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="imgui_impl_opengl3.cpp">
