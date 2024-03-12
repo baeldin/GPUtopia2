@@ -112,6 +112,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,6 +128,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -137,10 +139,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="cl_handler.h" />
+    <ClInclude Include="color.h" />
     <ClInclude Include="display.h" />
+    <ClInclude Include="formulaSettings.h" />
     <ClInclude Include="glewGuard.h" />
     <ClInclude Include="GLFW\glfw3.h" />
     <ClInclude Include="GLFW\glfw3native.h" />
+    <ClInclude Include="gradient.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="imgui_impl_glfw.h" />
@@ -153,9 +159,17 @@
     <ClInclude Include="imstb_truetype.h" />
     <ClInclude Include="key_callbacks.h" />
     <ClInclude Include="load_shaders.h" />
+    <ClInclude Include="parameterMaps.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="clFragments\FileName.cpp" />
+    <ClCompile Include="cl_handler.cpp" />
+    <ClCompile Include="cl_core.cpp" />
+    <ClCompile Include="cl_core.h" />
+    <ClCompile Include="color.cpp" />
     <ClCompile Include="display.cpp" />
+    <ClCompile Include="formulaSettings.cpp" />
+    <ClCompile Include="gradient.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imgui_demo.cpp" />
     <ClCompile Include="imgui_draw.cpp" />
@@ -164,11 +178,23 @@
     <ClCompile Include="imgui_stdlib.cpp" />
     <ClCompile Include="imgui_tables.cpp" />
     <ClCompile Include="imgui_widgets.cpp" />
+    <ClCompile Include="load_shaders.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="sampling.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="clFragments\anti_aliasing.cl" />
+    <None Include="clFragments\colors.cl" />
+    <None Include="clFragments\fractalFormulas\mandelbrot.cl" />
+    <None Include="clFragments\full_template.cl" />
+    <None Include="clFragments\gradient.cl" />
+    <None Include="dist.cl" />
     <None Include="fragment_shader.glsl" />
+    <None Include="gradient.cl" />
     <None Include="vertex_shader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="clFragments\coloringAlgorithms\smoothMandelbroth.cl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

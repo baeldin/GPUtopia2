@@ -16,6 +16,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{436dbf2c-9a3b-4eb7-99c4-f5f36f49717b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="OpenCL Files">
+      <UniqueIdentifier>{6baa69da-0105-444a-97b9-dea44aefb7e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui_impl_glfw.h">
@@ -66,6 +69,21 @@
     <ClInclude Include="glewGuard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="formulaSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cl_handler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parameterMaps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gradient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="imgui_impl_opengl3.cpp">
@@ -98,6 +116,33 @@
     <ClCompile Include="display.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="load_shaders.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cl_core.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cl_core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="formulaSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cl_handler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="clFragments\FileName.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gradient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="color.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sampling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="vertex_shader.glsl">
@@ -106,5 +151,27 @@
     <None Include="fragment_shader.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="clFragments\anti_aliasing.cl">
+      <Filter>OpenCL Files</Filter>
+    </None>
+    <None Include="clFragments\full_template.cl">
+      <Filter>OpenCL Files</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\mandelbrot.cl">
+      <Filter>OpenCL Files</Filter>
+    </None>
+    <None Include="gradient.cl" />
+    <None Include="clFragments\gradient.cl">
+      <Filter>OpenCL Files</Filter>
+    </None>
+    <None Include="dist.cl" />
+    <None Include="clFragments\colors.cl">
+      <Filter>OpenCL Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="clFragments\coloringAlgorithms\smoothMandelbroth.cl">
+      <Filter>OpenCL Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
