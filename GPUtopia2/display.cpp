@@ -1,15 +1,19 @@
 #include "display.h"
 
+void runKernelAsync(clFractal& cf, clCore& cc, bool& running)
+{
+    //int ii = 0;
+    //while (ii < fibonacci_number(cf.image.quality) && plsProceed)
+    //{
+    //    cl_int3 sampling = { ii, ii + 1, fibonacci_number(cf.image.quality) };
+    //    cl_int err = cc.setKernelArg(4, sampling, "sampling_info");
+    running = true;
+    cc.runKernel(cf);
+    running = false;
+    //    ii++;
+    //}
+}
 
-//struct color
-//{
-//    float r;
-//    float g;
-//    float b;
-//    float a = 1.;
-//};
-
-// prepare texture and bind to GLuint
 void prepTexture(GLuint& texture)
 {
     glGenTextures(1, &texture);
@@ -56,9 +60,9 @@ void drawBogusImg(std::vector<color>& img, int width, int height)
 
 namespace mainView
 {
-	void mainViewPort()
-	{
-		ImGui::Begin("Main View");
+    void mainViewPort()
+    {
+        ImGui::Begin("Main View");
         static GLuint textureID;
         static bool needTexture = false;
         static bool needBogusImg = false;
@@ -71,6 +75,8 @@ namespace mainView
         static bool needCLFractal = true;
         static bool needNewKernel = true;
         static clCore core;
+        // static asyncOpenCL asc;
+        // static std::jthread jt;
         if (needCLFractal)
         {
             std::cout << "Need a fractal, re-reading code and generating kernel code.\n";
@@ -90,7 +96,7 @@ namespace mainView
             //mainViewportSize.x < 1 ? mainViewportSize.x = 1 : mainViewportSize.x;
             mainViewportSize.y < 1 ? mainViewportSize.y = 1 : mainViewportSize.y;
             // request new img and texture for new size, resize img vector
-            needTexture = true;
+            // needTexture = true;
             needBogusImg = true;
             textureColors.resize((int)(mainViewportSize.x * mainViewportSize.y));
             cf.image.size = { (int)mainViewportSize.x, (int)mainViewportSize.y };
@@ -100,7 +106,7 @@ namespace mainView
             std::cout << "Need a new kernel, compiling it now.\n - requesting new texture\n - requesting new image\n";
             core.compileNewKernel(cf);
             needNewKernel = false;
-            needTexture = true;
+            // needTexture = true;
             needBogusImg = true;
             cf.rebuildKernel = false;
         }
@@ -108,9 +114,11 @@ namespace mainView
         static clFractalImage img_settings_old = cf.image;
         static bool redraw = false;
         formulaSettingsWindow(cf);
-        if (cf != cf_old) {
+        static bool runKernel = true;
+        static int waitCounter = 0;
+        if (cf != cf_old && waitCounter == 0) {
             std::cout << "Parameters changed, updating cf.params.\n - requesting new Texture\n - requesting new image\n";
-            needTexture = true;
+            // needTexture = true;
             needBogusImg = true;
             needCLFractal = false;
             std::cout << "Old zoom: " << cf_old.image.zoom << " new zoom: " << cf.image.zoom << std::endl;
@@ -118,20 +126,44 @@ namespace mainView
             core.setDefaultArguments(cf);
             core.setFractalKernelArgs(cf);
             cf_old = cf;
+            runKernel = true;
         }
 
         glViewport(0, 0, mainViewportSize.x, mainViewportSize.y);
         // first draw the image
-        if (needBogusImg) {
+        static bool running = false;
+        static std::jthread jt;
+        if (runKernel and !running) {
             std::cout << "Need a new image, setting kernel args and running kernel.\n";
             // drawBogusImg(textureColors, mainViewportSize.x, mainViewportSize.y);
             //make_img(textureColors, mainViewportSize.x, mainViewportSize.y, fs);
             // make_img2(cf, textureColors, mainViewportSize.x, mainViewportSize.y, fs);
             core.setDefaultArguments(cf);
             core.setFractalKernelArgs(cf);
-            core.runKernel(cf);
-            core.getImg(textureColors, cf);
-            needBogusImg = false;
+            jt = std::jthread(&runKernelAsync, std::ref(cf), std::ref(core), std::ref(running));
+            jt.detach();
+            needBogusImg = true;
+            runKernel = false;
+            // std::jthread jt = std::jthread(&core.runKernel, std::ref(cf));
+            // jt = std::jthread(&asyncOpenCL::clShepherd, std::ref(cf), std::ref(core));
+        }
+        if (running) {
+            std::cout << "Am I running? " << running << std::endl;
+            std::cout << "  My thread ID is " << jt.get_id() << std::endl;
+        }
+        static cl_int2 displaySize = { 0, 0 };
+        if (needBogusImg && !running)
+        {
+            // jt.join();
+            waitCounter++;
+            if (waitCounter > 1) // wait 3 frames before continuing
+            {
+                core.getImg(textureColors, cf);
+                displaySize = { cf.image.size.x, cf.image.size.y };
+                needBogusImg = false;
+                needTexture = true;
+                waitCounter = 0;
+            }
         }
         // create texture from the image
         if (needTexture) {
@@ -142,9 +174,14 @@ namespace mainView
         }
 
         ImGui::End();
-        ImGui::Begin("Main View");
+        static char mainViewStr[] = "Main View";
+        //static std::string runStr = "";
+        //runStr = (running) ? " (Running...)" : " (Idle)";
+        // sprintf_s(mainViewStr, "Main View%s###Main View", runStr.c_str());
+        // mainViewStr = (running) ? "Main View (Running...)" : "Main View";
+        ImGui::Begin(mainViewStr, nullptr, ImGuiWindowFlags_HorizontalScrollbar);
         ImGui::Image((void*)(intptr_t)textureID, ImVec2(
-            cf.image.size.x, cf.image.size.y)); // , texturesize);
+            displaySize.x, displaySize.y)); // , texturesize);
         ImGui::End();
         // ImVec2 vpPos = ImGui::GetCursorScreenPos();
         // this draws the font table instead of the blue/green image

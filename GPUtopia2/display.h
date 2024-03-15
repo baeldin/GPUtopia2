@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include <string>
+#include <thread>
 
 #include <vector>
 #include "GL/glew.h"
@@ -13,6 +14,8 @@
 #include "load_shaders.h"
 #include "cl_core.h"
 #include "formulaSettings.h"
+#include "cl_handler.h"
+//#include "cl_async.h"
 
 using std::string;
 
