@@ -15,7 +15,6 @@
 #include "cl_core.h"
 #include "formulaSettings.h"
 #include "cl_handler.h"
-//#include "cl_async.h"
 
 using std::string;
 

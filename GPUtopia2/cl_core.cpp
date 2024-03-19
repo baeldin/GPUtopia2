@@ -91,7 +91,6 @@ void clCore::compileNewKernel(clFractal& cf)
         std::cerr << "Build failed; error code: " << buildErr
             << ", build log:\n" << buildLog << std::endl;
     }
-    // std::vector<float>ret(N);
     cl_int err;
     this->queue = cl::CommandQueue(this->context, this->device, 0, &err);
     if (err != CL_SUCCESS) {

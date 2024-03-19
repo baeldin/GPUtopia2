@@ -53,5 +53,18 @@ void formulaSettingsWindow(clFractal& cf)
 	{
 		ImGui::DragFloat(key.c_str(), &val.first, 0.01f, -100.f, 100.f);
 	}
+	//static std::vector<color> gradientImg;
+	//static GLuint gradientTextureID;
+	//static bool needGradientTexture;
+	//if (ImGui::Button("Test Gradient"))
+	//{
+	//	gradient grad(4);
+	//	grad.printNodes();
+	//	grad.printFine();
+		// glDeleteTextures(1, &gradientTextureID);
+		// makeTexture(gradientTextureID, 200, 20, gradientImg);
+		// needGradientTexture = false;
+	//}
+	//ImGui::Image((void*)(intptr_t)gradientTextureID, ImVec2(200, 20));
 	ImGui::End();
 }

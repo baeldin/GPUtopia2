@@ -25,9 +25,21 @@ struct color
     {
         r = r_; g = g_; b = b_; a = a_;
     }
-    color operator+ (const color& c) { r += c.r; g += c.g; b += c.b; }
-    color operator* (const float& x) { r *= x, g *= x; b *= x; }
-    color operator/ (const float& x) { r /= x; g /= x; b /= x; }
+    color operator+ (const color& c) {
+        return color(r + c.r, g + c.g, b + c.b);
+    }
+    color operator* (const float& x) { 
+        return color(r * x, g * x, b * x); }
+    color operator/ (const float& x) { 
+        const float inv_x = 1.f / x;
+        return color(r * inv_x, g * inv_x, b * inv_x); }
+    color& operator= (const color& c)
+    {
+        if (this != &c) {
+            r = c.r; g = c.g; b = c.b; a = c.a;
+        }
+        return *this;
+    }
     cl_float4 to_cl_float4() { return cl_float4({ r, g, b, a }); }
 
 };
