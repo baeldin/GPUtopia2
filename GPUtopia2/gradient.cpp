@@ -29,6 +29,7 @@ Gradient::Gradient()
 Gradient::Gradient(const int N)
 {
 	std::vector<int> nodeLocations(N, 0);
+	nNodes = N;
 	nodes.resize(N);
 	for (int k = 0; k < N; k++)
 	{

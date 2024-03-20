@@ -140,7 +140,8 @@ inline const bool operator==(const clFractal& lhs, const clFractal& rhs)
 		lhs.coloringCLFragmentFile == rhs.coloringCLFragmentFile &&
 		lhs.fullCLcode == rhs.fullCLcode &&
 		lhs.maxIter == rhs.maxIter &&
-		lhs.bailout == rhs.bailout);
+		lhs.bailout == rhs.bailout &&
+		lhs.gradient == rhs.gradient);
 }
 inline const bool operator!=(const clFractal& lhs, const clFractal& rhs)
 {

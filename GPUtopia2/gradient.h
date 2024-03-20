@@ -30,8 +30,7 @@ inline const bool operator==(const colorNode& lhs, const colorNode& rhs)
     return(
         lhs.position == rhs.position &&
         lhs.index == rhs.index &&
-        lhs.color == rhs.color
-        );
+        lhs.color == rhs.color);
 }
 
 inline const bool operator!=(const colorNode& lhs, const colorNode& rhs) {

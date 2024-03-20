@@ -45,5 +45,5 @@ float4 getColor(const float4* colors, const float idxIn, const int nColors)
 	const float fidx = idxIn - floor(idxIn);
 	const int colorIndex1 = floor(fidx * nColors);
 	const int colorIndex2 = (colorIndex1 == nColors - 1) ? 0 : colorIndex1 + 1;
-	return sRGBtoLinear(f4lerp(fidx, colorIndex1, colorIndex2, colors[colorIndex1], colors[colorIndex2]));
+	return sRGBtoLinear(f4lerp(fidx, ceil(fidx), floor(fidx), colors[colorIndex1], colors[colorIndex2]));
 }

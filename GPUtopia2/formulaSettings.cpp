@@ -57,9 +57,11 @@ void formulaSettingsWindow(clFractal& cf)
 	static GLuint gradientTextureID;
 	static bool needGradientTexture;
 	static Gradient gradOld;
+	static int colorNodeCount = 4;
+	ImGui::DragInt("Gradient Nodes", &colorNodeCount, 1, 12);
 	if (ImGui::Button("Test Gradient"))
 	{
-		cf.gradient = Gradient(4);
+		cf.gradient = Gradient(colorNodeCount);
 		// grad.printNodes();
 		// grad.printFine();
 		glDeleteTextures(1, &gradientTextureID);
