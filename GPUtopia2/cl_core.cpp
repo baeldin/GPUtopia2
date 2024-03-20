@@ -147,7 +147,10 @@ void clCore::setDefaultArguments(clFractal& cf)
     err = setKernelArg(4, sampling, "sampling_info");
     err = setKernelArg(5, cf.maxIter, "iterations");
     err = setKernelArg(6, cf.bailout, "bailout");
-    this->imgBuffer = setBufferKernelArg(7, imgColors.data(), 
+    err = setKernelArg(7, cf.gradient.fineLength, "gradient_length");
+    this->gradientBuffer = setBufferKernelArg(8, cf.gradient.fineColors.data(), 
+        sizeof(float) * cf.gradient.fineLength * 4, CL_MEM_READ_ONLY, "gradient_colors", &err);
+    this->imgBuffer = setBufferKernelArg(9, imgColors.data(), 
         sizeof(cl_float4) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
 }
 

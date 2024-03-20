@@ -1,4 +1,7 @@
 #pragma once
+
+#define CL_USE_DEPRECATED_OPENCL_2_2_APIS
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -22,7 +25,8 @@ public:
     cl::Program program;
     cl::CommandQueue queue;
     cl::Kernel kernel;
-    cl::Buffer xBuffer, yBuffer; // what to do about these?
+    cl::Buffer xBuffer, yBuffer; 
+    cl::Buffer gradientBuffer;
     cl::Buffer imgBuffer;
     clCore() 
     {

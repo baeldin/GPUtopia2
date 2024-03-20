@@ -11,6 +11,7 @@
 #include <map>
 #include <CL/opencl.h>
 
+#include "gradient.h"
 #include "sampling.h"
 
 //const bool operator==(
@@ -112,13 +113,14 @@ class clFractal
 public:
 	paramCollector params;
 	clFractalImage image;
+	Gradient gradient;
 	std::string fractalCLFragmentFile;
 	std::string coloringCLFragmentFile;
 	std::string fullCLcode = "";
 	bool rebuildKernel = false;
 	int maxIter = 100;
 	float bailout = 4.f;
-	clFractal() {}
+	clFractal() : gradient(Gradient::Gradient(4)){}
 	void makeCLCode();
 	void setFractalCLFragmentFile(const char* fil) { 
 		fractalCLFragmentFile = std::string(fil);

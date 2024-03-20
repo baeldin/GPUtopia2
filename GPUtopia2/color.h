@@ -44,6 +44,11 @@ struct color
 
 };
 
+inline const bool operator==(const color& lhs, const color& rhs)
+{
+    return(lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b);
+}
+
 color clamp(const color& c);
 color sRGBtoLinear(const color& c);
 color linearToSRGB(const color& c);

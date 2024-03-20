@@ -24,3 +24,26 @@ float4 sRGBtoLinear(const float4 v) {
 float4 linearToSRGB(const float4 v) {
 	return (float4)(flinearToSRGB(v.x), flinearToSRGB(v.y), flinearToSRGB(v.z), flinearToSRGB(v.w));
 }
+
+float lerp(const float x, const float x0, const float x1,
+	const float y0, const float y1)
+{
+	return ((x - x0) * y1 + (x1 - x) * y0) / (x1 - x0);
+}
+
+float4 f4lerp(const float x, const float x0, const float x1,
+	const float4 y0, const float4 y1)
+{
+	return (float4)(
+		lerp(x, x0, x1, y0.x, y1.x), lerp(x, x0, x1, y0.y, y1.y),
+		lerp(x, x0, x1, y0.z, y1.z), lerp(x, x0, x1, y0.w, y1.w));
+}
+
+// get a color from a gradient via linear interpolation
+float4 getColor(const float4* colors, const float idxIn, const int nColors)
+{
+	const float fidx = idxIn - floor(idxIn);
+	const int colorIndex1 = floor(fidx * nColors);
+	const int colorIndex2 = (colorIndex1 == nColors - 1) ? 0 : colorIndex1 + 1;
+	return sRGBtoLinear(f4lerp(fidx, colorIndex1, colorIndex2, colors[colorIndex1], colors[colorIndex2]));
+}

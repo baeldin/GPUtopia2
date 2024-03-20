@@ -115,7 +115,8 @@ paramCollector parseKernelParameterBlock(std::string& kpb)
 	paramCollector pc;
 	std::string paramType;
 	int paramAffiliaton = 0; // 0 for fractal, 1 for coloring
-	int paramIndex = 8; // first non-default param
+	// TODO: somehow get this from the cl core or smth?
+	int paramIndex = 10; // first non-default param
 	std::string paramName;
 	std::string paramValue;
 	while (std::getline(kernelParamBlockStream, kernelParamLine))

@@ -14,14 +14,16 @@ bool bailed_out(const float2 z, const float bailout)
     return bailedout;
 }
 __kernel void computeLoop(
-    __global int const* xx,      // 0: pixel x values
-    __global int const* yy,      // 1: pixel y values
-    int2 image_size,             // 2: image sizeX, image sizeY
-    float4 complex_subplane,     // 3: {centerX, centerY, width, widths / aspectRatio}
-    int3 sampling,               // 4: {sampleStart, sampleEnd, nSamplesTotal}
-    int maxIterations,           // 5: maxIterations
-    float bailout,               // 6: bailout value
-    __global float4* colors,    // 7: output colors
+    __global int const* xx,            // 0: pixel x values
+    __global int const* yy,            // 1: pixel y values
+    const int2 image_size,             // 2: image sizeX, image sizeY
+    const float4 complex_subplane,     // 3: {centerX, centerY, width, widths / aspectRatio}
+    const int3 sampling,               // 4: {sampleStart, sampleEnd, nSamplesTotal}
+    const int maxIterations,           // 5: maxIterations
+    const float bailout,               // 6: bailout value
+    const int nColors,                 // 7: colors in gradient
+    __global const float4* gradient,   // 8: gradient
+    __global float4* colors,           // 9: output colors
 //@__kernelArguments)
 {
     // Get Parallel Index

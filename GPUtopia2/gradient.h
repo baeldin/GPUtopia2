@@ -25,25 +25,43 @@ struct colorNode
     color color;
 };
 
+inline const bool operator==(const colorNode& lhs, const colorNode& rhs)
+{
+    return(
+        lhs.position == rhs.position &&
+        lhs.index == rhs.index &&
+        lhs.color == rhs.color
+        );
+}
+
+inline const bool operator!=(const colorNode& lhs, const colorNode& rhs) {
+    return(!(lhs == rhs)); }
+
 float lerp(const float x, const float x0, const float x1,
     const float y0, const float y1);
 color lerp(const float x, const float x0, const float x1,
     const color& c0, const color& c1);
 
-class gradient
+class Gradient
 {
 public:
     std::vector<colorNode> nodes;
     std::vector<color> fineColors;
     int nNodes = 4;
     int length = 400; // UF compat, can be changed later
-    int fineLength = 20;
+    int fineLength = 1024;
     // generate a random N-node gradient when this is used
-    gradient();
-    gradient(const int N);
+    Gradient();
+    Gradient(const int N);
     void fillFine();
     void printNodes();
     void printFine();
     color getColor(const float idx);
     std::vector<color> getGradientImg(const int width, const int height);
 };
+
+inline const bool operator==(const Gradient& lhs, const Gradient& rhs) {
+    return(lhs.nodes == rhs.nodes); }
+
+inline const bool operator!=(const Gradient& lhs, const Gradient& rhs) {
+    return(!(lhs == rhs)); }
