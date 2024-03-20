@@ -65,7 +65,7 @@ namespace mainView
         ImGui::Begin("Main View");
         static GLuint textureID;
         static bool needTexture = false;
-        static bool needBogusImg = false;
+        static bool needImg = false;
         static bool refreshDefaultArguments = true;
         static bool refreshFractalArguments = true;
         static ImVec2 mainViewportSize = ImGui::GetContentRegionAvail();
@@ -83,6 +83,7 @@ namespace mainView
             cf.fractalCLFragmentFile = "clFragments/fractalFormulas/gnarl.cl";
             cf.coloringCLFragmentFile = "clFragments/coloringAlgorithms/dist.cl";
             cf.makeCLCode();
+            cf.image.size = { (int)mainViewportSize.x, (int)mainViewportSize.y };
             needCLFractal = false;
             needNewKernel = true;
         }
@@ -97,7 +98,7 @@ namespace mainView
             mainViewportSize.y < 1 ? mainViewportSize.y = 1 : mainViewportSize.y;
             // request new img and texture for new size, resize img vector
             // needTexture = true;
-            needBogusImg = true;
+            needImg = true;
             textureColors.resize((int)(mainViewportSize.x * mainViewportSize.y));
             cf.image.size = { (int)mainViewportSize.x, (int)mainViewportSize.y };
         }
@@ -107,19 +108,20 @@ namespace mainView
             core.compileNewKernel(cf);
             needNewKernel = false;
             // needTexture = true;
-            needBogusImg = true;
+            needImg = true;
             cf.rebuildKernel = false;
         }
         static paramCollector params_old = cf.params;
         static clFractalImage img_settings_old = cf.image;
         static bool redraw = false;
         formulaSettingsWindow(cf);
+        imageSettingsWindow(cf);
         static bool runKernel = true;
         static int waitCounter = 0;
         if (cf != cf_old && waitCounter == 0) {
             std::cout << "Parameters changed, updating cf.params.\n - requesting new Texture\n - requesting new image\n";
             // needTexture = true;
-            needBogusImg = true;
+            needImg = true;
             needCLFractal = false;
             std::cout << "Old zoom: " << cf_old.image.zoom << " new zoom: " << cf.image.zoom << std::endl;
             cf.image.updateComplexSubplane();
@@ -142,7 +144,7 @@ namespace mainView
             core.setFractalKernelArgs(cf);
             jt = std::jthread(&runKernelAsync, std::ref(cf), std::ref(core), std::ref(running));
             jt.detach();
-            needBogusImg = true;
+            needImg = true;
             runKernel = false;
             // std::jthread jt = std::jthread(&core.runKernel, std::ref(cf));
             // jt = std::jthread(&asyncOpenCL::clShepherd, std::ref(cf), std::ref(core));
@@ -152,7 +154,7 @@ namespace mainView
             std::cout << "  My thread ID is " << jt.get_id() << std::endl;
         }
         static cl_int2 displaySize = { 0, 0 };
-        if (needBogusImg && !running)
+        if (needImg && !running)
         {
             // jt.join();
             waitCounter++;
@@ -160,7 +162,7 @@ namespace mainView
             {
                 core.getImg(textureColors, cf);
                 displaySize = { cf.image.size.x, cf.image.size.y };
-                needBogusImg = false;
+                needImg = false;
                 needTexture = true;
                 waitCounter = 0;
             }

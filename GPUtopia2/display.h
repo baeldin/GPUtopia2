@@ -14,6 +14,7 @@
 #include "load_shaders.h"
 #include "cl_core.h"
 #include "formulaSettings.h"
+#include "imageSettings.h"
 #include "cl_handler.h"
 
 using std::string;
