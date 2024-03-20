@@ -8,6 +8,13 @@ float2 get_complex_coordinates(const float2 xy, const int2 img_size, const float
         cz.y + (xy.y / (float)img_size.y - 0.5f) * cz.w);
 }
 
+int2 revert_complex_coordinates(const float2 z, const int2 img_size, const float4 cz)
+{
+    return (int2)(
+        (int)(((z.x - cz.x) / cz.z + 0.5f) * img_size.x),
+        (int)(((z.x - cz.x) / cz.z + 0.5f) * img_size.x));
+}
+
 bool bailed_out(const float2 z, const float bailout)
 {
 //@__bailout
