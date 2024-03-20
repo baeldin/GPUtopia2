@@ -69,8 +69,8 @@ namespace mainView
         static bool refreshDefaultArguments = true;
         static bool refreshFractalArguments = true;
         static ImVec2 mainViewportSize = ImGui::GetContentRegionAvail();
-        static std::vector<color> textureColors((int)(mainViewportSize.x * mainViewportSize.y));
         static clFractal cf;
+        static std::vector<color> textureColors(cf.image.size.x * cf.image.size.y);
         static clFractal cf_old;
         static bool needCLFractal = true;
         static bool needNewKernel = true;
@@ -90,17 +90,16 @@ namespace mainView
         if (mainViewportSize.x != ImGui::GetContentRegionAvail().x ||
             mainViewportSize.y != ImGui::GetContentRegionAvail().y)
         {
-            std::cout << "Viewport size changed, resizing and remaking image.\n";
             mainViewportSize = ImGui::GetContentRegionAvail();
-            //prevent x and y from going negative
-            //TODO: just set min size for window, but where?
-            //mainViewportSize.x < 1 ? mainViewportSize.x = 1 : mainViewportSize.x;
             mainViewportSize.y < 1 ? mainViewportSize.y = 1 : mainViewportSize.y;
-            // request new img and texture for new size, resize img vector
-            // needTexture = true;
+        }
+        if (cf_old.image.size != cf.image.size)
+        {
             needImg = true;
-            textureColors.resize((int)(mainViewportSize.x * mainViewportSize.y));
-            cf.image.size = { (int)mainViewportSize.x, (int)mainViewportSize.y };
+            textureColors.resize((int)(cf.image.size.x * cf.image.size.y));
+            cf.image.size = { cf.image.size.x, cf.image.size.y };
+            cf_old = cf;
+
         }
         if (needNewKernel or cf.rebuildKernel)
         {
@@ -171,7 +170,7 @@ namespace mainView
         if (needTexture) {
             std::cout << "Need a new texture, deleting old and remaking using the new image.\n";
             glDeleteTextures(1, &textureID);
-            makeTexture(textureID, mainViewportSize.x, mainViewportSize.y, textureColors);
+            makeTexture(textureID, cf.image.size.x, cf.image.size.y, textureColors);
             needTexture = false;
         }
 
@@ -183,7 +182,7 @@ namespace mainView
         // mainViewStr = (running) ? "Main View (Running...)" : "Main View";
         ImGui::Begin(mainViewStr, nullptr, ImGuiWindowFlags_HorizontalScrollbar);
         ImGui::Image((void*)(intptr_t)textureID, ImVec2(
-            displaySize.x, displaySize.y)); // , texturesize);
+            cf.image.size.x, cf.image.size.y)); // , texturesize);
         ImGui::End();
         // ImVec2 vpPos = ImGui::GetCursorScreenPos();
         // this draws the font table instead of the blue/green image
