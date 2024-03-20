@@ -88,6 +88,9 @@ struct clFractalImage
 	cl_float4 complexSubplane = { 0.f, 0.f, 4.f, 4.f / aspectRatio };
 	int quality = 1;
 	float zoom = 1.f;
+	clFractalImage() {
+		float aspectRatio = (float)size.x / (float)size.y;
+	}
 	void updateComplexSubplane();
 };
 

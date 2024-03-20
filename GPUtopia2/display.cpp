@@ -83,7 +83,6 @@ namespace mainView
             cf.fractalCLFragmentFile = "clFragments/fractalFormulas/gnarl.cl";
             cf.coloringCLFragmentFile = "clFragments/coloringAlgorithms/dist.cl";
             cf.makeCLCode();
-            cf.image.size = { (int)mainViewportSize.x, (int)mainViewportSize.y };
             needCLFractal = false;
             needNewKernel = true;
         }
@@ -96,8 +95,8 @@ namespace mainView
         if (cf_old.image.size != cf.image.size)
         {
             needImg = true;
-            textureColors.resize((int)(cf.image.size.x * cf.image.size.y));
-            cf.image.size = { cf.image.size.x, cf.image.size.y };
+            textureColors.resize(cf.image.size.x * cf.image.size.y);
+            //cf.image.size = { cf.image.size.x, cf.image.size.y };
             cf_old = cf;
 
         }
@@ -106,7 +105,6 @@ namespace mainView
             std::cout << "Need a new kernel, compiling it now.\n - requesting new texture\n - requesting new image\n";
             core.compileNewKernel(cf);
             needNewKernel = false;
-            // needTexture = true;
             needImg = true;
             cf.rebuildKernel = false;
         }
@@ -119,7 +117,6 @@ namespace mainView
         static int waitCounter = 0;
         if (cf != cf_old && waitCounter == 0) {
             std::cout << "Parameters changed, updating cf.params.\n - requesting new Texture\n - requesting new image\n";
-            // needTexture = true;
             needImg = true;
             needCLFractal = false;
             std::cout << "Old zoom: " << cf_old.image.zoom << " new zoom: " << cf.image.zoom << std::endl;
@@ -147,15 +144,12 @@ namespace mainView
             std::cout << "Am I running? " << running << std::endl;
             std::cout << "  My thread ID is " << jt.get_id() << std::endl;
         }
-        static cl_int2 displaySize = { 0, 0 };
         if (needImg && !running)
         {
-            // jt.join();
             waitCounter++;
-            if (waitCounter > 1) // wait 3 frames before continuing
+            if (waitCounter > 1) // wait 1 frame before continuing
             {
                 core.getImg(textureColors, cf);
-                displaySize = { cf.image.size.x, cf.image.size.y };
                 needImg = false;
                 needTexture = true;
                 waitCounter = 0;
