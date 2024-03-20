@@ -62,7 +62,7 @@ namespace mainView
 {
     void mainViewPort()
     {
-        ImGui::Begin("Main View");
+        ImGui::Begin("Main View", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
         static GLuint textureID;
         static bool needTexture = false;
         static bool needImg = false;
@@ -136,17 +136,12 @@ namespace mainView
         static std::jthread jt;
         if (runKernel and !running) {
             std::cout << "Need a new image, setting kernel args and running kernel.\n";
-            // drawBogusImg(textureColors, mainViewportSize.x, mainViewportSize.y);
-            //make_img(textureColors, mainViewportSize.x, mainViewportSize.y, fs);
-            // make_img2(cf, textureColors, mainViewportSize.x, mainViewportSize.y, fs);
             core.setDefaultArguments(cf);
             core.setFractalKernelArgs(cf);
             jt = std::jthread(&runKernelAsync, std::ref(cf), std::ref(core), std::ref(running));
             jt.detach();
             needImg = true;
             runKernel = false;
-            // std::jthread jt = std::jthread(&core.runKernel, std::ref(cf));
-            // jt = std::jthread(&asyncOpenCL::clShepherd, std::ref(cf), std::ref(core));
         }
         if (running) {
             std::cout << "Am I running? " << running << std::endl;
@@ -176,24 +171,10 @@ namespace mainView
 
         ImGui::End();
         static char mainViewStr[] = "Main View";
-        //static std::string runStr = "";
-        //runStr = (running) ? " (Running...)" : " (Idle)";
-        // sprintf_s(mainViewStr, "Main View%s###Main View", runStr.c_str());
-        // mainViewStr = (running) ? "Main View (Running...)" : "Main View";
         ImGui::Begin(mainViewStr, nullptr, ImGuiWindowFlags_HorizontalScrollbar);
         ImGui::Image((void*)(intptr_t)textureID, ImVec2(
             cf.image.size.x, cf.image.size.y)); // , texturesize);
         ImGui::End();
-        // ImVec2 vpPos = ImGui::GetCursorScreenPos();
-        // this draws the font table instead of the blue/green image
-        /*ImGui::GetWindowDrawList()->AddImage(
-            (void*)textureID,
-            ImVec2(vpPos.x, vpPos.y),
-            ImVec2(vpPos.x + mainViewportSize.x, vpPos.y + mainViewportSize.y),
-            ImVec2(0, 1),
-            ImVec2(1, 0));
-		ImGui::End();*/
-        // bind default framebuffer again
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	}

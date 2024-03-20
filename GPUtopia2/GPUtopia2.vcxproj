@@ -147,6 +147,7 @@
     <ClInclude Include="GLFW\glfw3.h" />
     <ClInclude Include="GLFW\glfw3native.h" />
     <ClInclude Include="gradient.h" />
+    <ClInclude Include="imageSettings.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="imgui_impl_glfw.h" />
@@ -170,6 +171,7 @@
     <ClCompile Include="display.cpp" />
     <ClCompile Include="formulaSettings.cpp" />
     <ClCompile Include="gradient.cpp" />
+    <ClCompile Include="imageSettings.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imgui_demo.cpp" />
     <ClCompile Include="imgui_draw.cpp" />
