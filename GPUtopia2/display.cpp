@@ -132,6 +132,7 @@ namespace mainView
         static bool running = false;
         static std::jthread jt;
         if (runKernel and !running) {
+            running = true; // set this here to prevent another img read before the called function sets this to true
             std::cout << "Need a new image, setting kernel args and running kernel.\n";
             core.setDefaultArguments(cf);
             core.setFractalKernelArgs(cf);
@@ -149,6 +150,7 @@ namespace mainView
             waitCounter++;
             if (waitCounter > 1) // wait 1 frame before continuing
             {
+                textureColors.resize(cf.image.size.x * cf.image.size.y);
                 core.getImg(textureColors, cf);
                 needImg = false;
                 needTexture = true;

@@ -126,6 +126,7 @@ void clCore::setDefaultArguments(clFractal& cf)
     std::vector<int>xx(cf.image.size.x * cf.image.size.y);
     std::vector<int>yy(cf.image.size.x * cf.image.size.y);
     const int npixels = cf.image.size.x * cf.image.size.y;
+    this->currentRenderSize = npixels;
     int pixelIndex = 0;
     for (int y = 0; y < cf.image.size.y; y++) {
         for (int x = 0; x < cf.image.size.x; x++) {
@@ -179,8 +180,8 @@ void clCore::runKernel(clFractal& cf) const
 
 void clCore::getImg(std::vector<color>& img, clFractal& cf) const
 {
-    const int npixels = cf.image.size.x * cf.image.size.y;
-    queue.enqueueReadBuffer(this->imgBuffer, CL_TRUE, 0, sizeof(cl_float4) * npixels, img.data());
+    // const int npixels = cf.image.size.x * cf.image.size.y;
+    queue.enqueueReadBuffer(this->imgBuffer, CL_TRUE, 0, sizeof(cl_float4) * this->currentRenderSize, img.data());
 }
 
 //    

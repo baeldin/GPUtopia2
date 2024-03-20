@@ -28,6 +28,7 @@ public:
     cl::Buffer xBuffer, yBuffer; 
     cl::Buffer gradientBuffer;
     cl::Buffer imgBuffer;
+    int currentRenderSize = 0;
     clCore() 
     {
         setContext();
