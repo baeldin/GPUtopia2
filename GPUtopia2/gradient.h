@@ -48,7 +48,7 @@ public:
     std::vector<color> fineColors;
     int nNodes = 4;
     int length = 400; // UF compat, can be changed later
-    int fineLength = 1024;
+    int fineLength = 4096;
     // generate a random N-node gradient when this is used
     Gradient();
     Gradient(const int N);
