@@ -12,7 +12,7 @@ void clFractalImage::updateComplexSubplane()
 
 
 template <typename T>
-cl::Buffer clCore::setBufferKernelArg(int k, T* data, size_t size, cl_mem_flags mem_flag,
+cl::Buffer clCore::setBufferKernelArg(cl::Kernel& currentKernel, int k, T* data, size_t size, cl_mem_flags mem_flag,
     const char* name, cl_int* err_out)
 {
     // Write our data set into the input array in device memory
@@ -33,7 +33,7 @@ cl::Buffer clCore::setBufferKernelArg(int k, T* data, size_t size, cl_mem_flags 
         std::cout << "Buffer write for " << name << " with type " << typeid(data).name() << " and size " << size << " enqueued successfully.\n";
     }
 
-    err = this->kernel.setArg(k, buff);
+    err = currentKernel.setArg(k, buff);
     if (err != CL_SUCCESS) {
         std::cerr << "Failed to set kernel argument. Error code: " << err << std::endl;
     }
@@ -44,10 +44,20 @@ cl::Buffer clCore::setBufferKernelArg(int k, T* data, size_t size, cl_mem_flags 
     return buff;
 }
 
-template <typename T>
-cl_int clCore::setKernelArg(int arg_idx, T& arg, const char* name)
+void clCore::setReusedBufferArgument(cl::Kernel& currentKernel, int k, cl::Buffer& buff, const char* name)
 {
-    cl_int err = kernel.setArg(arg_idx, arg);
+    cl_int err = currentKernel.setArg(k, buff);
+    if (err != CL_SUCCESS)
+        std::cerr << "Failed to set reused buffer kernel argument. Error code: " << err << std::endl;
+    else
+        std::cout << "Successfully set kernel argument " << name << " at index : " << k << " with buffer : " << &buff << std::endl;
+
+}
+
+template <typename T>
+cl_int clCore::setKernelArg(cl::Kernel& currentKernel, int arg_idx, T& arg, const char* name)
+{
+    cl_int err = currentKernel.setArg(arg_idx, arg);
     if (err == CL_SUCCESS)
         std::cout << "Successfully set kernel argument " << name << " (" << typeid(arg).name() << ") at index " << arg_idx << "\n";
     else
@@ -107,13 +117,13 @@ void clCore::compileNewKernel(clFractal& cf)
 }
 
 template <typename T>
-void clCore::setMapOfArgs(std::map<std::string, std::pair<T, int>>& map)
+void clCore::setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::pair<T, int>>& map)
 {
     cl_int err = CL_SUCCESS;
     for (auto const& [key, val] : map)
     {
         std::cout << "Setting kernel argument " << key << " at position " << val.second << " with value " << val.first << std::endl;
-        err = setKernelArg(val.second, val.first, key.c_str());
+        err = setKernelArg(currentKernel, val.second, val.first, key.c_str());
         if (err != CL_SUCCESS)
         {
             std::cout << "Failed to add kernel argument " << key << " at position " << val.second << "!\n";
@@ -135,32 +145,32 @@ void clCore::setDefaultArguments(clFractal& cf)
             yy[pixelIndex] = y;
         }
     }
-    std::vector<color> imgColors(npixels, 0);
+    cf.imgData.resize(4 * npixels, 0);
     cl_int3 sampling = { 0, fibonacci_number(cf.image.quality), fibonacci_number(cf.image.quality) };
     cl_int err;
     std::cout << "xx size is " << xx.size() << std::endl;
-    this->xBuffer = setBufferKernelArg(0, xx.data(), 
+    this->xBuffer = setBufferKernelArg(this->kernel, 0, xx.data(), 
         sizeof(int) * npixels, CL_MEM_READ_ONLY, "xx", &err);
-    this->yBuffer = setBufferKernelArg(1, yy.data(), 
+    this->yBuffer = setBufferKernelArg(this->kernel, 1, yy.data(), 
         sizeof(int) * npixels, CL_MEM_READ_ONLY, "yy", &err);
-    err = setKernelArg(2, cf.image.size, "image_size");
-    err = setKernelArg(3, cf.image.complexSubplane, "complex_subplane");
-    err = setKernelArg(4, sampling, "sampling_info");
-    err = setKernelArg(5, cf.maxIter, "iterations");
-    err = setKernelArg(6, cf.bailout, "bailout");
-    err = setKernelArg(7, cf.gradient.fineLength, "gradient_length");
-    this->gradientBuffer = setBufferKernelArg(8, cf.gradient.fineColors.data(), 
+    err = setKernelArg(this->kernel, 2, cf.image.size, "image_size");
+    err = setKernelArg(this->kernel, 3, cf.image.complexSubplane, "complex_subplane");
+    err = setKernelArg(this->kernel, 4, sampling, "sampling_info");
+    err = setKernelArg(this->kernel, 5, cf.maxIter, "iterations");
+    err = setKernelArg(this->kernel, 6, cf.bailout, "bailout");
+    err = setKernelArg(this->kernel, 7, cf.gradient.fineLength, "gradient_length");
+    this->gradientBuffer = setBufferKernelArg(this->kernel, 8, cf.gradient.fineColors.data(), 
         sizeof(float) * cf.gradient.fineLength * 4, CL_MEM_READ_ONLY, "gradient_colors", &err);
-    this->imgBuffer = setBufferKernelArg(9, imgColors.data(), 
-        sizeof(cl_float4) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
+    this->imgIntBuffer = setBufferKernelArg(this->kernel, 9, cf.imgData.data(),
+        sizeof(uint32_t) * 4 * npixels, CL_MEM_WRITE_ONLY, "img", &err);
 }
 
 void clCore::setFractalKernelArgs(clFractal& cf)
 {
-    setMapOfArgs(cf.params.fractalParameterMaps.integerParameters);
-    setMapOfArgs(cf.params.fractalParameterMaps.floatParameters);
-    setMapOfArgs(cf.params.coloringParameterMaps.integerParameters);
-    setMapOfArgs(cf.params.coloringParameterMaps.floatParameters);
+    setMapOfArgs(this->kernel, cf.params.fractalParameterMaps.integerParameters);
+    setMapOfArgs(this->kernel, cf.params.fractalParameterMaps.floatParameters);
+    setMapOfArgs(this->kernel, cf.params.coloringParameterMaps.integerParameters);
+    setMapOfArgs(this->kernel, cf.params.coloringParameterMaps.floatParameters);
 }
 
 void clCore::runKernel(clFractal& cf) const
@@ -178,11 +188,143 @@ void clCore::runKernel(clFractal& cf) const
     this->queue.finish();
 }
 
+// define a color handling kernel for ET here, for the time being
+const std::string img_processing_kernel{ R"CLC(
+float clampZeroToOne(const float x)
+{
+	return fmax(0.f, fmin(1.f, x));
+}
+
+const float a = 1.f / 12.92f;
+const float b = 1.f / 1.055f;
+
+const float invGamma = 1.f / 2.4f;
+float flinearToSRGB(const float x) {
+	return (clampZeroToOne(x) <= 0.0031308f) ? clampZeroToOne(x) * 12.92f : 1.055f * pow(clampZeroToOne(x), invGamma) - 0.055f;
+}
+
+float4 linearToSRGB(const float4 v) {
+	return (float4)(flinearToSRGB(v.x), flinearToSRGB(v.y), flinearToSRGB(v.z), flinearToSRGB(v.w));
+}
+
+__kernel void imgProcessing(
+    __global const int4* inColors,   // accumulated int colors
+    const int4 inColorsMaxValues,    // max value per component (r, g, b, alpha)
+    __global float4* outColors,       // output float4 colors
+    const int3 sampling,             // sampling info
+    const int mode)                  // mode (0 = escape time, 1 = flame), UNUSED
+{
+    unsigned int i = get_global_id(0);
+
+    if (mode == 0)
+    {
+        // do ET stuff
+        const float invSamples = 1.f / (float)(256 * sampling.z);
+        outColors[i] = linearToSRGB((float4)(
+            invSamples * (float)inColors[i].x,
+            invSamples * (float)inColors[i].y,
+            invSamples * (float)inColors[i].z,
+            invSamples * (float)inColors[i].w));
+    }
+    //else if (mode == 1)
+    //{
+    //     
+    //    // do tone mapping stuff for flames
+    //}
+}
+    )CLC" };
+
+void clCore::compileImgKernel()
+{
+    cl::Program::Sources sources;
+    std::vector<std::string> programStrings;
+    programStrings.push_back(img_processing_kernel);
+    cl_int programErr;
+    this->program = cl::Program(this->context, programStrings, &programErr);
+    std::cout << programErr << "\n";
+    cl_int buildErr = CL_SUCCESS;
+    buildErr = this->program.build({ this->device }); // "-cl-std=CL2.0");
+    if (buildErr != CL_SUCCESS) {
+        std::string buildLog;
+        this->program.getBuildInfo(this->device, CL_PROGRAM_BUILD_LOG, &buildLog);
+        std::cerr << "Image kernel build failed; error code: " << buildErr
+            << ", build log:\n" << buildLog << std::endl;
+    }
+    cl_int err;
+    std::string kernelFunctionName = "imgProcessing"; // Replace with your actual kernel function name
+    this->imgKernel = cl::Kernel(this->program, kernelFunctionName.c_str(), &err);
+    if (err != CL_SUCCESS) {
+        std::cerr << "Failed to create image kernel. Error code: " << err << std::endl;
+    }
+    else {
+        std::cout << "Image kernel created successfully.\n";
+    }
+}
+
+void clCore::setImgKernelArguments(clFractal& cf)
+{
+    cl_int3 sampling = { 0, fibonacci_number(cf.image.quality), fibonacci_number(cf.image.quality) };
+    std::cout << "Sampling info is (" << sampling.x << ", " << sampling.y << ", " << sampling.z << ")" << std::endl;
+    cl_int err;
+    cf.imgData.resize(cf.image.size.x * cf.image.size.y);
+    cl_int4 dummy = { 0, 0, 0, 0 };
+    const int dummy2 = 0;
+    setReusedBufferArgument(this->imgKernel,
+        0, this->imgIntBuffer, 
+        "intImgBuffer");
+    // only for flame mode, currenly unused in the kernel
+    err = setKernelArg(this->imgKernel, 
+        1, dummy, 
+        "histogram Rmax, Gmax, Bmax, Amax"); 
+    this->imgFloatBuffer = setBufferKernelArg(this->imgKernel, 
+        2, cf.imgData.data(), sizeof(float) * 4 * this->currentRenderSize, CL_MEM_WRITE_ONLY, 
+        "imgFloatColorValues", &err);
+    err = setKernelArg(this->imgKernel, 
+        3, sampling, 
+        "sampling info");
+    // only 0 works atm, currently unused in the kernel
+    err = setKernelArg(this->imgKernel, 
+        4, dummy2, 
+        "image processing mode (escape time/flame)"); 
+}
+
+void clCore::runImgKernel(clFractal& cf) const
+{
+    cl_int local_size = WG_SIZE;
+    cl_int global_size = ceil(
+        cf.image.size.x * cf.image.size.y / (float)local_size) * local_size;
+    cl_int err = CL_SUCCESS;
+    cl::NDRange global_range = cl::NDRange(global_size);
+    cl::NDRange local_range = cl::NDRange(local_size);
+    err = this->queue.enqueueNDRangeKernel(this->imgKernel, cl::NullRange, global_range, local_range);
+    if (err != CL_SUCCESS) {
+        std::cerr << "Failed to enqueue image kernel. Error code: " << err << std::endl;
+    }
+    this->queue.finish();
+}
+
 void clCore::getImg(std::vector<color>& img, clFractal& cf) const
 {
     // const int npixels = cf.image.size.x * cf.image.size.y;
-    queue.enqueueReadBuffer(this->imgBuffer, CL_TRUE, 0, sizeof(cl_float4) * this->currentRenderSize, img.data());
+    queue.enqueueReadBuffer(this->imgFloatBuffer, CL_TRUE, 0, sizeof(cl_float4) * this->currentRenderSize, img.data());
 }
+
+void runKernelAsync(clFractal& cf, clCore& cc, bool& running)
+{
+    //int ii = 0;
+    //while (ii < fibonacci_number(cf.image.quality) && plsProceed)
+    //{
+    //    cl_int3 sampling = { ii, ii + 1, fibonacci_number(cf.image.quality) };
+    //    cl_int err = cc.setKernelArg(4, sampling, "sampling_info");
+    running = true;
+    cc.runKernel(cf);
+    cc.setImgKernelArguments(cf);
+    cc.runImgKernel(cf);
+    running = false;
+    //    ii++;
+    //}
+}
+
 
 //    
 //void make_img2(clFractal& cf, std::vector<color>& img, const int width, const int height, const formulaSettings& fs)

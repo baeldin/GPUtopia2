@@ -19,4 +19,5 @@ __final:
 //
 		float c = 0.5f + 0.5f * sin(0.21f * d + length(z));
 		// float c = 0.5f + 0.5f * sin(length(z));
-		colors[i].xyzw += (float4)(c, c, c, 1.f);
+		colors[i] += getColor(gradient, c, nColors);
+		

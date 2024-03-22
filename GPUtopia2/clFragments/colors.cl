@@ -39,11 +39,27 @@ float4 f4lerp(const float x, const float x0, const float x1,
 		lerp(x, x0, x1, y0.z, y1.z), lerp(x, x0, x1, y0.w, y1.w));
 }
 
+// turn a float4 color into an 8 bit int4 color which is suitable for
+// use with atomic_add
+int4 toIntColor(const float4 color)
+{
+	return (int4)(
+		(int)(256 * color.x),
+		(int)(256 * color.y),
+		(int)(256 * color.z),
+		(int)(256 * color.w));
+}
+
 // get a color from a gradient via linear interpolation
-float4 getColor(const float4* colors, const float idxIn, const int nColors)
+// TODO: figure out why the function fails at the rollover point
+int4 getColor(const float4* colors, const float idxIn, const int nColors)
 {
 	const float fidx = idxIn - floor(idxIn);
 	const int colorIndex1 = floor(fidx * nColors);
 	const int colorIndex2 = (colorIndex1 == nColors - 1) ? 0 : colorIndex1 + 1;
-	return sRGBtoLinear(f4lerp(fidx, ceil(fidx), floor(fidx), colors[colorIndex1], colors[colorIndex2]));
+	float4 outColor = sRGBtoLinear(
+		f4lerp(
+			fidx, ceil(fidx), floor(fidx), 
+			colors[colorIndex1], colors[colorIndex2]));
+	return toIntColor(outColor);
 }

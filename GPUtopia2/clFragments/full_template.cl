@@ -30,7 +30,7 @@ __kernel void computeLoop(
     const float bailout,               // 6: bailout value
     const int nColors,                 // 7: colors in gradient
     __global const float4* gradient,   // 8: gradient
-    __global float4* colors,           // 9: output colors
+    __global int4* colors,              // 9: output colors
 //@__kernelArguments)
 {
     // Get Parallel Index
@@ -57,8 +57,8 @@ __kernel void computeLoop(
         }
 //@__coloringFinal
     }
-    colors[i].xyzw /= (float4)(sample_count, sample_count, sample_count, 1.f);
-    colors[i] = linearToSRGB(colors[i]);
+    // colors[i].xyzw /= (float4)(sample_count, sample_count, sample_count, 1.f);
+    // colors[i] = linearToSRGB(colors[i]);
     //colors[i].xyzw = (float4)((float)sampling.x, (float)sampling.y, (float)sampling.z, 1.);
 }
 

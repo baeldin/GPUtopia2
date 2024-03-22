@@ -120,6 +120,7 @@ public:
 	std::string fractalCLFragmentFile;
 	std::string coloringCLFragmentFile;
 	std::string fullCLcode = "";
+	std::vector<color> imgData;
 	bool rebuildKernel = false;
 	int maxIter = 100;
 	float bailout = 4.f;

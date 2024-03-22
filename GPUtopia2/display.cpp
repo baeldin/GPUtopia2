@@ -1,19 +1,5 @@
 #include "display.h"
 
-void runKernelAsync(clFractal& cf, clCore& cc, bool& running)
-{
-    //int ii = 0;
-    //while (ii < fibonacci_number(cf.image.quality) && plsProceed)
-    //{
-    //    cl_int3 sampling = { ii, ii + 1, fibonacci_number(cf.image.quality) };
-    //    cl_int err = cc.setKernelArg(4, sampling, "sampling_info");
-    running = true;
-    cc.runKernel(cf);
-    running = false;
-    //    ii++;
-    //}
-}
-
 void prepTexture(GLuint& texture)
 {
     glGenTextures(1, &texture);

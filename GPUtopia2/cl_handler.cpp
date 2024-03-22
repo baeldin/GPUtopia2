@@ -209,7 +209,7 @@ void clFractal::makeCLCode()
 	std::cout << fullTemplateStr << std::endl;
 	std::cout << fractalFormulaStr << std::endl;
 	std::cout << coloringAlgorithmStr << std::endl;
-
+	
 	// get init, loop, bailout, and final fragments
 	// UF-style separation
 	std::string fractalInit = getFragmentPart(fractalFormulaStr, ini, loo);
