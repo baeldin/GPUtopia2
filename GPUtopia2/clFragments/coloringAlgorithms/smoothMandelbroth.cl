@@ -17,4 +17,4 @@ __final:
 		float c = 0.01f * ((float)iter + il * lp - il * log(0.5f * log(dot(z, z))));
 
 		// c = sqrt(c);
-		colors[i].xyzw += sRGBtoLinear(getColor(gradient, @colorDensity * c, nColors));
+		colors[i].xyzw += getColor(gradient, @colorDensity * c, nColors);

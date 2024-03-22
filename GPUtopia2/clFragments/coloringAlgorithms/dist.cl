@@ -1,10 +1,7 @@
 __parameters:
-float parameter bailout = 128.f;
-float parameter power = 2.f;
+float parameter colorDensity = 1.f;
 __init:
 //=====| coloring init
-		float il = 1.f / log(@power);  // Inverse log(power).
-		float lp = log(log(@bailout)); // log(log bailout).
 		float2 z_old = z;
 		float d = 0.f;
 __loop:
@@ -17,7 +14,5 @@ __final:
 // 		// this part has to set colors[i], the components have
 // 		// to be in [0., 1.)
 //
-		float c = 0.5f + 0.5f * sin(0.21f * d + length(z));
-		// float c = 0.5f + 0.5f * sin(length(z));
-		colors[i] += getColor(gradient, c, nColors);
+		colors[i] += getColor(gradient, @colorDensity * d, nColors);
 		

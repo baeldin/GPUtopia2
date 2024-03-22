@@ -10,4 +10,4 @@ __final:
 // 		// this part has to set colors[i], the components have
 // 		// to be in [0., 1.]
 //
-		colors[i].xyzw += getColor(gradient, z0.x, nColors);
+		colors[i].xyzw += getColor(gradient, z0.x * @colorDensity, nColors);
