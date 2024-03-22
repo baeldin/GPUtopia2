@@ -54,9 +54,9 @@ int4 toIntColor(const float4 color)
 // TODO: figure out why the function fails at the rollover point
 int4 getColor(const float4* colors, const float idxIn, const int nColors)
 {
-	const float fidx = idxIn - floor(idxIn);
-	const int colorIndex1 = floor(fidx * nColors);
-	const int colorIndex2 = (colorIndex1 == nColors - 1) ? 0 : colorIndex1 + 1;
+	const float fidx = idxIn  -floor(idxIn);
+	const int colorIndex1 = (int)floor(fidx * nColors) % nColors;
+	const int colorIndex2 = (colorIndex1 + 1) % nColors;
 	float4 outColor = sRGBtoLinear(
 		f4lerp(
 			fidx, ceil(fidx), floor(fidx), 
