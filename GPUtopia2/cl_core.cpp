@@ -195,6 +195,7 @@ float clampZeroToOne(const float x)
 	return fmax(0.f, fmin(1.f, x));
 }
 
+
 const float a = 1.f / 12.92f;
 const float b = 1.f / 1.055f;
 
@@ -207,30 +208,95 @@ float4 linearToSRGB(const float4 v) {
 	return (float4)(flinearToSRGB(v.x), flinearToSRGB(v.y), flinearToSRGB(v.z), flinearToSRGB(v.w));
 }
 
+//log density scaling
+float4 logscale(float4 acc, float brightness, float max_density)
+{
+	float ls = log10(1.0 + brightness * acc.w / max_density) / acc.w;
+	float4 lh = acc * ls;
+	return lh;
+}
+
 __kernel void imgProcessing(
     __global const int4* inColors,   // accumulated int colors
     const int4 inColorsMaxValues,    // max value per component (r, g, b, alpha)
-    __global float4* outColors,       // output float4 colors
+    __global float4* outColors,      // output float4 colors
     const int3 sampling,             // sampling info
-    const int mode)                  // mode (0 = escape time, 1 = flame), UNUSED
+    const int mode,                  // mode (0 = escape time, 1 = flame), UNUSED
+    const float brightness,          // flame brightness
+    const float gamma,               // flame gamma
+    const float vibrancy)            // flame vibrancy
 {
     unsigned int i = get_global_id(0);
-
+    
+    // define some default values for now
+    const float inv_gamma = 1.f / gamma;
+    
     if (mode == 0)
     {
         // do ET stuff
-        const float invSamples = 1.f / (float)(256 * sampling.z);
+        const float invFactor = 1.f / (float)(256 * sampling.z);
         outColors[i] = linearToSRGB((float4)(
-            invSamples * (float)inColors[i].x,
-            invSamples * (float)inColors[i].y,
-            invSamples * (float)inColors[i].z,
-            invSamples * (float)inColors[i].w));
+            invFactor * (float)inColors[i].x,
+            invFactor * (float)inColors[i].y,
+            invFactor * (float)inColors[i].z,
+            invFactor * (float)inColors[i].w));
     }
-    //else if (mode == 1)
-    //{
-    //     
-    //    // do tone mapping stuff for flames
-    //}
+    else if (mode == 1)
+    {
+        
+        float4 fColor = (float4)(inColors[i].x / 256, inColors[i].y / 256, inColors[i].z / 256, inColors[i].w / 256);
+        fColor = logscale(fColor, brightness, (float)inColorsMaxValues.x);
+
+        // SKIP GAMMA THRESHOLD STUFF FOR NOW
+        // do tone mapping stuff for flames
+	    //float funcval = 0.0;
+	    //if (gamma_threshold != 0.0)
+	    //{
+		   // funcval = pow(gamma_threshold, inv_gamma - 1.f);
+	    //}
+	    // float alpha;
+	    //if (fp.w < gamma_threshold)
+	    //{
+		   // float frac = fp.w / gamma_threshold;
+		   // alpha = (1.f - frac) * fp.w * funcval + frac * pow(fp.w, inv_gamma);
+	    //}
+	    //else
+		float alpha = pow(fColor.w, inv_gamma);
+
+	    float vls = vibrancy * alpha / fColor.w;
+	    alpha = clamp(alpha, 0.f, 1.f);
+
+	    float3 o = vls * fColor.rgb + (1.f - vibrancy) * pow(fColor.xyz, (float3)(inv_gamma));
+	    o = clamp(o, 0.f, 1.f);
+
+	    o += (1.f - alpha) * (float3)(0.f);
+	    o = clamp(o, 0.f, 1.f);
+
+	    outColors[i] = linearToSRGB(fColor); //(float4)(1., 0.5, 0., 1.); //(o.x, o.y, o.z, alpha);        
+    }    
+    else if (mode == 2) //Reinhard
+    {
+        outColors[i] = linearToSRGB((float4)(
+            (brightness * (float)inColors[i].x) / (1.f + brightness * (float)inColors[i].x), 
+            (brightness * (float)inColors[i].y) / (1.f + brightness * (float)inColors[i].y), 
+            (brightness * (float)inColors[i].z) / (1.f + brightness * (float)inColors[i].z), 
+            (brightness * (float)inColors[i].a) / (1.f + brightness * (float)inColors[i].a)));
+
+    }
+    else if (mode == 3) // something something log
+    {
+    float4 tmpColor = (float4)(
+        (float)inColors[i].x, 
+        (float)inColors[i].y, 
+        (float)inColors[i].z, 
+        (float)inColors[i].w);
+    float ls = log10(1.f + brightness * tmpColor.w) /  log10((float)inColorsMaxValues.w);
+    tmpColor = ls * tmpColor * brightness;
+    
+    tmpColor = pow(tmpColor, inv_gamma);
+    outColors[i] = tmpColor;
+    }
+
 }
     )CLC" };
 
@@ -267,14 +333,15 @@ void clCore::setImgKernelArguments(clFractal& cf)
     std::cout << "Sampling info is (" << sampling.x << ", " << sampling.y << ", " << sampling.z << ")" << std::endl;
     cl_int err;
     cf.imgData.resize(cf.image.size.x * cf.image.size.y);
-    cl_int4 dummy = { 0, 0, 0, 0 };
-    const int dummy2 = 0;
+    const uint32_t maxVal = sampling.z * cf.maxIter;
+    cl_uint4 maxValues = { maxVal * 256, maxVal * 256, maxVal * 256, maxVal * 256 };
+    const int mode = 1;
     setReusedBufferArgument(this->imgKernel,
         0, this->imgIntBuffer, 
         "intImgBuffer");
     // only for flame mode, currenly unused in the kernel
     err = setKernelArg(this->imgKernel, 
-        1, dummy, 
+        1, maxValues, 
         "histogram Rmax, Gmax, Bmax, Amax"); 
     this->imgFloatBuffer = setBufferKernelArg(this->imgKernel, 
         2, cf.imgData.data(), sizeof(float) * 4 * this->currentRenderSize, CL_MEM_WRITE_ONLY, 
@@ -283,9 +350,18 @@ void clCore::setImgKernelArguments(clFractal& cf)
         3, sampling, 
         "sampling info");
     // only 0 works atm, currently unused in the kernel
-    err = setKernelArg(this->imgKernel, 
-        4, dummy2, 
-        "image processing mode (escape time/flame)"); 
+    err = setKernelArg(this->imgKernel,
+        4, cf.mode,
+        "image processing mode (escape time/flame)");
+    err = setKernelArg(this->imgKernel,
+        5, cf.flameRenderSettings.x,
+        "flame render brightness");
+    err = setKernelArg(this->imgKernel,
+        6, cf.flameRenderSettings.y,
+        "flame render gamma");
+    err = setKernelArg(this->imgKernel,
+        7, cf.flameRenderSettings.z,
+        "flame render vibrancy");
 }
 
 void clCore::runImgKernel(clFractal& cf) const
@@ -301,6 +377,20 @@ void clCore::runImgKernel(clFractal& cf) const
         std::cerr << "Failed to enqueue image kernel. Error code: " << err << std::endl;
     }
     this->queue.finish();
+    if (cf.vomit)
+    {
+        std::vector<uint32_t> imgInt(4 * this->currentRenderSize, 0);
+        queue.enqueueReadBuffer(this->imgIntBuffer, CL_TRUE, 0, sizeof(cl_int4) * this->currentRenderSize, imgInt.data());
+        for (int ii = 0; ii < currentRenderSize * 4; ii++)
+            std::cout << imgInt[ii] << " ";
+        std::cout << std::endl;    
+        std::cout << " ============================================== " << std::endl;
+        std::vector<float> imgFloat(4 * this->currentRenderSize, 0);
+        queue.enqueueReadBuffer(this->imgFloatBuffer, CL_TRUE, 0, sizeof(cl_float4) * this->currentRenderSize, imgFloat.data());
+        for (int ii = 0; ii < currentRenderSize * 4; ii++)
+            std::cout << imgFloat[ii] << " ";
+        std::cout << std::endl;
+    }
 }
 
 void clCore::getImg(std::vector<color>& img, clFractal& cf) const
@@ -325,6 +415,13 @@ void runKernelAsync(clFractal& cf, clCore& cc, bool& running)
     //}
 }
 
+void runImgKernelAsync(clFractal& cf, clCore& cc, bool& running)
+{
+    running = true;
+    cc.setImgKernelArguments(cf);
+    cc.runImgKernel(cf);
+    running = false;
+}
 
 //    
 //void make_img2(clFractal& cf, std::vector<color>& img, const int width, const int height, const formulaSettings& fs)
