@@ -16,7 +16,8 @@ color lerp(const float x, const float x0, const float x1,
 	return color(
 		lerp(x, x0, x1, c0.r, c1.r),
 		lerp(x, x0, x1, c0.g, c1.g),
-		lerp(x, x0, x1, c0.b, c1.b));
+		lerp(x, x0, x1, c0.b, c1.b),
+		lerp(x, x0, x1, c0.a, c1.a));
 }
 
 Gradient::Gradient()

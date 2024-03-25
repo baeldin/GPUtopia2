@@ -142,6 +142,7 @@
     <ClInclude Include="cl_handler.h" />
     <ClInclude Include="color.h" />
     <ClInclude Include="display.h" />
+    <ClInclude Include="flameRenderSettings.h" />
     <ClInclude Include="formulaSettings.h" />
     <ClInclude Include="glewGuard.h" />
     <ClInclude Include="GLFW\glfw3.h" />
@@ -169,6 +170,7 @@
     <ClCompile Include="cl_core.h" />
     <ClCompile Include="color.cpp" />
     <ClCompile Include="display.cpp" />
+    <ClCompile Include="flameRenderSettings.cpp" />
     <ClCompile Include="formulaSettings.cpp" />
     <ClCompile Include="gradient.cpp" />
     <ClCompile Include="imageSettings.cpp" />
@@ -186,10 +188,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="clFragments\anti_aliasing.cl" />
+    <None Include="clFragments\coloringAlgorithms\buddha.cl" />
+    <None Include="clFragments\coloringAlgorithms\by_iteration.cl" />
+    <None Include="clFragments\coloringAlgorithms\debug_gradient.cl" />
+    <None Include="clFragments\coloringAlgorithms\dist.cl" />
     <None Include="clFragments\colors.cl" />
+    <None Include="clFragments\fractalFormulas\buddhabrot.cl" />
+    <None Include="clFragments\fractalFormulas\gnarl.cl" />
+    <None Include="clFragments\fractalFormulas\gnarl_with_MB.cl" />
     <None Include="clFragments\fractalFormulas\mandelbrot.cl" />
     <None Include="clFragments\full_template.cl" />
-    <None Include="clFragments\gradient.cl" />
     <None Include="dist.cl" />
     <None Include="fragment_shader.glsl" />
     <None Include="gradient.cl" />
