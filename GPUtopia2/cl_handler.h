@@ -121,9 +121,13 @@ public:
 	std::string coloringCLFragmentFile;
 	std::string fullCLcode = "";
 	std::vector<color> imgData;
+	bool vomit = false;
+	int mode = 0;
 	bool rebuildKernel = false;
 	int maxIter = 100;
 	float bailout = 4.f;
+	// brightness, gamma, vibrancy, UNUSED
+	cl_float4 flameRenderSettings = { 4.f, 2.f, 1.f, 0.f };
 	clFractal() : gradient(Gradient::Gradient(4)){}
 	void makeCLCode();
 	void setFractalCLFragmentFile(const char* fil) { 
@@ -145,7 +149,10 @@ inline const bool operator==(const clFractal& lhs, const clFractal& rhs)
 		lhs.fullCLcode == rhs.fullCLcode &&
 		lhs.maxIter == rhs.maxIter &&
 		lhs.bailout == rhs.bailout &&
-		lhs.gradient == rhs.gradient);
+		lhs.gradient == rhs.gradient &&
+		lhs.mode == rhs.mode &&
+		lhs.flameRenderSettings == rhs.flameRenderSettings &&
+		lhs.vomit == rhs.vomit);
 }
 inline const bool operator!=(const clFractal& lhs, const clFractal& rhs)
 {
