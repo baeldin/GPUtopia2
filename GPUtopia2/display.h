@@ -15,6 +15,7 @@
 #include "cl_core.h"
 #include "formulaSettings.h"
 #include "imageSettings.h"
+#include "flameRenderSettings.h"
 #include "cl_handler.h"
 
 using std::string;
