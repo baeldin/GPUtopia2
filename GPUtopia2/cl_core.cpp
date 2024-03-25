@@ -218,7 +218,7 @@ float4 logscale(float4 acc, float brightness, float max_density)
 
 __kernel void imgProcessing(
     __global const int4* inColors,   // accumulated int colors
-    const int4 inColorsMaxValues,    // max value per component (r, g, b, alpha)
+    const int inColorsMaxValues,     // max value per component (r, g, b, alpha)
     __global float4* outColors,      // output float4 colors
     const int3 sampling,             // sampling info
     const int mode,                  // mode (0 = escape time, 1 = flame), UNUSED
@@ -243,9 +243,9 @@ __kernel void imgProcessing(
     }
     else if (mode == 1)
     {
-        
+        // IFSRenderer attempt - work in progress   
         float4 fColor = (float4)(inColors[i].x / 256, inColors[i].y / 256, inColors[i].z / 256, inColors[i].w / 256);
-        fColor = logscale(fColor, brightness, (float)inColorsMaxValues.x);
+        fColor = logscale(fColor, brightness, (float)inColorsMaxValues);
 
         // SKIP GAMMA THRESHOLD STUFF FOR NOW
         // do tone mapping stuff for flames
@@ -290,7 +290,7 @@ __kernel void imgProcessing(
         (float)inColors[i].y, 
         (float)inColors[i].z, 
         (float)inColors[i].w);
-    float ls = log10(1.f + brightness * tmpColor.w) /  log10((float)inColorsMaxValues.w);
+    float ls = log10(1.f + brightness * tmpColor.w) /  log10((float)inColorsMaxValues);
     tmpColor = ls * tmpColor * brightness;
     
     tmpColor = pow(tmpColor, inv_gamma);
@@ -334,15 +334,13 @@ void clCore::setImgKernelArguments(clFractal& cf)
     cl_int err;
     cf.imgData.resize(cf.image.size.x * cf.image.size.y);
     const uint32_t maxVal = sampling.z * cf.maxIter;
-    cl_uint4 maxValues = { maxVal * 256, maxVal * 256, maxVal * 256, maxVal * 256 };
-    const int mode = 1;
     setReusedBufferArgument(this->imgKernel,
         0, this->imgIntBuffer, 
         "intImgBuffer");
     // only for flame mode, currenly unused in the kernel
     err = setKernelArg(this->imgKernel, 
-        1, maxValues, 
-        "histogram Rmax, Gmax, Bmax, Amax"); 
+        1, maxVal,
+        "histogram theoretical max"); 
     this->imgFloatBuffer = setBufferKernelArg(this->imgKernel, 
         2, cf.imgData.data(), sizeof(float) * 4 * this->currentRenderSize, CL_MEM_WRITE_ONLY, 
         "imgFloatColorValues", &err);
