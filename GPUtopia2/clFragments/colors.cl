@@ -18,11 +18,11 @@ float flinearToSRGB(const float x) {
 }
 
 float4 sRGBtoLinear(const float4 v) {
-	return (float4)(fsRGBtoLinear(v.x), fsRGBtoLinear(v.y), fsRGBtoLinear(v.z), fsRGBtoLinear(v.w));
+	return (float4)(fsRGBtoLinear(v.x), fsRGBtoLinear(v.y), fsRGBtoLinear(v.z), v.w);
 }
 
 float4 linearToSRGB(const float4 v) {
-	return (float4)(flinearToSRGB(v.x), flinearToSRGB(v.y), flinearToSRGB(v.z), flinearToSRGB(v.w));
+	return (float4)(flinearToSRGB(v.x), flinearToSRGB(v.y), flinearToSRGB(v.z), v.w);
 }
 
 float lerp(const float x, const float x0, const float x1,
@@ -54,7 +54,7 @@ int4 toIntColor(const float4 color)
 // TODO: figure out why the function fails at the rollover point
 int4 getColor(const float4* colors, const float idxIn, const int nColors)
 {
-	const float fidx = idxIn  -floor(idxIn);
+	const float fidx = idxIn - floor(idxIn);
 	const int colorIndex1 = (int)floor(fidx * nColors) % nColors;
 	const int colorIndex2 = (colorIndex1 + 1) % nColors;
 	float4 outColor = sRGBtoLinear(
