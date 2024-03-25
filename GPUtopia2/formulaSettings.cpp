@@ -47,10 +47,11 @@ void formulaSettingsWindow(clFractal& cf)
 		// grad.printNodes();
 		// grad.printFine();
 		glDeleteTextures(1, &gradientTextureID);
-		gradientImg = cf.gradient.getGradientImg(200, 20);
-		makeTexture(gradientTextureID, 200, 20, gradientImg);
+		gradientImg = cf.gradient.getGradientImg(400, 20);
+		makeTexture(gradientTextureID, 400, 20, gradientImg);
 		needGradientTexture = false;
 	}
-	ImGui::Image((void*)(intptr_t)gradientTextureID, ImVec2(200, 20));
+	ImGui::Image((void*)(intptr_t)gradientTextureID, ImVec2(400, 20));
+	ImGui::Checkbox("Vomit pixel contents", &cf.vomit);
 	ImGui::End();
 }
