@@ -24,5 +24,6 @@ void imageSettingsWindow(clFractal& cf)
 	ImGui::SliderInt("Render Quality", &cf.image.quality, 1, 16);
 	ImGui::InputInt("Width", &cf.image.size.x);
 	ImGui::InputInt("Height", &cf.image.size.y);
+	ImGui::InputInt("Coloring mode", &cf.mode);
 	ImGui::End();
 }
