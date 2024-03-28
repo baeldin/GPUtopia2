@@ -1,7 +1,5 @@
 #include "cl_handler.h"
 
-
-
 std::string readCLFragmentFromFile(const std::string& clFileName)
 {
 	std::ifstream clFragmentFile;
