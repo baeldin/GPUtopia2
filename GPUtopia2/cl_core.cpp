@@ -244,7 +244,7 @@ __kernel void imgProcessing(
     else if (mode == 1)
     {
         // IFSRenderer attempt - work in progress   
-        float4 fColor = (float4)(inColors[i].x / 256, inColors[i].y / 256, inColors[i].z / 256, inColors[i].w / 256);
+        float4 fColor = (float4)((float)inColors[i].x / 256.f, (float)inColors[i].y / 256.f, (float)inColors[i].z / 256.f, (float)inColors[i].w / 256.f);
         fColor = logscale(fColor, brightness, (float)inColorsMaxValues);
 
         // SKIP GAMMA THRESHOLD STUFF FOR NOW
