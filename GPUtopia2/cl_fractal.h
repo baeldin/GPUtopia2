@@ -110,6 +110,10 @@ public:
 	std::string fractalCLFragmentFile;
 	std::string coloringCLFragmentFile;
 	std::string fullCLcode = "";
+	std::vector<int> imgIntRData;
+	std::vector<int> imgIntGData;
+	std::vector<int> imgIntBData;
+	std::vector<int> imgIntAData;
 	std::vector<color> imgData;
 	bool vomit = false;
 	int mode = 0;

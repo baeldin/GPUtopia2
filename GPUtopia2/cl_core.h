@@ -30,6 +30,10 @@ public:
     cl::Buffer xBuffer, yBuffer; 
     cl::Buffer gradientBuffer;
     cl::Buffer imgIntBuffer;
+    cl::Buffer imgIntRBuffer;
+    cl::Buffer imgIntGBuffer;
+    cl::Buffer imgIntBBuffer;
+    cl::Buffer imgIntABuffer;
     cl::Buffer imgFloatBuffer;
     int currentRenderSize = 0;
     clCore() 

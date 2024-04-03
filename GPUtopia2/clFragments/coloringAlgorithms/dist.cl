@@ -14,5 +14,9 @@ __final:
 // 		// this part has to set colors[i], the components have
 // 		// to be in [0., 1.)
 //
-		colors[i] += getColor(gradient, @colorDensity * d, nColors);
+		int4 outColor = getColor(gradient, @colorDensity * d, nColors);
+		colorsR[i] += outColor.x;
+		colorsG[i] += outColor.y;
+		colorsB[i] += outColor.z;
+		colorsA[i] += outColor.w;
 		

@@ -146,6 +146,10 @@ void clCore::setDefaultArguments(clFractal& cf)
         }
     }
     cf.imgData.resize(4 * npixels, 0);
+    cf.imgIntRData.resize(npixels, 0);
+    cf.imgIntGData.resize(npixels, 0);
+    cf.imgIntBData.resize(npixels, 0);
+    cf.imgIntAData.resize(npixels, 0);
     cl_int3 sampling = { 0, fibonacci_number(cf.image.quality), fibonacci_number(cf.image.quality) };
     cl_int err;
     std::cout << "xx size is " << xx.size() << std::endl;
@@ -161,8 +165,14 @@ void clCore::setDefaultArguments(clFractal& cf)
     err = setKernelArg(this->kernel, 7, cf.gradient.fineLength, "gradient_length");
     this->gradientBuffer = setBufferKernelArg(this->kernel, 8, cf.gradient.fineColors.data(), 
         sizeof(float) * cf.gradient.fineLength * 4, CL_MEM_READ_ONLY, "gradient_colors", &err);
-    this->imgIntBuffer = setBufferKernelArg(this->kernel, 9, cf.imgData.data(),
-        sizeof(uint32_t) * 4 * npixels, CL_MEM_WRITE_ONLY, "img", &err);
+    this->imgIntRBuffer = setBufferKernelArg(this->kernel, 9, cf.imgIntRData.data(),
+        sizeof(uint32_t) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
+    this->imgIntGBuffer = setBufferKernelArg(this->kernel, 10, cf.imgIntGData.data(),
+        sizeof(uint32_t) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
+    this->imgIntBBuffer = setBufferKernelArg(this->kernel, 11, cf.imgIntBData.data(),
+        sizeof(uint32_t) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
+    this->imgIntABuffer = setBufferKernelArg(this->kernel, 12, cf.imgIntAData.data(),
+        sizeof(uint32_t) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
 }
 
 void clCore::setFractalKernelArgs(clFractal& cf)
@@ -217,7 +227,10 @@ float4 logscale(float4 acc, float brightness, float max_density)
 }
 
 __kernel void imgProcessing(
-    __global const int4* inColors,   // accumulated int colors
+    __global const int* inColorsR,   // accumulated int R
+    __global const int* inColorsG,   // accumulated int G
+    __global const int* inColorsB,   // accumulated int B
+    __global const int* inColorsA,   // accumulated int A
     const int inColorsMaxValues,     // max value per component (r, g, b, alpha)
     __global float4* outColors,      // output float4 colors
     const int3 sampling,             // sampling info
@@ -236,12 +249,12 @@ __kernel void imgProcessing(
         // do ET stuff
         const float invFactor = 1.f / (float)(256 * sampling.z);
         outColors[i] = linearToSRGB((float4)(
-            invFactor * (float)inColors[i].x,
-            invFactor * (float)inColors[i].y,
-            invFactor * (float)inColors[i].z,
-            invFactor * (float)inColors[i].w));
+            invFactor * (float)inColorsR[i],
+            invFactor * (float)inColorsG[i],
+            invFactor * (float)inColorsB[i],
+            invFactor * (float)inColorsA[i]));
     }
-    else if (mode == 1)
+    /*else if (mode == 1)
     {
         // IFSRenderer attempt - work in progress   
         float4 fColor = (float4)((float)inColors[i].x / 256.f, (float)inColors[i].y / 256.f, (float)inColors[i].z / 256.f, (float)inColors[i].w / 256.f);
@@ -295,7 +308,7 @@ __kernel void imgProcessing(
     
     tmpColor = pow(tmpColor, inv_gamma);
     outColors[i] = tmpColor;
-    }
+    }*/
 
 }
     )CLC" };
@@ -335,30 +348,39 @@ void clCore::setImgKernelArguments(clFractal& cf)
     cf.imgData.resize(cf.image.size.x * cf.image.size.y);
     const uint32_t maxVal = sampling.z * cf.maxIter;
     setReusedBufferArgument(this->imgKernel,
-        0, this->imgIntBuffer, 
+        0, this->imgIntRBuffer,
+        "intImgBuffer");
+    setReusedBufferArgument(this->imgKernel,
+        1, this->imgIntGBuffer,
+        "intImgBuffer");
+    setReusedBufferArgument(this->imgKernel,
+        2, this->imgIntBBuffer,
+        "intImgBuffer");
+    setReusedBufferArgument(this->imgKernel,
+        3, this->imgIntABuffer,
         "intImgBuffer");
     // only for flame mode, currenly unused in the kernel
     err = setKernelArg(this->imgKernel, 
-        1, maxVal,
+        4, maxVal,
         "histogram theoretical max"); 
     this->imgFloatBuffer = setBufferKernelArg(this->imgKernel, 
-        2, cf.imgData.data(), sizeof(float) * 4 * this->currentRenderSize, CL_MEM_WRITE_ONLY, 
+        5, cf.imgData.data(), sizeof(float) * 4 * this->currentRenderSize, CL_MEM_WRITE_ONLY, 
         "imgFloatColorValues", &err);
     err = setKernelArg(this->imgKernel, 
-        3, sampling, 
+        6, sampling, 
         "sampling info");
     // only 0 works atm, currently unused in the kernel
     err = setKernelArg(this->imgKernel,
-        4, cf.mode,
+        7, cf.mode,
         "image processing mode (escape time/flame)");
     err = setKernelArg(this->imgKernel,
-        5, cf.flameRenderSettings.x,
+        8, cf.flameRenderSettings.x,
         "flame render brightness");
     err = setKernelArg(this->imgKernel,
-        6, cf.flameRenderSettings.y,
+        9, cf.flameRenderSettings.y,
         "flame render gamma");
     err = setKernelArg(this->imgKernel,
-        7, cf.flameRenderSettings.z,
+        10, cf.flameRenderSettings.z,
         "flame render vibrancy");
 }
 
