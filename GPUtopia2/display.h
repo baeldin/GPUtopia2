@@ -17,6 +17,7 @@
 #include "imageSettings.h"
 #include "flameRenderSettings.h"
 #include "cl_handler.h"
+#include "explorer.h"
 
 using std::string;
 

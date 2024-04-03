@@ -100,6 +100,7 @@ namespace mainView
 		formulaSettingsWindow(cf);
 		imageSettingsWindow(cf);
 		flameRenderSettingsWindow(cf);
+		// explore1Dparam(cf.bailout, "Bailout");
 		static bool runKernel = true;
 		static bool runImgKernel = false;
 		static int waitCounter = 0;
