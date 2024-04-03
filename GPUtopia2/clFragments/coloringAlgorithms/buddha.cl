@@ -10,13 +10,13 @@ __loop:
 			{
 				int4 color = getColor(gradient, @colorDensity * iter, nColors);
 				int pixelIndex = xy.y * image_size.x + xy.x;
-				int4 col = getColor(gradient, 5.f * (float)iter / (float)maxIterations, nColors); // color;
-				colors[pixelIndex] += (int4)(col.x, col.y, col.z, 256); // color;
+				int4 col = getColor(gradient, @colorDensity * (float)iter / (float)maxIterations, nColors); // color;
+				// colors[pixelIndex] += (int4)(col.x, col.y, col.z, 256); // color;
 				// atomic_fetch_add_explicit(&hitCounts[hitY * width + hitX], 1, memory_order_relaxed);
-				//atomic_fetch_add_explicit(&colors[pixelIndex].x, 256, memory_order_relaxed);
-				//atomic_fetch_add_explicit(&colors[pixelIndex].y, 128, memory_order_relaxed);
-				//atomic_fetch_add_explicit(&colors[pixelIndex].z, 0, memory_order_relaxed);
-				//atomic_fetch_add_explicit(&colors[pixelIndex].w, 1, memory_order_relaxed);
+				atomic_fetch_add(&colorsR[pixelIndex], col.x); // , memory_order_relaxed, memory_scope_device);
+				atomic_fetch_add(&colorsG[pixelIndex], col.y); //, memory_order_relaxed);
+				atomic_fetch_add(&colorsB[pixelIndex], col.z); // , memory_order_relaxed);
+				atomic_fetch_add(&colorsA[pixelIndex], col.w); // , memory_order_relaxed);
 			}
 			//int xx = 500 * z.x;
 			//int yy = 500 * z.y;

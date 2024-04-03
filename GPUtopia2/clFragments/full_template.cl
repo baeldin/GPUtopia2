@@ -30,10 +30,10 @@ __kernel void computeLoop(
     const float bailout,               // 6:  bailout value
     const int nColors,                 // 7:  colors in gradient
     __global const float4* gradient,   // 8:  gradient
-    __global int* colorsR,              // 9:  output R
-    __global int* colorsG,              // 10: output G
-    __global int* colorsB,              // 11: output B
-    __global int* colorsA,              // 12: output A
+    __global atomic_uint* colorsR,     // 9:  output R
+    __global atomic_uint* colorsG,     // 10: output G
+    __global atomic_uint* colorsB,     // 11: output B
+    __global atomic_uint* colorsA,     // 12: output A
 //@__kernelArguments)
 {
     // Get Parallel Index
