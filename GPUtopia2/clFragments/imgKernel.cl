@@ -6,6 +6,7 @@ float clampZeroToOne(const float x)
 
 const float a = 1.f / 12.92f;
 const float b = 1.f / 1.055f;
+const float inv256 = 1.f / 256.f;
 
 const float invGamma = 1.f / 2.4f;
 float flinearToSRGB(const float x) {
@@ -96,16 +97,17 @@ __kernel void imgProcessing(
     }*/
     else if (mode == 3) // something something log
     {
-    float4 tmpColor = (float4)(
-        (float)inColorsR[i],
-        (float)inColorsG[i],
-        (float)inColorsB[i],
-        (float)inColorsA[i]);
-    float ls = log10(1.f + brightness * tmpColor.w) /  log10((float)inColorsMaxValues);
-    tmpColor = ls * tmpColor * brightness;
 
-    tmpColor = pow(tmpColor, inv_gamma);
-    outColors[i] = tmpColor;
+        float4 tmpColor = inv256 * (float4)(
+            (float)inColorsR[i],
+            (float)inColorsG[i],
+            (float)inColorsB[i],
+            (float)inColorsA[i]);
+        float ls = log10(1.f + brightness * tmpColor.w / (float)inColorsMaxValues) / (float)tmpColor.w;
+        tmpColor = ls * tmpColor;
+
+        tmpColor = pow(tmpColor, inv_gamma);
+        outColors[i] = tmpColor;
     }
 
 }
