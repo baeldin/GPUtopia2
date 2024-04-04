@@ -33,6 +33,7 @@ const std::string eof("EOF");
 
 const std::string AAFlag("//@__AA");
 const std::string COFlag("//@__COLORING");
+const std::string CPFlag("//@__COMPLEX");
 const std::string forIniFlag("//@__formulaInit");
 const std::string forLooFlag("//@__formulaLoop");
 const std::string forBaiFlag("//@__bailout");
@@ -203,6 +204,7 @@ void clFractal::makeCLCode()
 	std::string antiAliasing("clFragments/full_template.cl");
 	std::string antiAliasingStr = readCLFragmentFromFile("clFragments/anti_aliasing.cl");
 	std::string colorStr = readCLFragmentFromFile("clFragments/colors.cl");
+	std::string complexStr = readCLFragmentFromFile("clFragments/complex.cl");
 
 	std::cout << fullTemplateStr << std::endl;
 	std::cout << fractalFormulaStr << std::endl;
@@ -220,6 +222,7 @@ void clFractal::makeCLCode()
 	std::cout << "BEFORE:\n" << fullTemplateStr << std::endl;
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(AAFlag), antiAliasingStr);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(COFlag), colorStr);
+	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(CPFlag), complexStr);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(forIniFlag), fractalInit);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(forLooFlag), fractalLoop);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(forBaiFlag), fractalBailout);

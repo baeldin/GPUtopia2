@@ -1,5 +1,6 @@
 //@__COLORING
 //@__AA
+//@__COMPLEX
 
 float2 get_complex_coordinates(const float2 xy, const int2 img_size, const float4 cz)
 {
