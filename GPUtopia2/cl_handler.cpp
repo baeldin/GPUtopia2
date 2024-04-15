@@ -29,11 +29,15 @@ const std::string ini("__init:\n");
 const std::string loo("__loop:\n");
 const std::string bai("__bailout:\n");
 const std::string fin("__final:\n");
+const std::string fun("__functions:\n");
 const std::string eof("EOF");
 
 const std::string AAFlag("//@__AA");
 const std::string COFlag("//@__COLORING");
 const std::string CPFlag("//@__COMPLEX");
+const std::string FFFlag("//@__formulaFunctions");
+const std::string CFFlag("//@__coloringFunctions");
+
 const std::string forIniFlag("//@__formulaInit");
 const std::string forLooFlag("//@__formulaLoop");
 const std::string forBaiFlag("//@__bailout");
@@ -214,11 +218,13 @@ void clFractal::makeCLCode()
 	// UF-style separation
 	std::string fractalInit = getFragmentPart(fractalFormulaStr, ini, loo);
 	std::string fractalLoop = getFragmentPart(fractalFormulaStr, loo, bai);
-	std::string fractalBailout = getFragmentPart(fractalFormulaStr, bai, eof);
+	std::string fractalBailout = getFragmentPart(fractalFormulaStr, bai, fun);
+	std::string fractalFunctions = getFragmentPart(fractalFormulaStr, fun, eof);
 	std::string coloringInit = getFragmentPart(coloringAlgorithmStr, ini, loo);
 	std::string coloringLoop = getFragmentPart(coloringAlgorithmStr, loo, fin);
-	std::string coloringFinal = getFragmentPart(coloringAlgorithmStr, fin, eof);
-	
+	std::string coloringFinal = getFragmentPart(coloringAlgorithmStr, fin, fun);
+	std::string coloringFunctions = getFragmentPart(coloringAlgorithmStr, fun, eof);
+
 	std::cout << "BEFORE:\n" << fullTemplateStr << std::endl;
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(AAFlag), antiAliasingStr);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(COFlag), colorStr);
@@ -226,9 +232,11 @@ void clFractal::makeCLCode()
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(forIniFlag), fractalInit);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(forLooFlag), fractalLoop);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(forBaiFlag), fractalBailout);
+	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(FFFlag), fractalFunctions);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(colIniFlag), coloringInit);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(colLooFlag), coloringLoop);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(colFinFlag), coloringFinal);
+	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(CFFlag), coloringFunctions);
 
 	paramCollector pc = parseParameters(fullTemplateStr, fractalFormulaStr, coloringAlgorithmStr);
 	std::cout << "AFTER:\n" << fullTemplateStr << std::endl;

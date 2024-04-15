@@ -19,4 +19,5 @@ __final:
 		atomic_fetch_add(&colorsG[i], outColor.y); //, memory_order_relaxed);
 		atomic_fetch_add(&colorsB[i], outColor.z); // , memory_order_relaxed);
 		atomic_fetch_add(&colorsA[i], outColor.w); // , memory_order_relaxed);
-		
+__functions:
+//=====| functions for use in the init, loop, and final parts
