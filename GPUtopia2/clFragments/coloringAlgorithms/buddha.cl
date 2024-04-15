@@ -29,3 +29,5 @@ __final:
 
 		// c = sqrt(c);
 		// colors[i].xyzw += getColor(gradient, @colorDensity * c, nColors);
+__functions:
+// empty
