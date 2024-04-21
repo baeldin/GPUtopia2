@@ -98,7 +98,7 @@ namespace mainView
 		static clFractalImage img_settings_old = cf.image;
 		static bool redraw = false;
 		formulaSettingsWindow(cf);
-		imageSettingsWindow(cf);
+		imageSettingsWindow(cf, textureColors);
 		flameRenderSettingsWindow(cf);
 		// explore1Dparam(cf.bailout, "Bailout");
 		static bool runKernel = true;
@@ -109,6 +109,15 @@ namespace mainView
 			runImgKernel = true;
 			cf_old.flameRenderSettings = cf.flameRenderSettings;
 		}
+		static bool showExport = false;
+		if (ImGui::Button("Export"))
+		{
+			showExport = true;
+
+		}
+		if (showExport)
+			imageExportWindow(cf, showExport);
+
 		if (cf != cf_old && waitCounter == 0) {
 			std::cout << "Parameters changed, updating cf.params.\n - requesting new Texture\n - requesting new image\n";
 			needImg = true;
@@ -176,7 +185,6 @@ namespace mainView
 			makeTexture(textureID, cf.image.size.x, cf.image.size.y, textureColors);
 			needTexture = false;
 		}
-
 		ImGui::End();
 		static char mainViewStr[] = "Main View";
 		ImGui::Begin(mainViewStr, nullptr, ImGuiWindowFlags_HorizontalScrollbar);
