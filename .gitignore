@@ -361,6 +361,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/GPUtopia2/out.png
-/GPUtopia2/purpleFlames.png
-/GPUtopia2/test.png
+/GPUtopia2/*.png
