@@ -112,6 +112,10 @@ __kernel void imgProcessing(
         float alpha = pow(tmpColor.w, inv_gamma);
         float lsv = vibrancy * alpha / tmpColor.w;
         tmpColor.xyz = lsv * tmpColor.xyz + (1.f - vibrancy) * pow(tmpColor.xyz, inv_gamma);
+        tmpColor.xyz = (float3)(
+            clampZeroToOne(tmpColor.x),
+            clampZeroToOne(tmpColor.y),
+            clampZeroToOne(tmpColor.z));
         outColors[i] = tmpColor;
     }
 
