@@ -110,13 +110,6 @@ namespace mainView
 			cf_old.flameRenderSettings = cf.flameRenderSettings;
 		}
 		static bool showExport = false;
-		if (ImGui::Button("Export"))
-		{
-			showExport = true;
-
-		}
-		if (showExport)
-			imageExportWindow(cf, showExport);
 
 		if (cf != cf_old && waitCounter == 0) {
 			std::cout << "Parameters changed, updating cf.params.\n - requesting new Texture\n - requesting new image\n";
