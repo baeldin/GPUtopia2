@@ -7,7 +7,7 @@
 #include <string>
 #include <typeinfo>
 #include <chrono>
-#include <CL/opencl.hpp>
+#include <CL/cl2.hpp>
 
 #include "formulaSettings.h"
 #include "color.h"
