@@ -14,11 +14,11 @@ inline float linearToSRGB(const float x) {
 	return (clamp(x) <= 0.0031308f) ? clamp(x) * 12.92f : 1.055f * std::pow(clamp(x), invGamma) - 0.055f;
 }
 
-color sRGBtoLinear(const color& c)
+inline color sRGBtoLinear(const color& c)
 {
 	return color(sRGBtoLinear(c.r), sRGBtoLinear(c.g), sRGBtoLinear(c.b), c.a);
 }
-color linearToSRGB(const color& c)
+inline color linearToSRGB(const color& c)
 {
 	return color(linearToSRGB(c.r), linearToSRGB(c.g), linearToSRGB(c.b), c.a);
 }
