@@ -28,6 +28,7 @@ void save_to_png(const std::vector<color>& image_data, int imgWidth, const int i
 	stbi_write_png(fnam, imgWidth, imgHeight, 3, &image_sRGB[0], imgWidth * 3);
 }
 
+
 void imageSettingsWindow(clFractal& cf, std::vector<color>& img)
 {
 	ImGui::Begin("Image");

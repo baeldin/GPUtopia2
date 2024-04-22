@@ -53,49 +53,7 @@ __kernel void imgProcessing(
             invFactor * (float)inColorsB[i],
             invFactor * (float)inColorsA[i]));
     }
-    /*else if (mode == 1)
-    {
-        // IFSRenderer attempt - work in progress
-        float4 fColor = (float4)((float)inColors[i].x / 256.f, (float)inColors[i].y / 256.f, (float)inColors[i].z / 256.f, (float)inColors[i].w / 256.f);
-        fColor = logscale(fColor, brightness, (float)inColorsMaxValues);
-
-        // SKIP GAMMA THRESHOLD STUFF FOR NOW
-        // do tone mapping stuff for flames
-        //float funcval = 0.0;
-        //if (gamma_threshold != 0.0)
-        //{
-           // funcval = pow(gamma_threshold, inv_gamma - 1.f);
-        //}
-        // float alpha;
-        //if (fp.w < gamma_threshold)
-        //{
-           // float frac = fp.w / gamma_threshold;
-           // alpha = (1.f - frac) * fp.w * funcval + frac * pow(fp.w, inv_gamma);
-        //}
-        //else
-        float alpha = pow(fColor.w, inv_gamma);
-
-        float vls = vibrancy * alpha / fColor.w;
-        alpha = clamp(alpha, 0.f, 1.f);
-
-        float3 o = vls * fColor.rgb + (1.f - vibrancy) * pow(fColor.xyz, (float3)(inv_gamma));
-        o = clamp(o, 0.f, 1.f);
-
-        o += (1.f - alpha) * (float3)(0.f);
-        o = clamp(o, 0.f, 1.f);
-
-        outColors[i] = linearToSRGB(fColor); //(float4)(1., 0.5, 0., 1.); //(o.x, o.y, o.z, alpha);
-    }
-    else if (mode == 2) //Reinhard
-    {
-        outColors[i] = linearToSRGB((float4)(
-            (brightness * (float)inColors[i].x) / (1.f + brightness * (float)inColors[i].x),
-            (brightness * (float)inColors[i].y) / (1.f + brightness * (float)inColors[i].y),
-            (brightness * (float)inColors[i].z) / (1.f + brightness * (float)inColors[i].z),
-            (brightness * (float)inColors[i].a) / (1.f + brightness * (float)inColors[i].a)));
-
-    }*/
-    else if (mode == 3) // something something log
+    else if (mode == 1) // something something log
     {
 
         float4 tmpColor = inv256 * (float4)(
