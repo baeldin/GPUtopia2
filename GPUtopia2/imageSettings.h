@@ -11,4 +11,6 @@
 #include "gradient.h"
 #include "display.h"
 
-void imageSettingsWindow(clFractal& cf);
+void save_to_png(const std::vector<color>& image_data, int imgWidth, const int imgHeight, char fnam[256]);
+
+void imageSettingsWindow(clFractal& cf, std::vector<color>& img);

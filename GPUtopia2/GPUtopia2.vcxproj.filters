@@ -75,15 +75,15 @@
     <ClInclude Include="flameRenderSettings.h">
       <Filter>Header Files\Ui</Filter>
     </ClInclude>
+    <ClInclude Include="imgExport.h">
+      <Filter>Header Files\Ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="load_shaders.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="clFragments\FileName.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gradient.cpp">
@@ -158,6 +158,18 @@
     </None>
     <None Include="clFragments\coloringAlgorithms\buddha.cl">
       <Filter>OpenCL Files\coloring</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\gnarlRK4.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\four_gnarls.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\gnarl2.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\imgKernel.cl">
+      <Filter>OpenCL Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

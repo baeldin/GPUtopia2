@@ -98,7 +98,7 @@ namespace mainView
 		static clFractalImage img_settings_old = cf.image;
 		static bool redraw = false;
 		formulaSettingsWindow(cf);
-		imageSettingsWindow(cf);
+		imageSettingsWindow(cf, textureColors);
 		flameRenderSettingsWindow(cf);
 		// explore1Dparam(cf.bailout, "Bailout");
 		static bool runKernel = true;

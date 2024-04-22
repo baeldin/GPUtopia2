@@ -1,6 +1,35 @@
 #include "imageSettings.h"
 
-void imageSettingsWindow(clFractal& cf)
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
+void save_to_png(const std::vector<color>& image_data, int imgWidth, const int imgHeight, char fnam[256])
+{
+	// write to file
+	std::vector<uint8_t> image_sRGB(3 * imgWidth * imgHeight);
+	float fMax = 0.f;
+	uint32_t iMax = 0.f;
+	for (unsigned int i = 0; i < 3 * imgWidth * imgHeight; i += 3) {
+		color col = image_data[i / 3];
+		image_sRGB[i] = uint8_t(col.r * 255);
+		image_sRGB[i + 1] = uint8_t(col.g * 255);
+		image_sRGB[i + 2] = uint8_t(col.b * 255);
+		if (col.r > fMax) fMax = col.r;
+		if (col.g > fMax) fMax = col.r;
+		if (col.b > fMax) fMax = col.r;
+		if (image_sRGB[i] > iMax) iMax = image_sRGB[i];
+		if (image_sRGB[i + 1] > iMax) iMax = image_sRGB[i + 1];
+		if (image_sRGB[i + 2] > iMax) iMax = image_sRGB[i + 2];
+	}
+	std::cout << "fMax = " << fMax << std::endl;
+	std::cout << "iMax = " << iMax << std::endl;
+	stbi_write_png(fnam, imgWidth, imgHeight, 3, &image_sRGB[0], imgWidth * 3);
+}
+
+
+void imageSettingsWindow(clFractal& cf, std::vector<color>& img)
 {
 	ImGui::Begin("Image");
 	static float xmin = -5.f;
@@ -25,5 +54,11 @@ void imageSettingsWindow(clFractal& cf)
 	ImGui::InputInt("Width", &cf.image.size.x);
 	ImGui::InputInt("Height", &cf.image.size.y);
 	ImGui::InputInt("Coloring mode", &cf.mode);
+	static std::string outName = "out.png";
+	ImGui::InputText("File Name:", (char*)outName.c_str(), 256);
+	if (ImGui::Button("Save"))
+	{
+		save_to_png(img, cf.image.size.x, cf.image.size.y, (char*)outName.c_str());
+	}
 	ImGui::End();
 }
