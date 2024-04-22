@@ -113,6 +113,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,6 +130,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,6 +152,7 @@
     <ClInclude Include="gradient.h" />
     <ClInclude Include="imageSettings.h" />
     <ClInclude Include="imconfig.h" />
+    <ClInclude Include="imgExport.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="imgui_impl_glfw.h" />
     <ClInclude Include="imgui_impl_opengl3.h" />
@@ -164,7 +167,6 @@
     <ClInclude Include="parameterMaps.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="clFragments\FileName.cpp" />
     <ClCompile Include="cl_handler.cpp" />
     <ClCompile Include="cl_core.cpp" />
     <ClCompile Include="cl_core.h" />
@@ -195,6 +197,8 @@
     <None Include="clFragments\colors.cl" />
     <None Include="clFragments\fractalFormulas\buddhabrot.cl" />
     <None Include="clFragments\fractalFormulas\gnarl.cl" />
+    <None Include="clFragments\fractalFormulas\gnarl2.cl" />
+    <None Include="clFragments\fractalFormulas\gnarlRK4.cl" />
     <None Include="clFragments\fractalFormulas\gnarl_with_MB.cl" />
     <None Include="clFragments\fractalFormulas\mandelbrot.cl" />
     <None Include="clFragments\fractalFormulas\manowar.cl" />
