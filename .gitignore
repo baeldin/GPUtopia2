@@ -364,3 +364,5 @@ FodyWeavers.xsd
 /GPUtopia2/large_test.png
 /GPUtopia2/out.png
 /GPUtopia2/purpleFlames.png
+*.png
+/vcpkg_installed/x64-windows
