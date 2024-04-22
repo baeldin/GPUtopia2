@@ -1,4 +1,6 @@
+#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
 #include "imageSettings.h"
+#undef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
