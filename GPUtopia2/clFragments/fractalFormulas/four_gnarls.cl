@@ -12,14 +12,14 @@ __init:
         float os = @pentarlOffset;
         const float pi = 3.1415926f;
         const float deg2rad = pi / 180.f;
-        const float a1 = cos(deg2rad * 72.f);
-        const float a2 = cos(deg2rad * 144.f);
-        const float a3 = a1;
-        const float a4 = a2;
-        const float b1 = sin(deg2rad * 72.f);
-        const float b2 = sin(deg2rad * 144.f);
-        const float b3 = -b1;
-        const float b4 = -b2; 
+        float a1 = cos(deg2rad * 72.f);
+        float a2 = cos(deg2rad * 144.f);
+        float a3 = a1;
+        float a4 = a2;
+        float b1 = sin(deg2rad * 72.f);
+        float b2 = sin(deg2rad * 144.f);
+        float b3 = -b1;
+        float b4 = -b2; 
 __loop:
 //=========| fractal formula loop
             z += (float2)(
