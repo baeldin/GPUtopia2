@@ -197,10 +197,10 @@
     <None Include="clFragments\fractalFormulas\gnarl.cl" />
     <None Include="clFragments\fractalFormulas\gnarl_with_MB.cl" />
     <None Include="clFragments\fractalFormulas\mandelbrot.cl" />
+    <None Include="clFragments\fractalFormulas\manowar.cl" />
     <None Include="clFragments\full_template.cl" />
-    <None Include="dist.cl" />
+    <None Include="clFragments\imgKernel.cl" />
     <None Include="fragment_shader.glsl" />
-    <None Include="gradient.cl" />
     <None Include="vertex_shader.glsl" />
   </ItemGroup>
   <ItemGroup>
