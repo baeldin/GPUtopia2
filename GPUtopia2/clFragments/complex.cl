@@ -5,7 +5,7 @@ typedef float2 complex;
 inline float real(complex z) { return z.x; }
 inline float imag(complex z) { return z.y; }
 inline float abs(complex z) { return length(z); }
-inline float carg(complex z) { return atan2(z.x, z.y); }
+inline float carg(complex z) { return atan2(z.y, z.x); }
 inline complex cabs(complex z) { return (complex)(fabs(z.x), fabs(z.y)); }
 
 // operations with two complex arguments
@@ -33,7 +33,7 @@ inline complex clog2(complex z) { return 1.f / log(2.f) * clog(z); }
 inline complex clog10(complex z) { return 1.f / log(10.f) * clog(z); }
 
 // complex exp, sin, cos, tan, pow
-inline complex cexp(complex z) { return exp(real(z)) * (complex)(cos(z.x), sin(z.y)); }
+inline complex cexp(complex z) { return exp(real(z)) * (complex)(cos(z.y), sin(z.y)); }
 inline complex csin(complex z) { return cdiv(exp(cmul(i1, z)) - exp(cmul(-1i, z)), 2 * i1); }
 inline complex ccos(complex z) { return cdiv(exp(cmul(i1, z)) + exp(cmul(-1i, z)), 2 * i1); }
 inline complex ctan(complex z) { return cdiv(cos(z), sin(z)); }
