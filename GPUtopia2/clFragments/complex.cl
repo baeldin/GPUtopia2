@@ -1,6 +1,7 @@
 typedef float2 complex;
 
 #define i1 ((complex)(0.f, 1.f))
+#define half_pi 1.57079632679f;
 
 inline float real(complex z) { return z.x; }
 inline float imag(complex z) { return z.y; }
@@ -34,7 +35,15 @@ inline complex clog10(complex z) { return 1.f / log(10.f) * clog(z); }
 
 // complex exp, sin, cos, tan, pow
 inline complex cexp(complex z) { return exp(real(z)) * (complex)(cos(z.y), sin(z.y)); }
-inline complex csin(complex z) { return cdiv(exp(cmul(i1, z)) - exp(cmul(-1i, z)), 2 * i1); }
-inline complex ccos(complex z) { return cdiv(exp(cmul(i1, z)) + exp(cmul(-1i, z)), 2 * i1); }
+inline complex csin(complex z) {
+	return
+		-0.5f * (
+			exp(-z.y) * (complex)(-sin(z.x), cos(z.x)) -
+			exp(z.y) * (complex)(sin(z.x), cos(z.x)));
+}
+inline complex ccos(complex z) {
+	z.x -= half_pi;
+	return csin(z);
+}
 inline complex ctan(complex z) { return cdiv(cos(z), sin(z)); }
 inline complex cpow(complex z1, complex z2) { return cexp(cmul(z2, clog(z1))); }
