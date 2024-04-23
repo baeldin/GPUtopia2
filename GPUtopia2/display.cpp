@@ -66,8 +66,8 @@ namespace mainView
 		if (needCLFractal)
 		{
 			std::cout << "Need a fractal, re-reading code and generating kernel code.\n";
-			cf.fractalCLFragmentFile = "clFragments/fractalFormulas/gnarl.cl";
-			cf.coloringCLFragmentFile = "clFragments/coloringAlgorithms/dist.cl";
+			cf.fractalCLFragmentFile = "clFragments/fractalFormulas/ctest.cl";
+			cf.coloringCLFragmentFile = "clFragments/coloringAlgorithms/by_iteration.cl";
 			cf.makeCLCode();
 			needCLFractal = false;
 			needNewKernel = true;

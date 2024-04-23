@@ -5,8 +5,8 @@ void formulaSettingsWindow(clFractal& cf)
 {
 	ImGui::Begin("Formulas");
 
-	static char formulaCLFragment[100] = "clFragments/fractalFormulas/gnarl.cl";
-	static char coloringCLFragment[100] = "clFragments/coloringAlgorithms/dist.cl";
+	static char formulaCLFragment[100] = "clFragments/fractalFormulas/ctest.cl";
+	static char coloringCLFragment[100] = "clFragments/coloringAlgorithms/by_iteration.cl";
 	ImGui::InputText("Formula:", formulaCLFragment, 100);
 	ImGui::InputText("Coloring:", coloringCLFragment, 100);
 	if (ImGui::Button("Reload CL Fragments"))
