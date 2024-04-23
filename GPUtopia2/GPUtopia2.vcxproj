@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="cl_fractal.h" />
     <ClInclude Include="cl_handler.h" />
     <ClInclude Include="color.h" />
     <ClInclude Include="display.h" />
