@@ -12,8 +12,6 @@
 #include "formulaSettings.h"
 #include "color.h"
 
-#pragma OPENCL EXTENSION cl_amd_printf : enable
-#pragma OPENCL EXTENSION cl_intel_printf : enable
 constexpr int WG_SIZE = 256; // Workgroup size
 
 class clCore
