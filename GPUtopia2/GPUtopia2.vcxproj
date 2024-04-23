@@ -195,6 +195,7 @@
     <None Include="clFragments\coloringAlgorithms\debug_gradient.cl" />
     <None Include="clFragments\coloringAlgorithms\dist.cl" />
     <None Include="clFragments\colors.cl" />
+    <None Include="clFragments\complex.cl" />
     <None Include="clFragments\fractalFormulas\buddhabrot.cl" />
     <None Include="clFragments\fractalFormulas\four_gnarls.cl" />
     <None Include="clFragments\fractalFormulas\gnarl.cl" />
@@ -202,6 +203,7 @@
     <None Include="clFragments\fractalFormulas\gnarlRK4.cl" />
     <None Include="clFragments\fractalFormulas\gnarl_with_MB.cl" />
     <None Include="clFragments\fractalFormulas\mandelbrot.cl" />
+    <None Include="clFragments\fractalFormulas\manowar.cl" />
     <None Include="clFragments\full_template.cl" />
     <None Include="clFragments\imgKernel.cl" />
     <None Include="dist.cl" />
