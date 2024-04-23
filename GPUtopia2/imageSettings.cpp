@@ -1,4 +1,6 @@
+#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
 #include "imageSettings.h"
+#undef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -27,6 +29,7 @@ void save_to_png(const std::vector<color>& image_data, int imgWidth, const int i
 	std::cout << "iMax = " << iMax << std::endl;
 	stbi_write_png(fnam, imgWidth, imgHeight, 3, &image_sRGB[0], imgWidth * 3);
 }
+
 
 void imageSettingsWindow(clFractal& cf, std::vector<color>& img)
 {

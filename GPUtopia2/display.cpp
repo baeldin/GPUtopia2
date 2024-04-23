@@ -109,8 +109,6 @@ namespace mainView
 			runImgKernel = true;
 			cf_old.flameRenderSettings = cf.flameRenderSettings;
 		}
-		static bool showExport = false;
-
 		if (cf != cf_old && waitCounter == 0) {
 			std::cout << "Parameters changed, updating cf.params.\n - requesting new Texture\n - requesting new image\n";
 			needImg = true;
@@ -178,6 +176,7 @@ namespace mainView
 			makeTexture(textureID, cf.image.size.x, cf.image.size.y, textureColors);
 			needTexture = false;
 		}
+
 		ImGui::End();
 		static char mainViewStr[] = "Main View";
 		ImGui::Begin(mainViewStr, nullptr, ImGuiWindowFlags_HorizontalScrollbar);

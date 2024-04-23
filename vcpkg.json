@@ -1,0 +1,41 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "gputopia",
+  "dependencies": [
+    "glew",
+    "glfw3",
+    {
+      "name": "imgui",
+      "features": [
+        "docking-experimental",
+        "glfw-binding",
+        "opengl3-binding"
+      ]
+    },
+    "opencl",
+    "stb"
+  ],
+  "overrides": [
+    {
+      "name": "glew",
+      "version": "2.2.0"
+    },
+    {
+      "name": "glfw3",
+      "version": "3.3.9"
+    },
+    {
+      "name": "imgui",
+      "version": "1.88"
+    },
+    {
+      "name": "opencl",
+      "version": "2.2#8"
+    },
+    {
+      "name": "stb",
+      "version": "2023-04-11"
+    }
+  ],
+  "builtin-baseline": "3850888eb8480abc8f73f84bf618de3b68900572"
+}

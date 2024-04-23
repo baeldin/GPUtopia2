@@ -361,5 +361,11 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/GPUtopia2/*.png
-/vcpkg_installed/x64-windows
+
+/GPUtopia2/large_test.png
+/GPUtopia2/out.png
+/GPUtopia2/purpleFlames.png
+*.png
+
+# Ignore installed packages from vcpkg
+vcpkg_installed/
