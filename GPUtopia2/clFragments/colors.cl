@@ -18,11 +18,11 @@ float flinearToSRGB(const float x) {
 }
 
 float4 sRGBtoLinear(const float4 v) {
-	return (float4)(fsRGBtoLinear(v.x), fsRGBtoLinear(v.y), fsRGBtoLinear(v.z), v.w);
+	return (float4)(fsRGBtoLinear(v.x), fsRGBtoLinear(v.y), fsRGBtoLinear(v.z), clampZeroToOne(v.w));
 }
 
 float4 linearToSRGB(const float4 v) {
-	return (float4)(flinearToSRGB(v.x), flinearToSRGB(v.y), flinearToSRGB(v.z), v.w);
+	return (float4)(flinearToSRGB(v.x), flinearToSRGB(v.y), flinearToSRGB(v.z), clampZeroToOne(v.w));
 }
 
 float lerp(const float x, const float x0, const float x1,
