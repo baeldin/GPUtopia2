@@ -59,7 +59,7 @@ int4 getColor(const float4* colors, const float idxIn, const int nColors)
 	const int colorIndex2 = (colorIndex1 + 1) % nColors;
 	float4 outColor = sRGBtoLinear(
 		f4lerp(
-			fidx, ceil(fidx), floor(fidx), 
+			fidx, 0.f, 1.f, //ceil(fidx), floor(fidx), 
 			colors[colorIndex1], colors[colorIndex2]));
 	return toIntColor(outColor);
 }
