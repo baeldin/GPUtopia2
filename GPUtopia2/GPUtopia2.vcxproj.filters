@@ -78,6 +78,9 @@
     <ClInclude Include="imgExport.h">
       <Filter>Header Files\Ui</Filter>
     </ClInclude>
+    <ClInclude Include="cl_fractal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -130,8 +133,6 @@
     <None Include="clFragments\full_template.cl">
       <Filter>OpenCL Files</Filter>
     </None>
-    <None Include="gradient.cl" />
-    <None Include="dist.cl" />
     <None Include="clFragments\colors.cl">
       <Filter>OpenCL Files</Filter>
     </None>
@@ -162,14 +163,16 @@
     <None Include="clFragments\fractalFormulas\gnarlRK4.cl">
       <Filter>OpenCL Files\formulas</Filter>
     </None>
-    <None Include="clFragments\fractalFormulas\four_gnarls.cl">
-      <Filter>OpenCL Files\formulas</Filter>
-    </None>
     <None Include="clFragments\fractalFormulas\gnarl2.cl">
       <Filter>OpenCL Files\formulas</Filter>
     </None>
     <None Include="clFragments\imgKernel.cl">
       <Filter>OpenCL Files</Filter>
+    </None>
+    <None Include="clFragments\complex.cl" />
+    <None Include="clFragments\fractalFormulas\manowar.cl" />
+    <None Include="clFragments\coloringAlgorithms\abs.cl">
+      <Filter>OpenCL Files\coloring</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

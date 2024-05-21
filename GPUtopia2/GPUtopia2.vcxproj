@@ -175,6 +175,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="clFragments\anti_aliasing.cl" />
+    <None Include="clFragments\coloringAlgorithms\abs.cl" />
     <None Include="clFragments\coloringAlgorithms\buddha.cl" />
     <None Include="clFragments\coloringAlgorithms\by_iteration.cl" />
     <None Include="clFragments\coloringAlgorithms\debug_gradient.cl" />
