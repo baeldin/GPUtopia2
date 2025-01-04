@@ -122,6 +122,7 @@ public:
 	float bailout = 4.f;
 	// brightness, gamma, vibrancy, UNUSED
 	cl_float4 flameRenderSettings = { 4.f, 2.f, 1.f, 0.f };
+	cl_int flamePointSelection = 0;
 	clFractal() : gradient(Gradient::Gradient(4)) {}
 	void makeCLCode();
 	void setFractalCLFragmentFile(const char* fil) {
@@ -146,6 +147,7 @@ inline const bool operator==(const clFractal& lhs, const clFractal& rhs)
 		lhs.gradient == rhs.gradient &&
 		lhs.mode == rhs.mode &&
 		lhs.flameRenderSettings == rhs.flameRenderSettings &&
+		lhs.flamePointSelection == rhs.flamePointSelection &&
 		lhs.vomit == rhs.vomit);
 }
 inline const bool operator!=(const clFractal& lhs, const clFractal& rhs)

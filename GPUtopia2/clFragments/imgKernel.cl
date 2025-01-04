@@ -33,7 +33,7 @@ __kernel void imgProcessing(
     const int inColorsMaxValues,     // max value per component (r, g, b, alpha)
     __global float4* outColors,      // output float4 colors
     const int3 sampling,             // sampling info
-    const int mode,                  // mode (0 = escape time, 1 = flame), UNUSED
+    const int mode,                  // mode (0 = escape time, 1 = flame)
     const float brightness,          // flame brightness
     const float gamma,               // flame gamma
     const float vibrancy)            // flame vibrancy
@@ -63,10 +63,7 @@ __kernel void imgProcessing(
             (float)inColorsA[i]);
         float ls = log10(1.f + brightness * tmpColor.w / (float)inColorsMaxValues) / (float)tmpColor.w;
         tmpColor = ls * tmpColor;
-
         tmpColor = pow(tmpColor, inv_gamma);
-        
-
         float alpha = pow(tmpColor.w, inv_gamma);
         float lsv = vibrancy * alpha / tmpColor.w;
         tmpColor.xyz = lsv * tmpColor.xyz + (1.f - vibrancy) * pow(tmpColor.xyz, inv_gamma);
@@ -76,5 +73,4 @@ __kernel void imgProcessing(
             clampZeroToOne(tmpColor.z));
         outColors[i] = tmpColor;
     }
-
 }

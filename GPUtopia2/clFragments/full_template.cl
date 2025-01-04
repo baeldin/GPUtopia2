@@ -37,6 +37,7 @@ __kernel void computeLoop(
     __global atomic_uint* colorsG,     // 10: output G
     __global atomic_uint* colorsB,     // 11: output B
     __global atomic_uint* colorsA,     // 12: output A
+    const int flamePointSelection,     // 13: discard points, used for flame
 //@__kernelArguments)
 {
     // Get Parallel Index
@@ -46,26 +47,55 @@ __kernel void computeLoop(
     const int pixelIdx = image_size.x * y + x;
     const int sample_count = sampling.y - sampling.x;
     int offset_fac = min(1, sampling.z - 1);
-    for (int s = sampling.x; s < sampling.y; s++)
+    bool use_point = true;
+    // check if point is to be used
     {
-        int iter = 0;
-        float2 sample_position = (float2)(x, y) + offset_fac * (float2)(
-            tent(fracf((float)s * phi + tofloat(lowbias32((uint)(2 * pixelIdx))))),
-            tent(fracf((float)s / (float)sampling.z + tofloat(lowbias32((uint)(2 * pixelIdx + 1))))));
-        const float2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane);
-//@__formulaInit
-//@__coloringInit
-        while (!bailed_out(z, bailout) && iter < maxIterations)
+        for (int s = sampling.x; s < sampling.y; s++)
         {
-//@__formulaLoop
-//@__coloringLoop
-            iter++;
+            if (flamePointSelection > 0)
+            {
+                int iter = 0;
+                float2 sample_position = (float2)(x, y) + offset_fac * (float2)(
+                    tent(fracf((float)s * phi + tofloat(lowbias32((uint)(2 * pixelIdx))))),
+                    tent(fracf((float)s / (float)sampling.z + tofloat(lowbias32((uint)(2 * pixelIdx + 1))))));
+                const float2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane);
+                //@__formulaInit
+                while (!bailed_out(z, bailout) && iter < maxIterations)
+                {
+                    //@__formulaLoop
+                    iter++;
+                }
+                if (bailed_out(z, bailout))
+                {
+                    use_point = flamePointSelection == 1 ? true : false;
+                }
+                else
+                {
+                    use_point = flamePointSelection == 2 ? true : false;
+                }
+            }
+            if (use_point)
+            {
+                int iter = 0;
+                float2 sample_position = (float2)(x, y) + offset_fac * (float2)(
+                    tent(fracf((float)s * phi + tofloat(lowbias32((uint)(2 * pixelIdx))))),
+                    tent(fracf((float)s / (float)sampling.z + tofloat(lowbias32((uint)(2 * pixelIdx + 1))))));
+                const float2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane);
+                //@__formulaInit
+                //@__coloringInit
+                while (!bailed_out(z, bailout) && iter < maxIterations)
+                {
+                    //@__formulaLoop
+                    //@__coloringLoop
+                    iter++;
+                }
+                //@__coloringFinal
+            }
         }
-//@__coloringFinal
+        // colors[i].xyzw /= (float4)(sample_count, sample_count, sample_count, 1.f);
+        // colors[i] = linearToSRGB(colors[i]);
+        //colors[i].xyzw = (float4)((float)sampling.x, (float)sampling.y, (float)sampling.z, 1.);
     }
-    // colors[i].xyzw /= (float4)(sample_count, sample_count, sample_count, 1.f);
-    // colors[i] = linearToSRGB(colors[i]);
-    //colors[i].xyzw = (float4)((float)sampling.x, (float)sampling.y, (float)sampling.z, 1.);
 }
 
 
