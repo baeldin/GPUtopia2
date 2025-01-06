@@ -146,7 +146,7 @@ inline const bool operator==(const clFractal& lhs, const clFractal& rhs)
 		lhs.bailout == rhs.bailout &&
 		lhs.gradient == rhs.gradient &&
 		lhs.mode == rhs.mode &&
-		lhs.flameRenderSettings == rhs.flameRenderSettings &&
+		// lhs.flameRenderSettings == rhs.flameRenderSettings &&
 		lhs.flamePointSelection == rhs.flamePointSelection &&
 		lhs.vomit == rhs.vomit);
 }

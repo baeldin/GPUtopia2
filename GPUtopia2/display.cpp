@@ -104,8 +104,8 @@ namespace mainView
 		static bool runKernel = true;
 		static bool runImgKernel = false;
 		static int waitCounter = 0;
-		if (cf.flameRenderSettings != cf.flameRenderSettings) {
-			needImg = true;
+		if (cf.flameRenderSettings != cf_old.flameRenderSettings) {
+			std::cout << "Fractal's flameRenderSettings changed, demanding new run of imgKernel.\n";
 			runImgKernel = true;
 			cf_old.flameRenderSettings = cf.flameRenderSettings;
 		}
@@ -125,19 +125,9 @@ namespace mainView
 		// first draw the image
 		static bool running = false;
 		static std::jthread jt;
-		if (runImgKernel and !running) {
-			running = true; // set this here to prevent another img read before the called function sets this to true
-			std::cout << "Need a new image, setting kernel args and running kernel.\n";
-			core.setDefaultArguments(cf);
-			core.setFractalKernelArgs(cf);
-			jt = std::jthread(&runKernelAsync, std::ref(cf), std::ref(core), std::ref(running));
-			jt.detach();
-			needImg = true;
-			runKernel = false;
-		}
 		if (runKernel and !running) {
 			running = true; // set this here to prevent another img read before the called function sets this to true
-			std::cout << "Need a new image, setting kernel args and running kernel.\n";
+			std::cout << "Need a new fractal, setting kernel args and running kernel.\n";
 			core.setDefaultArguments(cf);
 			core.setFractalKernelArgs(cf);
 			jt = std::jthread(&runKernelAsync, std::ref(cf), std::ref(core), std::ref(running));
