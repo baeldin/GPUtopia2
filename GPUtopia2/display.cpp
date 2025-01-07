@@ -64,8 +64,6 @@ namespace mainView
 		static clCore core;
 		// static asyncOpenCL asc;
 		// static std::jthread jt;
-		static cl_int3 sampling = { 0, 0, 1 };
-		static int next_update_sample_count = 1;
 		if (needCLFractal)
 		{
 			std::cout << "Need a fractal, re-reading code and generating kernel code.\n";
@@ -99,92 +97,80 @@ namespace mainView
 		}
 		static paramCollector params_old = cf.params;
 		static clFractalImage img_settings_old = cf.image;
-		static bool redraw = false;
 		formulaSettingsWindow(cf);
 		imageSettingsWindow(cf, textureColors);
 		flameRenderSettingsWindow(cf);
-		// explore1Dparam(cf.bailout, "Bailout");
-		static bool runKernel = true;
-		static bool runImgKernel = false;
 		static int waitCounter = 0;
-		static int target_sample_count = fibonacci_number(cf.image.quality); // 2584;
-		static int current_sample_count = 0;
-		static int new_sample_count = current_sample_count + 1;
 		static bool force_img_update = false;
 		if (cf.flameRenderSettings != cf_old.flameRenderSettings) {
 			std::cout << "Fractal's flameRenderSettings changed, demanding new run of imgKernel.\n";
-			runImgKernel = true;
+			cf.status.runImgKernel = true;
+			cf.status.done = false;
 			cf_old.flameRenderSettings = cf.flameRenderSettings;
 		}
 		if (cf != cf_old && waitCounter == 0) {
 			std::cout << "Parameters changed, updating cf.params.\n - requesting new Texture\n - requesting new image\n";
-			// needImg = true;
 			needCLFractal = false;
-			// std::cout << "Old zoom: " << cf_old.image.zoom << " new zoom: " << cf.image.zoom << std::endl;
 			cf.image.updateComplexSubplane();
 			core.setDefaultArguments(cf);
 			core.setFractalKernelArgs(cf);
 			cf_old = cf;
-			current_sample_count = 0;
-			next_update_sample_count = 1;
-			target_sample_count = fibonacci_number(cf.image.quality);
-			runKernel = true;
+			cf.image.current_sample_count = 0;
+			cf.image.next_update_sample_count = 1;
+			cf.image.target_sample_count = fibonacci_number(cf.image.quality);
+			cf.status.runKernel = true;
+			cf.status.done = false;
 		}
 
 		glViewport(0, 0, mainViewportSize.x, mainViewportSize.y);
 		// first draw the image
 		static bool running = false;
 		static std::jthread jt;
-		if (runKernel and !running and current_sample_count < target_sample_count) {
+		if (cf.status.runKernel and !cf.running() and cf.image.current_sample_count < cf.image.target_sample_count) {
 			running = true; // set this here to prevent another img read before the called function sets this to true
-			int new_sample_count = current_sample_count + 1; // int(1.618f * current_sample_count);
-			new_sample_count = new_sample_count > target_sample_count ? target_sample_count : new_sample_count;
-			new_sample_count = new_sample_count < 1 ? 1 : new_sample_count;
-			sampling = { current_sample_count, new_sample_count, target_sample_count };
-			std::cout << "Need a new fractal, setting kernel args and running kernel.\n";
-			if (current_sample_count == 0)
+			// std::cout << "Need a new fractal, setting kernel args and running kernel.\n";
+			if (cf.image.current_sample_count == 0)
 			{
-				next_update_sample_count = 1;
+				cf.image.next_update_sample_count = 1;
 				core.setDefaultArguments(cf);
 				core.setFractalKernelArgs(cf);
 			}
-			jt = std::jthread(&runKernelAsync, std::ref(cf), std::ref(core), std::ref(running), std::ref(sampling));
+			jt = std::jthread(&runKernelAsync, std::ref(cf), std::ref(core));
 			jt.detach();
-			runKernel = false;
+			cf.status.runKernel = false;
 		}
-		std::cout << "current_sample_count = " << current_sample_count << "\n";
-		std::cout << "next_update_sample_count = " << next_update_sample_count << "\n";
-		if (!running)
+		std::cout << "current_sample_count = " << cf.image.current_sample_count << "\n";
+		std::cout << "next_update_sample_count = " << cf.image.next_update_sample_count << "\n";
+		if (!cf.running())
 		{
-			current_sample_count = sampling.y;
-			if (current_sample_count >= next_update_sample_count and !force_img_update)
+			if (cf.image.current_sample_count >= cf.image.next_update_sample_count and !force_img_update)
 			{
-				runImgKernel = true;
-				if (current_sample_count == target_sample_count)
+				cf.status.runImgKernel = true;
+				if (cf.image.current_sample_count == cf.image.target_sample_count)
 				{
-					target_sample_count++;
+					cf.image.next_update_sample_count++;
 				}
 			}
 			else
 			{
-				runKernel = true;
+				cf.status.runKernel = true;
 			}
 		}
-		if (runImgKernel and !running) {
+		if (cf.status.runImgKernel and !cf.running() and !cf.status.done) {
 			running = true; // set this here to prevent another img read before the called function sets this to true
 			std::cout << "Need a new image, setting kernel args and running kernel.\n";
-			jt = std::jthread(&runImgKernelAsync, std::ref(cf), std::ref(core), std::ref(running), std::ref(sampling));
+			jt = std::jthread(&runImgKernelAsync, std::ref(cf), std::ref(core));
 			jt.detach();
 			needImg = true;
-			runImgKernel = false;
-			next_update_sample_count *= 2;
-			next_update_sample_count = next_update_sample_count > target_sample_count ? target_sample_count : next_update_sample_count;
+			cf.status.runImgKernel = false;
+			cf.image.next_update_sample_count *= 2;
+			cf.image.next_update_sample_count = cf.image.next_update_sample_count > cf.image.target_sample_count ? cf.image.target_sample_count : cf.image.next_update_sample_count;
 		}        
-		if (running) {
+		if (cf.running()) {
 			std::cout << "Am I running? " << running << std::endl;
 			std::cout << "  My thread ID is " << jt.get_id() << std::endl;
 		}
-		if (needImg && !running)
+		if (needImg && !cf.running())
 		{
 			waitCounter++;
 			if (waitCounter > 1) // wait 1 frame before continuing

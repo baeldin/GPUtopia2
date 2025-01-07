@@ -65,8 +65,8 @@ public:
 
 };
 
-void runKernelAsync(clFractal& cf, clCore& cc, bool& running, cl_int3& sampling_range);
-void runImgKernelAsync(clFractal& cf, clCore& cc, bool& running, cl_int3& sampling_range);
+void runKernelAsync(clFractal& cf, clCore& cc);
+void runImgKernelAsync(clFractal& cf, clCore& cc);
 
 // void make_img(std::vector<color>& img, const int width, const int height, const formulaSettings& fs);
 // void make_img2(clFractal& cf, std::vector<color>& img, const int width, const int height, const formulaSettings& fs);

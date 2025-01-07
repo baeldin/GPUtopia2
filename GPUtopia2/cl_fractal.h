@@ -78,6 +78,9 @@ struct clFractalImage
 	cl_float4 complexSubplane = { 0.f, 0.f, 4.f, 4.f / aspectRatio };
 	int quality = 1;
 	float zoom = 1.f;
+	uint32_t current_sample_count = 0;
+	uint32_t target_sample_count = 1;
+	uint32_t next_update_sample_count = 1;
 	clFractalImage() {
 		float aspectRatio = (float)size.x / (float)size.y;
 	}
@@ -99,6 +102,14 @@ inline const bool operator!=(const clFractalImage& lhs, const clFractalImage& rh
 	return !(lhs == rhs);
 }
 
+struct clFractalStatus
+{
+	bool kernelRunning = false;
+	bool imgKernelRunning = false;
+	bool runKernel = false;
+	bool runImgKernel = false;
+	bool done = false;
+};
 // Fractal class that holds parameters, names of the code fragmens, and the full
 // CL code of the fractal + coloring
 class clFractal
@@ -123,6 +134,7 @@ public:
 	// brightness, gamma, vibrancy, UNUSED
 	cl_float4 flameRenderSettings = { 4.f, 2.f, 1.f, 0.f };
 	cl_int flamePointSelection = 0;
+	clFractalStatus status;
 	clFractal() : gradient(Gradient::Gradient(4)) {}
 	void makeCLCode();
 	void setFractalCLFragmentFile(const char* fil) {
@@ -130,6 +142,9 @@ public:
 	}
 	void setColoringCLFragmentFile(const char* fil) {
 		coloringCLFragmentFile = std::string(fil);
+	}
+	bool running() {
+		return this->status.kernelRunning or this->status.imgKernelRunning;
 	}
 };
 

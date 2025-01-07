@@ -297,26 +297,39 @@ void clCore::getImg(std::vector<color>& img, clFractal& cf) const
     queue.enqueueReadBuffer(this->imgFloatBuffer, CL_TRUE, 0, sizeof(cl_float4) * this->currentRenderSize, img.data());
 }
 
-void runKernelAsync(clFractal& cf, clCore& cc, bool& running, cl_int3& sampling_range)
+void runKernelAsync(clFractal& cf, clCore& cc)
 {
+    cf.status.kernelRunning = true;
     cl_int err = 0;
-    std::cout << "Kernel called with sampling (" << sampling_range.x << " " << sampling_range.y << " " << sampling_range.z << ")\n";
-    err = cc.setKernelArg(cc.kernel, 4, sampling_range, "sampling_info");
-    running = true;
+    cl_int3 sampling_info = {
+        cf.image.current_sample_count,
+        cf.image.current_sample_count + 1,
+        cf.image.target_sample_count };
+    std::cout << "Kernel called with sampling (" << sampling_info.x << " " << sampling_info.y << " " << sampling_info.z << ")\n";
+    err = cc.setKernelArg(cc.kernel, 4, sampling_info, "sampling_info");
     cc.runKernel(cf);
-    running = false;
+    cf.image.current_sample_count += 1;
+    cf.status.kernelRunning = false;
 }
 
-void runImgKernelAsync(clFractal& cf, clCore& cc, bool& running, cl_int3& sampling_range)
+void runImgKernelAsync(clFractal& cf, clCore& cc)
 {
-    running = true;
+    cf.status.imgKernelRunning = true;
     cl_int err = 0;
-    const uint32_t maxVal = sampling_range.y * cf.maxIter;
+    cl_int3 sampling_info = {
+        cf.image.current_sample_count,
+        cf.image.current_sample_count,
+        cf.image.target_sample_count }; 
+    const uint32_t maxVal = sampling_info.y * cf.maxIter;
     err = cc.setKernelArg(cc.imgKernel, 4, maxVal, "histogram theoretical max");
-    err = cc.setKernelArg(cc.imgKernel, 6, sampling_range, "sampling info");
+    err = cc.setKernelArg(cc.imgKernel, 6, sampling_info, "sampling info");
     cc.setImgKernelArguments(cf);
     cc.runImgKernel(cf);
-    running = false;
+    if (cf.image.current_sample_count == cf.image.target_sample_count)
+    {
+        cf.status.done = true;
+    }
+    cf.status.imgKernelRunning = false;
 }
 
 //    
