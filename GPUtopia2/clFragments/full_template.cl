@@ -56,8 +56,11 @@ __kernel void computeLoop(
             {
                 int iter = 0;
                 float2 sample_position = (float2)(x, y) + offset_fac * (float2)(
-                    tent(fracf((float)s * phi + tofloat(lowbias32((uint)(2 * pixelIdx))))),
-                    tent(fracf((float)s / (float)sampling.z + tofloat(lowbias32((uint)(2 * pixelIdx + 1))))));
+                    tent(fracf(fracf((float)s * phi) + tofloat(lowbias32((uint)(2 * pixelIdx))))),
+                    tent(fracf(fracf((float)s * phi2) + tofloat(lowbias32((uint)(2 * pixelIdx + 1))))));
+                //float2 sample_position = (float2)(x, y) + offset_fac * (float2)(
+                //    tent(fracf((float)s * phi + tofloat(lowbias32((uint)(2 * pixelIdx))))),
+                //    tent(fracf((float)s / (float)sampling.z + tofloat(lowbias32((uint)(2 * pixelIdx + 1))))));
                 const float2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane);
                 //@__formulaInit
                 while (!bailed_out(z, bailout) && iter < maxIterations)
