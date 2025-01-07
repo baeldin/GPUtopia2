@@ -63,6 +63,7 @@ namespace mainView
 		static clCore core;
 		// static asyncOpenCL asc;
 		// static std::jthread jt;
+		static cl_int3 sampling = { 0, 10, 233 };
 		if (needCLFractal)
 		{
 			std::cout << "Need a fractal, re-reading code and generating kernel code.\n";
@@ -104,6 +105,9 @@ namespace mainView
 		static bool runKernel = true;
 		static bool runImgKernel = false;
 		static int waitCounter = 0;
+		static bool target_quality_reached = false;
+		static int target_sample_count = 610; // 2584;
+		static int current_sample_count = 0;
 		if (cf.flameRenderSettings != cf_old.flameRenderSettings) {
 			std::cout << "Fractal's flameRenderSettings changed, demanding new run of imgKernel.\n";
 			runImgKernel = true;
@@ -118,6 +122,7 @@ namespace mainView
 			core.setDefaultArguments(cf);
 			core.setFractalKernelArgs(cf);
 			cf_old = cf;
+			current_sample_count = 0;
 			runKernel = true;
 		}
 
@@ -125,20 +130,29 @@ namespace mainView
 		// first draw the image
 		static bool running = false;
 		static std::jthread jt;
-		if (runKernel and !running) {
+		if (runKernel and !running and current_sample_count < target_sample_count) {
 			running = true; // set this here to prevent another img read before the called function sets this to true
+			int new_sample_count = int(1.618f * current_sample_count);
+			new_sample_count = new_sample_count > target_sample_count ? target_sample_count : new_sample_count;
+			new_sample_count = new_sample_count < 10 ? 10 : new_sample_count;
+			sampling = { current_sample_count, new_sample_count, target_sample_count };
 			std::cout << "Need a new fractal, setting kernel args and running kernel.\n";
-			core.setDefaultArguments(cf);
-			core.setFractalKernelArgs(cf);
-			jt = std::jthread(&runKernelAsync, std::ref(cf), std::ref(core), std::ref(running));
+			if (current_sample_count == 0)
+			{
+				core.setDefaultArguments(cf);
+				core.setFractalKernelArgs(cf);
+			}
+			jt = std::jthread(&runKernelAsync, std::ref(cf), std::ref(core), std::ref(running), std::ref(sampling));
 			jt.detach();
 			needImg = true;
 			runKernel = false;
+			runImgKernel = true;
 		}
 		if (runImgKernel and !running) {
+			current_sample_count = sampling.y;
 			running = true; // set this here to prevent another img read before the called function sets this to true
 			std::cout << "Need a new image, setting kernel args and running kernel.\n";
-			jt = std::jthread(&runImgKernelAsync, std::ref(cf), std::ref(core), std::ref(running));
+			jt = std::jthread(&runImgKernelAsync, std::ref(cf), std::ref(core), std::ref(running), std::ref(sampling));
 			jt.detach();
 			needImg = true;
 			runImgKernel = false;
@@ -157,6 +171,7 @@ namespace mainView
 				needImg = false;
 				needTexture = true;
 				waitCounter = 0;
+				runKernel = current_sample_count < target_sample_count ? true : false;
 			}
 		}
 		// create texture from the image

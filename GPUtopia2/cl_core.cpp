@@ -159,7 +159,6 @@ void clCore::setDefaultArguments(clFractal& cf)
         sizeof(int) * npixels, CL_MEM_READ_ONLY, "yy", &err);
     err = setKernelArg(this->kernel, 2, cf.image.size, "image_size");
     err = setKernelArg(this->kernel, 3, cf.image.complexSubplane, "complex_subplane");
-    err = setKernelArg(this->kernel, 4, sampling, "sampling_info");
     err = setKernelArg(this->kernel, 5, cf.maxIter, "iterations");
     err = setKernelArg(this->kernel, 6, cf.bailout, "bailout");
     err = setKernelArg(this->kernel, 7, cf.gradient.fineLength, "gradient_length");
@@ -229,11 +228,11 @@ void clCore::compileImgKernel()
 
 void clCore::setImgKernelArguments(clFractal& cf)
 {
-    cl_int3 sampling = { 0, fibonacci_number(cf.image.quality), fibonacci_number(cf.image.quality) };
-    std::cout << "Sampling info is (" << sampling.x << ", " << sampling.y << ", " << sampling.z << ")" << std::endl;
+    //cl_int3 sampling = { 0, fibonacci_number(cf.image.quality), fibonacci_number(cf.image.quality) };
+    //std::cout << "Sampling info is (" << sampling.x << ", " << sampling.y << ", " << sampling.z << ")" << std::endl;
     cl_int err;
     cf.imgData.resize(cf.image.size.x * cf.image.size.y);
-    const uint32_t maxVal = sampling.z * cf.maxIter;
+    //const uint32_t maxVal = sampling.z * cf.maxIter;
     setReusedBufferArgument(this->imgKernel,
         0, this->imgIntRBuffer,
         "intImgBuffer");
@@ -247,16 +246,9 @@ void clCore::setImgKernelArguments(clFractal& cf)
         3, this->imgIntABuffer,
         "intImgBuffer");
     // only for flame mode, currenly unused in the kernel
-    err = setKernelArg(this->imgKernel, 
-        4, maxVal,
-        "histogram theoretical max"); 
     this->imgFloatBuffer = setBufferKernelArg(this->imgKernel, 
         5, cf.imgData.data(), sizeof(float) * 4 * this->currentRenderSize, CL_MEM_WRITE_ONLY, 
         "imgFloatColorValues", &err);
-    err = setKernelArg(this->imgKernel, 
-        6, sampling, 
-        "sampling info");
-    // only 0 works atm, currently unused in the kernel
     err = setKernelArg(this->imgKernel,
         7, cf.mode,
         "image processing mode (escape time/flame)");
@@ -306,25 +298,28 @@ void clCore::getImg(std::vector<color>& img, clFractal& cf) const
     queue.enqueueReadBuffer(this->imgFloatBuffer, CL_TRUE, 0, sizeof(cl_float4) * this->currentRenderSize, img.data());
 }
 
-void runKernelAsync(clFractal& cf, clCore& cc, bool& running)
+void runKernelAsync(clFractal& cf, clCore& cc, bool& running, cl_int3& sampling_range)
 {
-    //int ii = 0;
-    //while (ii < fibonacci_number(cf.image.quality) && plsProceed)
-    //{
-    //    cl_int3 sampling = { ii, ii + 1, fibonacci_number(cf.image.quality) };
-    //    cl_int err = cc.setKernelArg(4, sampling, "sampling_info");
+    cl_int err = 0;
+    //const uint32_t maxVal = sampling_range.y * cf.maxIter;
+    std::cout << "Kernel called with sampling (" << sampling_range.x << " " << sampling_range.y << " " << sampling_range.z << ")\n";
+    err = cc.setKernelArg(cc.kernel, 4, sampling_range, "sampling_info");
+    //err = cc.setKernelArg(cc.imgKernel, 4, maxVal, "histogram theoretical max");
+    //err = cc.setKernelArg(cc.imgKernel, 6, sampling_range, "sampling info");
     running = true;
     cc.runKernel(cf);
     cc.setImgKernelArguments(cf);
     cc.runImgKernel(cf);
     running = false;
-    //    ii++;
-    //}
 }
 
-void runImgKernelAsync(clFractal& cf, clCore& cc, bool& running)
+void runImgKernelAsync(clFractal& cf, clCore& cc, bool& running, cl_int3& sampling_range)
 {
     running = true;
+    cl_int err = 0;
+    const uint32_t maxVal = sampling_range.y * cf.maxIter;
+    err = cc.setKernelArg(cc.imgKernel, 4, maxVal, "histogram theoretical max");
+    err = cc.setKernelArg(cc.imgKernel, 6, sampling_range, "sampling info");
     cc.setImgKernelArguments(cf);
     cc.runImgKernel(cf);
     running = false;
