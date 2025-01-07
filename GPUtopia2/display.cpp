@@ -132,7 +132,7 @@ namespace mainView
 		static std::jthread jt;
 		if (runKernel and !running and current_sample_count < target_sample_count) {
 			running = true; // set this here to prevent another img read before the called function sets this to true
-			int new_sample_count = int(1.618f * current_sample_count);
+			int new_sample_count = current_sample_count + 10; // int(1.618f * current_sample_count);
 			new_sample_count = new_sample_count > target_sample_count ? target_sample_count : new_sample_count;
 			new_sample_count = new_sample_count < 10 ? 10 : new_sample_count;
 			sampling = { current_sample_count, new_sample_count, target_sample_count };
