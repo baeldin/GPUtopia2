@@ -52,7 +52,7 @@ void imageSettingsWindow(clFractal& cf, std::vector<color>& img)
 		ymin = cf.image.complexSubplane.y - 2.f / cf.image.zoom / cf.image.aspectRatio;
 		ymax = cf.image.complexSubplane.y + 2.f / cf.image.zoom / cf.image.aspectRatio;
 	}
-	ImGui::SliderInt("Render Quality", &cf.image.quality, 1, 16);
+	ImGui::SliderInt("Render Quality", &cf.image.quality, 1, 30);
 	ImGui::InputInt("Width", &cf.image.size.x);
 	ImGui::InputInt("Height", &cf.image.size.y);
 	ImGui::InputInt("Coloring mode", &cf.mode);
