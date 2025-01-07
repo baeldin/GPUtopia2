@@ -46,7 +46,7 @@ __kernel void imgProcessing(
     if (mode == 0)
     {
         // do ET stuff
-        const float invFactor = 1.f / (float)(256 * sampling.z);
+        const float invFactor = 1.f / (float)(256 * sampling.y);
         outColors[i] = linearToSRGB((float4)(
             invFactor * (float)inColorsR[i],
             invFactor * (float)inColorsG[i],
