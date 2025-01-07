@@ -294,22 +294,16 @@ void clCore::runImgKernel(clFractal& cf) const
 
 void clCore::getImg(std::vector<color>& img, clFractal& cf) const
 {
-    // const int npixels = cf.image.size.x * cf.image.size.y;
     queue.enqueueReadBuffer(this->imgFloatBuffer, CL_TRUE, 0, sizeof(cl_float4) * this->currentRenderSize, img.data());
 }
 
 void runKernelAsync(clFractal& cf, clCore& cc, bool& running, cl_int3& sampling_range)
 {
     cl_int err = 0;
-    //const uint32_t maxVal = sampling_range.y * cf.maxIter;
     std::cout << "Kernel called with sampling (" << sampling_range.x << " " << sampling_range.y << " " << sampling_range.z << ")\n";
     err = cc.setKernelArg(cc.kernel, 4, sampling_range, "sampling_info");
-    //err = cc.setKernelArg(cc.imgKernel, 4, maxVal, "histogram theoretical max");
-    //err = cc.setKernelArg(cc.imgKernel, 6, sampling_range, "sampling info");
     running = true;
     cc.runKernel(cf);
-    cc.setImgKernelArguments(cf);
-    cc.runImgKernel(cf);
     running = false;
 }
 

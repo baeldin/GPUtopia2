@@ -1,4 +1,5 @@
 #include "display.h"
+#include "sampling.h"
 
 void prepTexture(GLuint& texture)
 {
@@ -63,12 +64,13 @@ namespace mainView
 		static clCore core;
 		// static asyncOpenCL asc;
 		// static std::jthread jt;
-		static cl_int3 sampling = { 0, 10, 233 };
+		static cl_int3 sampling = { 0, 0, 1 };
+		static int next_update_sample_count = 1;
 		if (needCLFractal)
 		{
 			std::cout << "Need a fractal, re-reading code and generating kernel code.\n";
 			cf.fractalCLFragmentFile = "clFragments/fractalFormulas/mandelbrot.cl";
-			cf.coloringCLFragmentFile = "clFragments/coloringAlgorithms/buddha.cl";
+			cf.coloringCLFragmentFile = "clFragments/coloringAlgorithms/by_iteration.cl";
 			cf.makeCLCode();
 			needCLFractal = false;
 			needNewKernel = true;
@@ -105,9 +107,10 @@ namespace mainView
 		static bool runKernel = true;
 		static bool runImgKernel = false;
 		static int waitCounter = 0;
-		static bool target_quality_reached = false;
-		static int target_sample_count = 610; // 2584;
+		static int target_sample_count = fibonacci_number(cf.image.quality); // 2584;
 		static int current_sample_count = 0;
+		static int new_sample_count = current_sample_count + 1;
+		static bool force_img_update = false;
 		if (cf.flameRenderSettings != cf_old.flameRenderSettings) {
 			std::cout << "Fractal's flameRenderSettings changed, demanding new run of imgKernel.\n";
 			runImgKernel = true;
@@ -115,14 +118,16 @@ namespace mainView
 		}
 		if (cf != cf_old && waitCounter == 0) {
 			std::cout << "Parameters changed, updating cf.params.\n - requesting new Texture\n - requesting new image\n";
-			needImg = true;
+			// needImg = true;
 			needCLFractal = false;
-			std::cout << "Old zoom: " << cf_old.image.zoom << " new zoom: " << cf.image.zoom << std::endl;
+			// std::cout << "Old zoom: " << cf_old.image.zoom << " new zoom: " << cf.image.zoom << std::endl;
 			cf.image.updateComplexSubplane();
 			core.setDefaultArguments(cf);
 			core.setFractalKernelArgs(cf);
 			cf_old = cf;
 			current_sample_count = 0;
+			next_update_sample_count = 1;
+			target_sample_count = fibonacci_number(cf.image.quality);
 			runKernel = true;
 		}
 
@@ -132,30 +137,48 @@ namespace mainView
 		static std::jthread jt;
 		if (runKernel and !running and current_sample_count < target_sample_count) {
 			running = true; // set this here to prevent another img read before the called function sets this to true
-			int new_sample_count = current_sample_count + 10; // int(1.618f * current_sample_count);
+			int new_sample_count = current_sample_count + 1; // int(1.618f * current_sample_count);
 			new_sample_count = new_sample_count > target_sample_count ? target_sample_count : new_sample_count;
-			new_sample_count = new_sample_count < 10 ? 10 : new_sample_count;
+			new_sample_count = new_sample_count < 1 ? 1 : new_sample_count;
 			sampling = { current_sample_count, new_sample_count, target_sample_count };
 			std::cout << "Need a new fractal, setting kernel args and running kernel.\n";
 			if (current_sample_count == 0)
 			{
+				next_update_sample_count = 1;
 				core.setDefaultArguments(cf);
 				core.setFractalKernelArgs(cf);
 			}
 			jt = std::jthread(&runKernelAsync, std::ref(cf), std::ref(core), std::ref(running), std::ref(sampling));
 			jt.detach();
-			needImg = true;
 			runKernel = false;
-			runImgKernel = true;
+		}
+		std::cout << "current_sample_count = " << current_sample_count << "\n";
+		std::cout << "next_update_sample_count = " << next_update_sample_count << "\n";
+		if (!running)
+		{
+			current_sample_count = sampling.y;
+			if (current_sample_count >= next_update_sample_count and !force_img_update)
+			{
+				runImgKernel = true;
+				if (current_sample_count == target_sample_count)
+				{
+					target_sample_count++;
+				}
+			}
+			else
+			{
+				runKernel = true;
+			}
 		}
 		if (runImgKernel and !running) {
-			current_sample_count = sampling.y;
 			running = true; // set this here to prevent another img read before the called function sets this to true
 			std::cout << "Need a new image, setting kernel args and running kernel.\n";
 			jt = std::jthread(&runImgKernelAsync, std::ref(cf), std::ref(core), std::ref(running), std::ref(sampling));
 			jt.detach();
 			needImg = true;
 			runImgKernel = false;
+			next_update_sample_count *= 2;
+			next_update_sample_count = next_update_sample_count > target_sample_count ? target_sample_count : next_update_sample_count;
 		}        
 		if (running) {
 			std::cout << "Am I running? " << running << std::endl;
@@ -171,7 +194,7 @@ namespace mainView
 				needImg = false;
 				needTexture = true;
 				waitCounter = 0;
-				runKernel = current_sample_count < target_sample_count ? true : false;
+				// runKernel = current_sample_count < target_sample_count ? true : false;
 			}
 		}
 		// create texture from the image
