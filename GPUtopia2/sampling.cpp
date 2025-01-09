@@ -14,3 +14,18 @@ int fibonacci_number(const int N)
     }
     return c;
 }
+
+bool is_fibonacci_number(const uint32_t N)
+{
+    uint32_t checkNum = 0;
+    uint32_t idx = 0;
+    while (checkNum <= N)
+    {
+        if (fibonacci_number(idx) == N)
+        {
+            return true;
+        }
+        idx++;
+    }
+    return false;
+}
