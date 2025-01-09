@@ -306,9 +306,11 @@ void runKernelAsync(clFractal& cf, clCore& cc)
         cf.image.current_sample_count + 1,
         cf.image.target_sample_count };
     std::cout << "Kernel called with sampling (" << sampling_info.x << " " << sampling_info.y << " " << sampling_info.z << ")\n";
+    std::cout << "Fractal image curent_sample_count = " << cf.image.current_sample_count << "\n";
     err = cc.setKernelArg(cc.kernel, 4, sampling_info, "sampling_info");
     cc.runKernel(cf);
     cf.image.current_sample_count += 1;
+    std::cout << "New fractal image curent_sample_count = " << cf.image.current_sample_count << "\n";
     cf.status.kernelRunning = false;
 }
 
@@ -320,6 +322,7 @@ void runImgKernelAsync(clFractal& cf, clCore& cc)
         cf.image.current_sample_count,
         cf.image.current_sample_count,
         cf.image.target_sample_count }; 
+    std::cout << "ImageKernel called with sampling (" << sampling_info.x << " " << sampling_info.y << " " << sampling_info.z << ")\n";
     const uint32_t maxVal = sampling_info.y * cf.maxIter;
     err = cc.setKernelArg(cc.imgKernel, 4, maxVal, "histogram theoretical max");
     err = cc.setKernelArg(cc.imgKernel, 6, sampling_info, "sampling info");
