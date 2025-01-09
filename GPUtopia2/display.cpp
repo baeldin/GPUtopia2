@@ -100,6 +100,7 @@ namespace mainView
 		formulaSettingsWindow(cf);
 		imageSettingsWindow(cf, textureColors);
 		flameRenderSettingsWindow(cf);
+		infoWindow(cf);
 		static int waitCounter = 0;
 		static bool force_img_update = false;
 		if (cf.flameRenderSettings != cf_old.flameRenderSettings) {
@@ -139,17 +140,15 @@ namespace mainView
 			jt.detach();
 			cf.status.runKernel = false;
 		}
-		std::cout << "current_sample_count = " << cf.image.current_sample_count << "\n";
-		std::cout << "next_update_sample_count = " << cf.image.next_update_sample_count << "\n";
 		if (!cf.running())
 		{
 			if (cf.image.current_sample_count >= cf.image.next_update_sample_count and !force_img_update)
 			{
 				cf.status.runImgKernel = true;
-				if (cf.image.current_sample_count == cf.image.target_sample_count)
-				{
-					cf.image.next_update_sample_count++;
-				}
+				//if (cf.image.current_sample_count == cf.image.target_sample_count)
+				//{
+				//	cf.image.next_update_sample_count++;
+				//}
 			}
 			else
 			{
@@ -157,8 +156,8 @@ namespace mainView
 			}
 		}
 		if (cf.status.runImgKernel and !cf.running() and !cf.status.done) {
-			running = true; // set this here to prevent another img read before the called function sets this to true
 			std::cout << "Need a new image, setting kernel args and running kernel.\n";
+			std::cout << "sampling info is (" << cf.image.current_sample_count << ", " << cf.image.target_sample_count << ")\n";
 			jt = std::jthread(&runImgKernelAsync, std::ref(cf), std::ref(core));
 			jt.detach();
 			needImg = true;
@@ -180,13 +179,14 @@ namespace mainView
 				needImg = false;
 				needTexture = true;
 				waitCounter = 0;
-				// runKernel = current_sample_count < target_sample_count ? true : false;
 			}
 		}
 		// create texture from the image
 		if (needTexture) {
 			std::cout << "Need a new texture, deleting old and remaking using the new image.\n";
 			glDeleteTextures(1, &textureID);
+			std::cout << "IMAGE SIZE: " << cf.image.size.x << ", " << cf.image.size.y << "(" << cf.image.size.x * cf.image.size.y << ")\n";
+			std::cout << textureColors.size() << "\n";
 			makeTexture(textureID, cf.image.size.x, cf.image.size.y, textureColors);
 			needTexture = false;
 		}
@@ -198,6 +198,5 @@ namespace mainView
 			cf.image.size.x, cf.image.size.y)); // , texturesize);
 		ImGui::End();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	}
 };

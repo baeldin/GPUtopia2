@@ -18,6 +18,7 @@
 #include "flameRenderSettings.h"
 #include "cl_handler.h"
 #include "explorer.h"
+#include "info.h"
 
 using std::string;
 
