@@ -4,18 +4,6 @@
 #include "gradient.h"
 #include "sampling.h"
 
-//const bool operator==(
-//	const std::map<std::string, std::pair<cl_float2, int>>&lhs,
-//	const std::map<std::string, std::pair<cl_float2, int>>&rhs) {
-//	bool ret = true;
-//	ret = (lhs.size() == rhs.size()) ? false : true;
-//	for (auto [key, val] : lhs)
-//	{
-//		std::pair<cl_float2, int> val_rhs = rhs.find(key);
-//
-//	}
-//}
-
 inline const bool operator==(const cl_int2& lhs, const cl_int2& rhs)
 {
 	return
@@ -44,8 +32,7 @@ struct parameterMaps
 	std::map<std::string, std::pair<cl_float2, int>> float2Parameters;
 };
 
-//#ifndef HELLO
-//#define HELLO
+
 inline const bool operator==(const parameterMaps& lhs, const parameterMaps& rhs)
 {
 	return (
@@ -54,8 +41,6 @@ inline const bool operator==(const parameterMaps& lhs, const parameterMaps& rhs)
 		lhs.floatParameters == rhs.floatParameters &&
 		lhs.float2Parameters == rhs.float2Parameters);
 }
-//#endif
-//const bool operator!=(const parameterMaps& lhs, const parameterMaps& rhs) {	return !(lhs == rhs); }
 
 struct paramCollector
 {
@@ -131,7 +116,7 @@ public:
 	bool rebuildKernel = false;
 	int maxIter = 100;
 	float bailout = 4.f;
-	// brightness, gamma, vibrancy, UNUSED
+	// brightness, gamma, vibrancy
 	cl_float4 flameRenderSettings = { 4.f, 2.f, 1.f, 0.f };
 	cl_int flamePointSelection = 0;
 	clFractalStatus status;
