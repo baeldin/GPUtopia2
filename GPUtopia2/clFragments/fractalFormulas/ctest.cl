@@ -6,7 +6,7 @@ z.x = z0.x;
 z.y = z0.y;
 __loop:
 //=========| fractal formula loop
-        z = cexp(z);
+        z = cmul(csin(z), z);
         z.x += z0.x;
         z.y += z0.y;
 __bailout:
