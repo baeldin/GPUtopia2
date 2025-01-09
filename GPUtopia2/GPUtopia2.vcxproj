@@ -169,6 +169,8 @@
     <ClCompile Include="formulaSettings.cpp" />
     <ClCompile Include="gradient.cpp" />
     <ClCompile Include="imageSettings.cpp" />
+    <ClCompile Include="info.cpp" />
+    <ClCompile Include="info.h" />
     <ClCompile Include="load_shaders.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sampling.cpp" />
