@@ -113,6 +113,7 @@ void clCore::compileNewKernel(clFractal& cf)
     }
     else {
         std::cout << "Kernel created successfully.\n";
+        cf.buildKernel = false;
     }
 }
 
@@ -150,7 +151,7 @@ void clCore::setDefaultArguments(clFractal& cf)
     cf.imgIntGData.resize(npixels, 0);
     cf.imgIntBData.resize(npixels, 0);
     cf.imgIntAData.resize(npixels, 0);
-    cl_int3 sampling = { 0, fibonacci_number(cf.image.quality), fibonacci_number(cf.image.quality) };
+    cl_int3 sampling = { 0, fibonacci_number(cf.image.targetQuality), fibonacci_number(cf.image.targetQuality) };
     cl_int err;
     std::cout << "xx size is " << xx.size() << std::endl;
     this->xBuffer = setBufferKernelArg(this->kernel, 0, xx.data(), 
@@ -295,11 +296,11 @@ void clCore::runImgKernel(clFractal& cf) const
 void clCore::getImg(std::vector<color>& img, clFractal& cf) const
 {
     queue.enqueueReadBuffer(this->imgFloatBuffer, CL_TRUE, 0, sizeof(cl_float4) * this->currentRenderSize, img.data());
+    cf.status.updateImage = false;
 }
 
 void runKernelAsync(clFractal& cf, clCore& cc)
 {
-    cf.status.kernelRunning = true;
     cl_int err = 0;
     cl_int3 sampling_info = {
         cf.image.current_sample_count,
@@ -316,7 +317,6 @@ void runKernelAsync(clFractal& cf, clCore& cc)
 
 void runImgKernelAsync(clFractal& cf, clCore& cc)
 {
-    cf.status.imgKernelRunning = true;
     cl_int err = 0;
     cl_int3 sampling_info = {
         cf.image.current_sample_count,
@@ -328,11 +328,9 @@ void runImgKernelAsync(clFractal& cf, clCore& cc)
     err = cc.setKernelArg(cc.imgKernel, 6, sampling_info, "sampling info");
     cc.setImgKernelArguments(cf);
     cc.runImgKernel(cf);
-    if (cf.image.current_sample_count == cf.image.target_sample_count)
-    {
-        cf.status.done = true;
-    }
+    cf.status.done = cf.image.current_sample_count == cf.image.target_sample_count ? true : false;
     cf.status.imgKernelRunning = false;
+    cf.status.updateImage = true;
 }
 
 //    

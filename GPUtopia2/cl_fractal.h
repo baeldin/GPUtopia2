@@ -61,7 +61,8 @@ struct clFractalImage
 	cl_int2 size = { 800, 600 };
 	float aspectRatio = (float)size.x / (float)size.y;
 	cl_float4 complexSubplane = { 0.f, 0.f, 4.f, 4.f / aspectRatio };
-	int quality = 1;
+	int targetQuality = 3;
+	uint32_t currentQuality = 0;
 	float zoom = 1.f;
 	uint32_t current_sample_count = 0;
 	uint32_t target_sample_count = 1;
@@ -70,6 +71,12 @@ struct clFractalImage
 		float aspectRatio = (float)size.x / (float)size.y;
 	}
 	void updateComplexSubplane();
+	void resetStatus() {
+		this->currentQuality = 0;
+		this->current_sample_count = 0;
+		this->next_update_sample_count = 1;
+		this->target_sample_count = fibonacci_number(this->targetQuality);
+	}
 };
 
 inline const bool operator==(const clFractalImage& lhs, const clFractalImage& rhs)
@@ -78,7 +85,7 @@ inline const bool operator==(const clFractalImage& lhs, const clFractalImage& rh
 		lhs.size == rhs.size &&
 		lhs.aspectRatio == rhs.aspectRatio &&
 		lhs.complexSubplane == rhs.complexSubplane &&
-		lhs.quality == rhs.quality &&
+		lhs.targetQuality == rhs.targetQuality &&
 		lhs.zoom == rhs.zoom);
 }
 
@@ -93,6 +100,7 @@ struct clFractalStatus
 	bool imgKernelRunning = false;
 	bool runKernel = false;
 	bool runImgKernel = false;
+	bool updateImage = false;
 	bool done = false;
 };
 // Fractal class that holds parameters, names of the code fragmens, and the full
@@ -103,8 +111,8 @@ public:
 	paramCollector params;
 	clFractalImage image;
 	Gradient gradient;
-	std::string fractalCLFragmentFile;
-	std::string coloringCLFragmentFile;
+	std::string fractalCLFragmentFile = "clFragments/fractalFormulas/mandelbrot.cl";
+	std::string coloringCLFragmentFile = "clFragments/coloringAlgorithms/by_iteration.cl";
 	std::string fullCLcode = "";
 	std::vector<int> imgIntRData;
 	std::vector<int> imgIntGData;
@@ -113,7 +121,7 @@ public:
 	std::vector<color> imgData;
 	bool vomit = false;
 	int mode = 0;
-	bool rebuildKernel = false;
+	bool buildKernel = false;
 	int maxIter = 100;
 	float bailout = 4.f;
 	// brightness, gamma, vibrancy
@@ -131,6 +139,7 @@ public:
 	bool running() {
 		return this->status.kernelRunning or this->status.imgKernelRunning;
 	}
+
 };
 
 inline const bool operator==(const clFractal& lhs, const clFractal& rhs)
@@ -138,7 +147,7 @@ inline const bool operator==(const clFractal& lhs, const clFractal& rhs)
 	return (
 		lhs.params == rhs.params &&
 		lhs.image == rhs.image &&
-		lhs.rebuildKernel == rhs.rebuildKernel &&
+		lhs.buildKernel == rhs.buildKernel &&
 		lhs.fractalCLFragmentFile == rhs.fractalCLFragmentFile &&
 		lhs.coloringCLFragmentFile == rhs.coloringCLFragmentFile &&
 		lhs.fullCLcode == rhs.fullCLcode &&

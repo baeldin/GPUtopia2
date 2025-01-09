@@ -14,7 +14,7 @@ void formulaSettingsWindow(clFractal& cf)
 		cf.fractalCLFragmentFile = std::string(formulaCLFragment);
 		cf.coloringCLFragmentFile = std::string(coloringCLFragment);
 		cf.makeCLCode();
-		cf.rebuildKernel = true;
+		cf.buildKernel = true;
 	}
 	ImGui::DragFloat("Bailout", &cf.bailout, 4., 20000.);
 	ImGui::Text("Formula Parameters:");

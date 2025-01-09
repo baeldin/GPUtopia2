@@ -51,49 +51,42 @@ namespace mainView
 	{
 		ImGui::Begin("Main View", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 		static GLuint textureID;
-		static bool needTexture = false;
-		static bool needImg = false;
+		static bool updateTexture = false;
 		static bool refreshDefaultArguments = true;
 		static bool refreshFractalArguments = true;
 		static ImVec2 mainViewportSize = ImGui::GetContentRegionAvail();
 		static clFractal cf;
-		static std::vector<color> textureColors(cf.image.size.x * cf.image.size.y);
 		static clFractal cf_old;
+		static std::vector<color> textureColors(cf.image.size.x * cf.image.size.y);
 		static bool needCLFractal = true;
-		static bool needNewKernel = true;
 		static clCore core;
-		// static asyncOpenCL asc;
-		// static std::jthread jt;
+		// only run at startup, maybe move somewhere else?
 		if (needCLFractal)
 		{
-			std::cout << "Need a fractal, re-reading code and generating kernel code.\n";
-			cf.fractalCLFragmentFile = "clFragments/fractalFormulas/mandelbrot.cl";
-			cf.coloringCLFragmentFile = "clFragments/coloringAlgorithms/by_iteration.cl";
 			cf.makeCLCode();
+			core.compileNewKernel(cf);
 			needCLFractal = false;
-			needNewKernel = true;
 		}
+		// check if main viewport needs resizing
 		if (mainViewportSize.x != ImGui::GetContentRegionAvail().x ||
 			mainViewportSize.y != ImGui::GetContentRegionAvail().y)
 		{
 			mainViewportSize = ImGui::GetContentRegionAvail();
 			mainViewportSize.y < 1 ? mainViewportSize.y = 1 : mainViewportSize.y;
 		}
+		// check if image size changed, if so, resize the texture too
 		if (cf_old.image.size != cf.image.size)
 		{
-			needImg = true;
+			cf.status.runImgKernel = true;
 			textureColors.resize(cf.image.size.x * cf.image.size.y);
-			//cf.image.size = { cf.image.size.x, cf.image.size.y };
-			cf_old = cf;
-
+			cf_old.image = cf.image;
 		}
-		if (needNewKernel or cf.rebuildKernel)
+		// check if a kernel rebuild is needed
+		if (cf.buildKernel)
 		{
 			std::cout << "Need a new kernel, compiling it now.\n - requesting new texture\n - requesting new image\n";
 			core.compileNewKernel(cf);
-			needNewKernel = false;
-			needImg = true;
-			cf.rebuildKernel = false;
+			cf.status.runKernel = true;
 		}
 		static paramCollector params_old = cf.params;
 		static clFractalImage img_settings_old = cf.image;
@@ -103,24 +96,23 @@ namespace mainView
 		infoWindow(cf);
 		static int waitCounter = 0;
 		static bool force_img_update = false;
-		if (cf.flameRenderSettings != cf_old.flameRenderSettings) {
+		// only order rerun of imgKernel if flameRenderSettings change
+		if (cf.flameRenderSettings != cf_old.flameRenderSettings and !cf.running()) {
 			std::cout << "Fractal's flameRenderSettings changed, demanding new run of imgKernel.\n";
 			cf.status.runImgKernel = true;
-			cf.status.done = false;
 			cf_old.flameRenderSettings = cf.flameRenderSettings;
 		}
-		if (cf != cf_old && waitCounter == 0) {
+		// 
+		if (cf != cf_old) { //}&& waitCounter == 0) {
 			std::cout << "Parameters changed, updating cf.params.\n - requesting new Texture\n - requesting new image\n";
 			needCLFractal = false;
 			cf.image.updateComplexSubplane();
 			core.setDefaultArguments(cf);
 			core.setFractalKernelArgs(cf);
-			cf_old = cf;
-			cf.image.current_sample_count = 0;
-			cf.image.next_update_sample_count = 1;
-			cf.image.target_sample_count = fibonacci_number(cf.image.quality);
+			cf.image.resetStatus();
 			cf.status.runKernel = true;
 			cf.status.done = false;
+			cf_old = cf;
 		}
 
 		glViewport(0, 0, mainViewportSize.x, mainViewportSize.y);
@@ -128,67 +120,58 @@ namespace mainView
 		static bool running = false;
 		static std::jthread jt;
 		if (cf.status.runKernel and !cf.running() and cf.image.current_sample_count < cf.image.target_sample_count) {
-			running = true; // set this here to prevent another img read before the called function sets this to true
-			// std::cout << "Need a new fractal, setting kernel args and running kernel.\n";
 			if (cf.image.current_sample_count == 0)
 			{
 				cf.image.next_update_sample_count = 1;
 				core.setDefaultArguments(cf);
 				core.setFractalKernelArgs(cf);
 			}
+			cf.status.kernelRunning = true;
 			jt = std::jthread(&runKernelAsync, std::ref(cf), std::ref(core));
 			jt.detach();
 			cf.status.runKernel = false;
 		}
-		if (!cf.running())
+
+		if (cf.status.runImgKernel and !cf.running()) {
+			std::cout << "Need a new image, setting kernel args and running kernel.\n";
+			std::cout << "sampling info is (" << cf.image.current_sample_count << ", " << cf.image.target_sample_count << ")\n";
+			cf.status.imgKernelRunning = true;
+			jt = std::jthread(&runImgKernelAsync, std::ref(cf), std::ref(core));
+			jt.detach();
+			cf.status.runImgKernel = false;
+		}
+		// check current image quality
+		if (!cf.running() and !cf.status.done)
 		{
-			if (cf.image.current_sample_count >= cf.image.next_update_sample_count and !force_img_update)
+			if (cf.image.current_sample_count == cf.image.next_update_sample_count)
 			{
+				cf.image.next_update_sample_count = 2* cf.image.next_update_sample_count;
+				cf.image.next_update_sample_count = cf.image.next_update_sample_count > cf.image.target_sample_count ? cf.image.target_sample_count : cf.image.next_update_sample_count;
 				cf.status.runImgKernel = true;
-				//if (cf.image.current_sample_count == cf.image.target_sample_count)
-				//{
-				//	cf.image.next_update_sample_count++;
-				//}
 			}
 			else
 			{
 				cf.status.runKernel = true;
 			}
 		}
-		if (cf.status.runImgKernel and !cf.running() and !cf.status.done) {
-			std::cout << "Need a new image, setting kernel args and running kernel.\n";
-			std::cout << "sampling info is (" << cf.image.current_sample_count << ", " << cf.image.target_sample_count << ")\n";
-			jt = std::jthread(&runImgKernelAsync, std::ref(cf), std::ref(core));
-			jt.detach();
-			needImg = true;
-			cf.status.runImgKernel = false;
-			cf.image.next_update_sample_count *= 2;
-			cf.image.next_update_sample_count = cf.image.next_update_sample_count > cf.image.target_sample_count ? cf.image.target_sample_count : cf.image.next_update_sample_count;
-		}        
-		if (cf.running()) {
-			std::cout << "Am I running? " << running << std::endl;
-			std::cout << "  My thread ID is " << jt.get_id() << std::endl;
-		}
-		if (needImg && !cf.running())
+		if (cf.status.updateImage and !cf.running())
 		{
-			waitCounter++;
-			if (waitCounter > 1) // wait 1 frame before continuing
+			if (cf.image.size.x * cf.image.size.y != textureColors.size())
 			{
 				textureColors.resize(cf.image.size.x * cf.image.size.y);
-				core.getImg(textureColors, cf);
-				needImg = false;
-				needTexture = true;
-				waitCounter = 0;
 			}
+			core.getImg(textureColors, cf);
+			updateTexture = true;
+			waitCounter = 0;
 		}
 		// create texture from the image
-		if (needTexture) {
+		if (updateTexture) {
 			std::cout << "Need a new texture, deleting old and remaking using the new image.\n";
 			glDeleteTextures(1, &textureID);
 			std::cout << "IMAGE SIZE: " << cf.image.size.x << ", " << cf.image.size.y << "(" << cf.image.size.x * cf.image.size.y << ")\n";
 			std::cout << textureColors.size() << "\n";
 			makeTexture(textureID, cf.image.size.x, cf.image.size.y, textureColors);
-			needTexture = false;
+			updateTexture = false;
 		}
 
 		ImGui::End();
