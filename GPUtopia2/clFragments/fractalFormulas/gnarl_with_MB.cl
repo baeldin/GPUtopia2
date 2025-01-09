@@ -24,3 +24,5 @@ __bailout:
 //=| factal bailout function
     // must always define bool bailedout!!!
     bool bailedout = (dot(z, z) > bailout*bailout);
+__functions:
+// nothing
