@@ -1,6 +1,8 @@
 
 const float phi = 1.618033988749f;
 const float phi2 = 1.324717957244f;
+const float inv_phi2A = 1.f / phi2;
+const float inv_phi2B = 1.f / (phi2 * phi2);
 
 float fracf(const float x) { return x - floor(x); }
 float absf(const float x) { return x * sign(x); }
