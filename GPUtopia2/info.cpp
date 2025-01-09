@@ -20,20 +20,34 @@ void infoWindow(clFractal& cf)
 	bool ret = false;
 	ImGui::BulletText(
 		"Fractal Status:\n"
-		"- Render Kernel Running = %d\n"
-		"- Image Kernel Running = %d\n"
-		"- Render Kernel Run Requested = %d\n"
-		"- Image Kernel Run Requested = %d\n"
+		"- Render kernel build requested = %d \n"
+		"- Render kernel run requested = %d\n"
+		"- Render kernel running = %d\n"
+		"- Image kernel run requested = %d\n"
+		"- Image kernel running = %d\n"
+		"- Update Image = %d\n"
 		"- Running = %d\n"
-		"- Done = %d\n",
-		ret,
-		cf.status.kernelRunning,
-		cf.status.imgKernelRunning,
+		"- Done = %d\n\n"
+		"Image Status:\n"
+		"- Image targetQuality= %d\n"
+		"- Image currentQuality = %d\n"
+		"- Image current_sample_count = %d\n"
+		"- Image next_update_sample_count = %d\n"
+		"- Image target_sample_count = %d",
+		cf.buildKernel,
 		cf.status.runKernel,
+		cf.status.kernelRunning,
 		cf.status.runImgKernel,
+		cf.status.imgKernelRunning,
+		cf.status.updateImage,
 		cf.running(),
-		cf.status.done
-	);
+		cf.status.done,
+		cf.image.targetQuality,
+		cf.image.currentQuality,
+		cf.image.current_sample_count,
+		cf.image.next_update_sample_count,
+		cf.image.target_sample_count
+		);
 	// PROGRESS BAR
 	static float progress = 0.f;
 	progress = (float)cf.image.current_sample_count / (float)cf.image.target_sample_count;
