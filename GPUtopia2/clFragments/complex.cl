@@ -23,7 +23,7 @@ inline complex cdiv(complex z1, complex z2)
 	const float inv_denominator = 1.f / (z2.x * z2.x + z2.y * z2.y);
 	return (complex)(
 		(z1.x * z2.x + z1.y * z2.y) * inv_denominator,
-		(z1.y * z2.x + z1.x * z2.y) * inv_denominator);
+		(z1.y * z2.x - z1.x * z2.y) * inv_denominator);
 }
 
 // ANALYTICAL FUNCTIONS
