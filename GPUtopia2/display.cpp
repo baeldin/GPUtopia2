@@ -75,7 +75,7 @@ namespace mainView
 			mainViewportSize.y < 1 ? mainViewportSize.y = 1 : mainViewportSize.y;
 		}
 		// check if image size changed, if so, resize the texture too
-		if (cf_old.image.size != cf.image.size)
+		if (cf_old.image.size != cf.image.size and !cf.running())
 		{
 			cf.status.runImgKernel = true;
 			textureColors.resize(cf.image.size.x * cf.image.size.y);
@@ -156,13 +156,17 @@ namespace mainView
 		}
 		if (cf.status.updateImage and !cf.running())
 		{
-			if (cf.image.size.x * cf.image.size.y != textureColors.size())
-			{
-				textureColors.resize(cf.image.size.x * cf.image.size.y);
-			}
-			core.getImg(textureColors, cf);
-			updateTexture = true;
-			waitCounter = 0;
+			//if (waitCounter > 2)
+			//{
+				if (cf.image.size.x * cf.image.size.y != textureColors.size())
+				{
+					textureColors.resize(cf.image.size.x * cf.image.size.y);
+				}
+				core.getImg(textureColors, cf);
+				updateTexture = true;
+				waitCounter = 0;
+			//}
+			//waitCounter++;
 		}
 		// create texture from the image
 		if (updateTexture) {
