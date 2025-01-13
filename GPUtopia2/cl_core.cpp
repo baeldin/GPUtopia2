@@ -115,6 +115,7 @@ void clCore::compileNewKernel(clFractal& cf)
         std::cout << "Kernel created successfully.\n";
         cf.buildKernel = false;
     }
+    this->kernelArgumentCount = 0;
 }
 
 template <typename T>
@@ -124,7 +125,8 @@ void clCore::setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::
     for (auto const& [key, val] : map)
     {
         std::cout << "Setting kernel argument " << key << " at position " << val.second << " with value " << val.first << std::endl;
-        err = setKernelArg(currentKernel, val.second, val.first, key.c_str());
+        const uint32_t currentArgumentIndex = val.second + this->kernelArgumentCount;
+        err = setKernelArg(currentKernel, currentArgumentIndex, val.first, key.c_str());
         if (err != CL_SUCCESS)
         {
             std::cout << "Failed to add kernel argument " << key << " at position " << val.second << "!\n";
@@ -146,6 +148,7 @@ void clCore::setDefaultArguments(clFractal& cf)
             yy[pixelIndex] = y;
         }
     }
+    // TODO: figure out if this is the part that breaks the image when resizing in the UI
     cf.imgData.resize(4 * npixels, 0);
     cf.imgIntRData.resize(npixels, 0);
     cf.imgIntGData.resize(npixels, 0);
@@ -174,9 +177,11 @@ void clCore::setDefaultArguments(clFractal& cf)
     this->imgIntABuffer = setBufferKernelArg(this->kernel, 12, cf.imgIntAData.data(),
         sizeof(uint32_t) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
     err = setKernelArg(this->kernel, 13, cf.flamePointSelection, "flamePointSelection");
+    err = setKernelArg(this->kernel, 14, cf.mode, "fractal mode");
+    this->kernelArgumentCount = 15;
 }
 
-void clCore::setFractalKernelArgs(clFractal& cf)
+void clCore::setKernelFractalArgs(clFractal& cf)
 {
     setMapOfArgs(this->kernel, cf.params.fractalParameterMaps.integerParameters);
     setMapOfArgs(this->kernel, cf.params.fractalParameterMaps.floatParameters);
@@ -225,6 +230,7 @@ void clCore::compileImgKernel()
     else {
         std::cout << "Image kernel created successfully.\n";
     }
+    this->imgKernelArgumentCount = 0;
 }
 
 void clCore::setImgKernelArguments(clFractal& cf)
@@ -247,8 +253,8 @@ void clCore::setImgKernelArguments(clFractal& cf)
         3, this->imgIntABuffer,
         "intImgBuffer");
     // only for flame mode, currenly unused in the kernel
-    this->imgFloatBuffer = setBufferKernelArg(this->imgKernel, 
-        5, cf.imgData.data(), sizeof(float) * 4 * this->currentRenderSize, CL_MEM_WRITE_ONLY, 
+    this->imgFloatBuffer = setBufferKernelArg(this->imgKernel,
+        5, cf.imgData.data(), sizeof(float) * 4 * this->currentRenderSize, CL_MEM_WRITE_ONLY,
         "imgFloatColorValues", &err);
     err = setKernelArg(this->imgKernel,
         7, cf.mode,
@@ -261,7 +267,8 @@ void clCore::setImgKernelArguments(clFractal& cf)
         "flame render gamma");
     err = setKernelArg(this->imgKernel,
         10, cf.flameRenderSettings.z,
-        "flame render vibrancy");
+        "flame reimageKernelArgumentCountnder vibrancy");
+    this->imgKernelArgumentCount = 11;
 }
 
 void clCore::runImgKernel(clFractal& cf) const

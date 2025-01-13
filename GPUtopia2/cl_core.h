@@ -23,7 +23,9 @@ public:
     cl::Program program;
     cl::CommandQueue queue;
     cl::Kernel kernel;
+    uint32_t kernelArgumentCount = 0;
     cl::Kernel imgKernel;
+    uint32_t imgKernelArgumentCount = 0;
     bool imgKernelCompiled = false;
     cl::Buffer xBuffer, yBuffer; 
     cl::Buffer gradientBuffer;
@@ -56,7 +58,7 @@ public:
     template <typename T>
     void setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::pair<T, int>>& map);
     
-    void setFractalKernelArgs(clFractal& cf);
+    void setKernelFractalArgs(clFractal& cf);
     void setImgKernelArguments(clFractal& cf);
     void setDefaultArguments(clFractal& cf);
     void runKernel(clFractal& cf) const;

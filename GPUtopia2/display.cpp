@@ -108,7 +108,7 @@ namespace mainView
 			needCLFractal = false;
 			cf.image.updateComplexSubplane();
 			core.setDefaultArguments(cf);
-			core.setFractalKernelArgs(cf);
+			core.setKernelFractalArgs(cf);
 			cf.image.resetStatus();
 			cf.status.runKernel = true;
 			cf.status.done = false;
@@ -124,7 +124,8 @@ namespace mainView
 			{
 				cf.image.next_update_sample_count = 1;
 				core.setDefaultArguments(cf);
-				core.setFractalKernelArgs(cf);
+				std::cout << "kernel currently has " << core.kernelArgumentCount << " arguments.'n";
+				core.setKernelFractalArgs(cf);
 			}
 			cf.status.kernelRunning = true;
 			jt = std::jthread(&runKernelAsync, std::ref(cf), std::ref(core));

@@ -103,6 +103,7 @@ struct clFractalStatus
 	bool updateImage = false;
 	bool done = false;
 };
+
 // Fractal class that holds parameters, names of the code fragmens, and the full
 // CL code of the fractal + coloring
 class clFractal
@@ -159,6 +160,7 @@ inline const bool operator==(const clFractal& lhs, const clFractal& rhs)
 		lhs.flamePointSelection == rhs.flamePointSelection &&
 		lhs.vomit == rhs.vomit);
 }
+
 inline const bool operator!=(const clFractal& lhs, const clFractal& rhs)
 {
 	return !(lhs == rhs);
