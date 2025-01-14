@@ -1,8 +1,10 @@
 #pragma once
 #include <map>
+#include <cmath>
 
 #include "gradient.h"
 #include "sampling.h"
+#include "complex_number.h"
 
 inline const bool operator==(const cl_int2& lhs, const cl_int2& rhs)
 {
@@ -64,6 +66,8 @@ struct clFractalImage
 	int targetQuality = 3;
 	uint32_t currentQuality = 0;
 	float zoom = 1.f;
+	float angle = 0.f;
+	Complex<float> rotation = Complex<float>(std::cos(angle), std::sin(angle));
 	uint32_t current_sample_count = 0;
 	uint32_t target_sample_count = 1;
 	uint32_t next_update_sample_count = 1;
