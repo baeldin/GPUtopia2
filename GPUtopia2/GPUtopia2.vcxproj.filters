@@ -45,9 +45,6 @@
     <ClInclude Include="load_shaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="key_callbacks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="glewGuard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -79,6 +76,9 @@
       <Filter>Header Files\Ui</Filter>
     </ClInclude>
     <ClInclude Include="cl_fractal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cubic_spline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -124,6 +124,15 @@
     </ClCompile>
     <ClCompile Include="info.cpp">
       <Filter>Source Files\Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="cubic_spline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_gradients.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_gradients.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

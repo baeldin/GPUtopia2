@@ -147,6 +147,7 @@
     <ClInclude Include="cl_fractal.h" />
     <ClInclude Include="cl_handler.h" />
     <ClInclude Include="color.h" />
+    <ClInclude Include="cubic_spline.h" />
     <ClInclude Include="display.h" />
     <ClInclude Include="flameRenderSettings.h" />
     <ClInclude Include="formulaSettings.h" />
@@ -155,7 +156,6 @@
     <ClInclude Include="imageSettings.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgExport.h" />
-    <ClInclude Include="key_callbacks.h" />
     <ClInclude Include="load_shaders.h" />
     <ClInclude Include="parameterMaps.h" />
   </ItemGroup>
@@ -164,6 +164,7 @@
     <ClCompile Include="cl_core.cpp" />
     <ClCompile Include="cl_core.h" />
     <ClCompile Include="color.cpp" />
+    <ClCompile Include="cubic_spline.cpp" />
     <ClCompile Include="display.cpp" />
     <ClCompile Include="flameRenderSettings.cpp" />
     <ClCompile Include="formulaSettings.cpp" />
@@ -174,6 +175,8 @@
     <ClCompile Include="load_shaders.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sampling.cpp" />
+    <ClCompile Include="test_gradients.cpp" />
+    <ClCompile Include="test_gradients.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="clFragments\anti_aliasing.cl" />
