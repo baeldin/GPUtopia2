@@ -177,8 +177,9 @@ void clCore::setDefaultArguments(clFractal& cf)
     this->imgIntABuffer = setBufferKernelArg(this->kernel, 12, cf.imgIntAData.data(),
         sizeof(uint32_t) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
     err = setKernelArg(this->kernel, 13, cf.flamePointSelection, "flamePointSelection");
-    err = setKernelArg(this->kernel, 14, cf.mode, "fractal mode");
-    this->kernelArgumentCount = 15;
+    err = setKernelArg(this->kernel, 14, cf.flameWarmup, "flameWarmup");
+    err = setKernelArg(this->kernel, 15, cf.mode, "fractal mode");
+    this->kernelArgumentCount = 16;
 }
 
 void clCore::setKernelFractalArgs(clFractal& cf)

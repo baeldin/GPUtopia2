@@ -38,7 +38,8 @@ __kernel void computeLoop(
     __global atomic_uint* colorsB,     // 11: output B
     __global atomic_uint* colorsA,     // 12: output A
     const int flamePointSelection,     // 13: discard points, used for flame
-    const int mode,                    // 14: mode (0 = escape time, 1 = flame)
+    const int flameWarmup,             // 14: warmup before splatting flame samples
+    const int mode,                    // 15: mode (0 = escape time, 1 = flame)
 //@__kernelArguments)
 {
     // Get Parallel Index

@@ -6,7 +6,7 @@ __loop:
 //=========| coloring loop
 			// empty for smooth mandelbrot
 			int2 xy = revert_complex_coordinates(z, image_size, complex_subplane);
-			if (xy.x < image_size.x && xy.x >= 0 && xy.y < image_size.y && xy.y >= 0)
+			if (xy.x < image_size.x && xy.x >= 0 && xy.y < image_size.y && xy.y >= 0 && iter >= flameWarmup)
 			{
 				int4 color = getColor(gradient, @colorDensity * iter, nColors);
 				int pixelIndex = xy.y * image_size.x + xy.x;

@@ -128,6 +128,7 @@ public:
 	// brightness, gamma, vibrancy
 	cl_float4 flameRenderSettings = { 4.f, 2.f, 1.f, 0.f };
 	cl_int flamePointSelection = 0;
+	cl_int flameWarmup = 0;
 	clFractalStatus status;
 	clFractal() : gradient() {}
 	void makeCLCode();
