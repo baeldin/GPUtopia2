@@ -1,5 +1,5 @@
 #include "display.h"
-#include "sampling.h"
+
 
 void prepTexture(GLuint& texture)
 {

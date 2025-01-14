@@ -40,10 +40,17 @@ void formulaSettingsWindow(clFractal& cf)
 	static bool needGradientTexture;
 	static Gradient gradOld;
 	static int colorNodeCount = 4;
+	static int currentGradientIndex = 1;
+	static int previousGradientIndex = -1; // make sure that this is different initially
+	const char* items[] = { "UF Default", "UF Default Muted", "Volcano Under a Glacier", "Volcano Under a Glacier2", "Jet", "CBR_coldhot", "Default" , "Test" };
+	static std::vector<color> gradient_img_data(400 * 30, color(0));
+	static std::vector<Gradient> gradients = { uf_default, standard_muted, volcano_under_a_glacier, volcano_under_a_glacier2, jet, CBR_coldhot, Gradient(), test };
+	cf.gradient = gradients[currentGradientIndex];
+	ImGui::Combo("Gradent", &currentGradientIndex, items, IM_ARRAYSIZE(items));
 	ImGui::DragInt("Gradient Nodes", &colorNodeCount, 1, 12);
 	if (ImGui::Button("Test Gradient"))
 	{
-		cf.gradient = Gradient(colorNodeCount);
+		cf.gradient = Gradient();
 		// grad.printNodes();
 		// grad.printFine();
 		glDeleteTextures(1, &gradientTextureID);

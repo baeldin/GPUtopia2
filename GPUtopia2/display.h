@@ -19,6 +19,8 @@
 #include "cl_handler.h"
 #include "explorer.h"
 #include "info.h"
+#include "test_gradients.h"
+#include "sampling.h"
 
 using std::string;
 
