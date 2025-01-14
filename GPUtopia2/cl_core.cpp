@@ -145,7 +145,7 @@ void clCore::setDefaultArguments(clFractal& cf)
         for (int x = 0; x < cf.image.size.x; x++) {
             pixelIndex = y * cf.image.size.x + x;
             xx[pixelIndex] = x;
-            yy[pixelIndex] = y;
+            yy[pixelIndex] = cf.image.size.y - y;
         }
     }
     // TODO: figure out if this is the part that breaks the image when resizing in the UI
