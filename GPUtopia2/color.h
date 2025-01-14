@@ -1,5 +1,7 @@
 #pragma once
-
+#include <algorithm>
+#include <vector>
+#include <iostream>
 #include <cmath>
 #include <CL/opencl.h>
 
@@ -47,6 +49,9 @@ inline const bool operator==(const color& lhs, const color& rhs)
 {
     return(lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && lhs.a == rhs.a);
 }
+
+
+std::ostream& operator<<(std::ostream& os, const color& c);
 
 color clamp(const color& c);
 color sRGBtoLinear(const color& c);
