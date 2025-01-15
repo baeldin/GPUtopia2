@@ -10,5 +10,6 @@
 #include "cl_handler.h"
 #include "gradient.h"
 #include "display.h"
+#include "fractal_navigation.h"
 
-void infoWindow(clFractal& cf);
+void infoWindow(clFractal& cf, fractalNavigationParameters& nav);

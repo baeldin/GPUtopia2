@@ -1,7 +1,8 @@
 #include "info.h"
 
-void infoWindow(clFractal& cf)
+void infoWindow(clFractal& cf, fractalNavigationParameters& nav)
 {
+	static ImGuiIO& io = ImGui::GetIO();
 	ImGui::Begin("Info");
 	if (ImGui::TreeNode("Full OpenCL Code"))
 	{
@@ -18,7 +19,9 @@ void infoWindow(clFractal& cf)
 		ImGui::TreePop();
 	}
 	bool ret = false;
-	ImGui::BulletText(
+	if (ImGui::TreeNode("Fractal Status"))
+	{
+		ImGui::BulletText(
 		"Fractal Status:\n"
 		"- Render kernel build requested = %d \n"
 		"- Render kernel run requested = %d\n"
@@ -48,11 +51,55 @@ void infoWindow(clFractal& cf)
 		cf.image.next_update_sample_count,
 		cf.image.target_sample_count
 		);
+		ImGui::TreePop();
+	}
 	// PROGRESS BAR
 	static float progress = 0.f;
 	progress = (float)cf.image.current_sample_count / (float)cf.image.target_sample_count;
 	ImGui::Text("Render Progress:");
 	ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
+	if (ImGui::TreeNode("Fractal Navigation"))
+	{
+		ImGui::BulletText(
+			"General:\n"
+			"- dragStart.x = %d\n"
+			"- dragStart.y = %d\n"
+			"- dragOffset.x = %d\n"
+			"- dragOffset.y = %d\n"
+			"- coursorPos.x = %d\n"
+			"- coursorPos.y = %d\n"
+			"- coursorPosIO.x = %d\n"
+			"- coursorPosIO.y = %d\n"
+			"Panning:\n"
+			"- draggingCenter = %d \n"
+			"- centerOffset.x = %f\n"
+			"- centerOffset.y = %f\n"
+			"Panning:\n"
+			"- draggingZoom = %d \n"
+			"- imgDisplayCenter.x = %d \n"
+			"- imgDisplayCenter.y = %d \n"
+			"- dragZoomFactor = %f \n",
+			// genral
+			nav.dragStart.x,
+			nav.dragStart.y,
+			nav.dragOffset.x,
+			nav.dragOffset.y,
+			nav.coursorPos.x,
+			nav.coursorPos.y,
+			io.MousePos.x,
+			io.MousePos.y,
+			// pan
+			nav.draggingCenter,
+			nav.centerOffset.x,
+			nav.centerOffset.y,
+			// zoom
+			nav.draggingZoom,
+			nav.imgDisplayCenter.x,
+			nav.imgDisplayCenter.y,
+			nav.dragZoomFactor
+		);
+		ImGui::TreePop();
+	}
 
 
 	ImGui::End();
