@@ -81,6 +81,20 @@ struct clFractalImage
 		this->next_update_sample_count = 1;
 		this->target_sample_count = fibonacci_number(this->targetQuality);
 	}
+	// cl_float2 complex2image(Complex<float> z);
+	Complex<float> image2complex(const cl_float2 xy) const;
+	Complex<float> image2complex(const cl_int2 xy) const
+	{
+		return image2complex(cl_float2((float)xy.x, (float)xy.y));
+	}
+	Complex<float> image2complex(const float x, const float y) const
+	{
+		return image2complex(cl_float2(x, y));
+	}
+	Complex<float> image2complex(const int x, const int y) const
+	{
+		return image2complex(cl_int2(x, y));
+	}
 };
 
 inline const bool operator==(const clFractalImage& lhs, const clFractalImage& rhs)

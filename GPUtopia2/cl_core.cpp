@@ -2,15 +2,6 @@
 
 struct color;
 
-// update coordinates within the complex plane if zoom or aspect ratio is changed
-void clFractalImage::updateComplexSubplane()
-{
-    complexSubplane.z = 4.f / zoom;
-    aspectRatio = (float)size.x / (float)size.y;
-    complexSubplane.w = complexSubplane.z / aspectRatio;
-}
-
-
 template <typename T>
 cl::Buffer clCore::setBufferKernelArg(cl::Kernel& currentKernel, int k, T* data, size_t size, cl_mem_flags mem_flag,
     const char* name, cl_int* err_out)
