@@ -147,13 +147,14 @@ void clCore::setDefaultArguments(clFractal& cf)
     cf.imgIntAData.resize(npixels, 0);
     cl_int3 sampling = { 0, fibonacci_number(cf.image.targetQuality), fibonacci_number(cf.image.targetQuality) };
     cl_int err;
+    const cl_float4 complexSubplane = { cf.image.center.x, cf.image.center.y, cf.image.span.x, cf.image.span.y };
     std::cout << "xx size is " << xx.size() << std::endl;
     this->xBuffer = setBufferKernelArg(this->kernel, 0, xx.data(), 
         sizeof(int) * npixels, CL_MEM_READ_ONLY, "xx", &err);
     this->yBuffer = setBufferKernelArg(this->kernel, 1, yy.data(), 
         sizeof(int) * npixels, CL_MEM_READ_ONLY, "yy", &err);
     err = setKernelArg(this->kernel, 2, cf.image.size, "image_size");
-    err = setKernelArg(this->kernel, 3, cf.image.complexSubplane, "complex_subplane");
+    err = setKernelArg(this->kernel, 3, complexSubplane, "complex_subplane");
     err = setKernelArg(this->kernel, 5, cf.maxIter, "iterations");
     err = setKernelArg(this->kernel, 6, cf.bailout, "bailout");
     err = setKernelArg(this->kernel, 7, cf.gradient.fineLength, "gradient_length");

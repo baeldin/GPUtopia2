@@ -68,21 +68,30 @@ cl_float2 get_image_center_after_zoom(clFractal& cf, fractalNavigationParameters
 {
 	const cl_float2 oldCenter = { (float)cf.image.size.x / 2.f, (float)cf.image.size.y / 2.f };
 	const cl_float2 dragCenterDist = { (float)nav.dragStart.x - oldCenter.x, (float)nav.dragStart.y - oldCenter.y };
-	return oldCenter + dragCenterDist / nav.dragZoomFactor;
+	const cl_float2 ret = { oldCenter.x + dragCenterDist.x * nav.dragZoomFactor,
+							oldCenter.y + dragCenterDist.y * nav.dragZoomFactor };
+	return ret;
 }
 
 Complex<float> get_complex_offset(const int dx, const int dy, const clFractal& cf)
 {
 	const float dxFloat = (float)dx * cf.image.zoom;
 	const float dyFloat = (float)dy * cf.image.zoom;
-	const double xRange = cf.image.complexSubplane.z / cf.image.zoom; // max(cf.image.complexSubplane.z * cf.image.aspectRatio, cf.image.complexSubplane.z) / cf.image.zoom;
-	const double yRange = cf.image.complexSubplane.w / cf.image.zoom; // max(cf.image.complexSubplane.w, cf.image.complexSubplane.z) / cf.image.zoom;
+	const double xRange = cf.image.span.x / cf.image.zoom; // max(cf.image.complexSubplane.z * cf.image.aspectRatio, cf.image.complexSubplane.z) / cf.image.zoom;
+	const double yRange = cf.image.span.y / cf.image.zoom; // max(cf.image.complexSubplane.w, cf.image.complexSubplane.z) / cf.image.zoom;
 	double xOffset = -dxFloat / cf.image.size.x * xRange;
 	double yOffset = dyFloat / cf.image.size.y * yRange;
 	return Complex<float>(xOffset, yOffset) * cf.image.rotation;
 }
 
-Complex<float> get_complex_coord(const float x_shifted, const float y_shifted, const clFractal& cf)
-{
-	
-}
+//Complex<float> get_complex_coord(const cl_float2 p, const clFractal& cf)
+//{
+//	const cl_float2 center = { cf.image.complexSubplane.x, cf.image.complexSubplane.y };
+//	const cl_float2 span = { cf.image.complexSubplane.z, cf.image.complexSubplane.w };
+//	const cl_float2 relImgCoordinates = {
+//		p.x / (float)cf.image.size.x - 0.5,
+//		p.y / (float)cf.image.size.y - 0.5 };
+//	return Complex<float>(
+//		center.x + span.x * relImgCoordinates.x,
+//		center.y + span.y * relImgCoordinates.y);
+//}

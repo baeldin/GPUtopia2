@@ -39,4 +39,4 @@ void zoomImageInBox(const std::vector<color>& image, std::vector<color>& offsetI
 cl_float2 get_image_center_after_zoom(clFractal& cf, fractalNavigationParameters& nav);
 
 Complex<float> get_complex_offset(const int dx, const int dy, const clFractal& cf);
-Complex<float> get_complex_coord(const cl_float2 xy_float, const clFractal& cf);
+// Complex<float> get_complex_coord(const cl_float2 xy_float, clFractal& cf);

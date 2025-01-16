@@ -62,12 +62,14 @@ struct clFractalImage
 {
 	cl_int2 size = { 800, 600 };
 	float aspectRatio = (float)size.x / (float)size.y;
-	cl_float4 complexSubplane = { 0.f, 0.f, 4.f, 4.f / aspectRatio };
+	Complex<float> center = Complex<float>(0., 0.);
+	Complex<float> rotation = Complex<float>(std::cos(angle), std::sin(angle));
+	Complex<float> span = Complex<float>(4., 4. / aspectRatio);
+	// cl_float4 complexSubplane = { 0.f, 0.f, 4.f, 4.f / aspectRatio };
 	int targetQuality = 3;
 	uint32_t currentQuality = 0;
 	float zoom = 1.f;
 	float angle = 0.f;
-	Complex<float> rotation = Complex<float>(std::cos(angle), std::sin(angle));
 	uint32_t current_sample_count = 0;
 	uint32_t target_sample_count = 1;
 	uint32_t next_update_sample_count = 1;
@@ -83,26 +85,32 @@ struct clFractalImage
 	}
 	// cl_float2 complex2image(Complex<float> z);
 	Complex<float> image2complex(const cl_float2 xy) const;
-	Complex<float> image2complex(const cl_int2 xy) const
+	Complex<float> image2complex(const cl_int2 xy_int) const
 	{
-		return image2complex(cl_float2((float)xy.x, (float)xy.y));
+		const cl_float2 xy = { xy_int.x, xy_int.y };
+		return image2complex(xy);
 	}
 	Complex<float> image2complex(const float x, const float y) const
 	{
-		return image2complex(cl_float2(x, y));
+		const cl_float2 xy = { x, y };
+		return image2complex(xy);
 	}
 	Complex<float> image2complex(const int x, const int y) const
 	{
-		return image2complex(cl_int2(x, y));
+		const cl_float2 xy = { x, y };
+		return image2complex(xy);
 	}
 };
+
 
 inline const bool operator==(const clFractalImage& lhs, const clFractalImage& rhs)
 {
 	return(
 		lhs.size == rhs.size &&
 		lhs.aspectRatio == rhs.aspectRatio &&
-		lhs.complexSubplane == rhs.complexSubplane &&
+		// lhs.complexSubplane == rhs.complexSubplane &&
+		lhs.center == rhs.center &&
+		lhs.rotation == rhs.rotation &&
 		lhs.targetQuality == rhs.targetQuality &&
 		lhs.zoom == rhs.zoom);
 }

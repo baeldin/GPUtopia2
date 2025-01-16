@@ -38,19 +38,19 @@ void imageSettingsWindow(clFractal& cf, std::vector<color>& img)
 	static float xmax = 5.f;
 	static float ymin = -5.f;
 	static float ymax = 5.f;
-	static float xCenter = cf.image.complexSubplane.x;
-	static float yCenter = cf.image.complexSubplane.y;
+	// static float xCenter = cf.image.center.x;
+	// static float yCenter = cf.image.center.y;
 	ImGui::InputInt("Iterations", &cf.maxIter, 1, 100);
 	ImGui::InputFloat("Zoom", &cf.image.zoom, 0.1f, 10.f);
-	static cl_float2 center = { cf.image.complexSubplane.x, cf.image.complexSubplane.y };
-	ImGui::SliderFloat("Center Real", &cf.image.complexSubplane.x, xmin, xmax);
-	ImGui::SliderFloat("Center Imag", &cf.image.complexSubplane.y, ymin, ymax);
+	// static cl_float2 center = { cf.image.complexSubplane.x, cf.image.complexSubplane.y };
+	ImGui::SliderFloat("Center Real", &cf.image.center.x, xmin, xmax);
+	ImGui::SliderFloat("Center Imag", &cf.image.center.y, ymin, ymax);
 	if (!ImGui::IsMouseDragging(ImGuiMouseButton_Left))
 	{
-		xmin = cf.image.complexSubplane.x - 2.f / cf.image.zoom;
-		xmax = cf.image.complexSubplane.x + 2.f / cf.image.zoom;
-		ymin = cf.image.complexSubplane.y - 2.f / cf.image.zoom / cf.image.aspectRatio;
-		ymax = cf.image.complexSubplane.y + 2.f / cf.image.zoom / cf.image.aspectRatio;
+		xmin = cf.image.center.x - 2.f / cf.image.zoom;
+		xmax = cf.image.center.x + 2.f / cf.image.zoom;
+		ymin = cf.image.center.y - 2.f / cf.image.zoom / cf.image.aspectRatio;
+		ymax = cf.image.center.y + 2.f / cf.image.zoom / cf.image.aspectRatio;
 	}
 	ImGui::SliderInt("Target Quality", &cf.image.targetQuality, 1, 30);
 	ImGui::InputInt("Width", &cf.image.size.x);

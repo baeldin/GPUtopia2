@@ -200,8 +200,8 @@ namespace mainView
 		{
 			nav.draggingCenter = false;
 			nav.centerOffset = get_complex_offset(nav.dragOffset.x, nav.dragOffset.y, cf);
-			cf.image.complexSubplane.x += nav.centerOffset.x;
-			cf.image.complexSubplane.y += nav.centerOffset.y;
+			cf.image.center.x += nav.centerOffset.x;
+			cf.image.center.y += nav.centerOffset.y;
 			textureColors = vec_img_f_offset;
 			imgBlocked = false;
 		}
@@ -212,9 +212,9 @@ namespace mainView
 			nav.draggingZoom = false;
 			// calculate coordinate of pixel in the middle of the displayed image
 			cl_float2 new_image_center = get_image_center_after_zoom(cf, nav);
-			Complex new_center = get_complex_coord(new_image_center, cf);
-			cf.image.complexSubplane.x = new_center.x;
-			cf.image.complexSubplane.y = new_center.y;
+			Complex new_center = cf.image.image2complex(new_image_center);
+			cf.image.center.x = new_center.x;
+			cf.image.center.y = new_center.y;
 			cf.image.zoom *= nav.dragZoomFactor;
 			textureColors = vec_img_f_offset;
 			imgBlocked = false;
