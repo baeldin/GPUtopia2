@@ -66,6 +66,16 @@ public:
 	}
 };
 
+inline const bool operator==(const Complex<float> lhs, const Complex<float> rhs)
+{
+	return rhs.x == lhs.x && rhs.y == rhs.y;
+}
+
+inline const bool operator!=(const Complex<float> lhs, const Complex<float> rhs)
+{
+	return !(rhs == lhs);
+}
+
 inline const Complex<double>& operator/ (const float lhs, const Complex<double>& rhs) {
 	Complex<double> clhs(lhs);
 	return clhs / rhs;
