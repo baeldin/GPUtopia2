@@ -53,11 +53,6 @@ namespace mainView
 		static bool imgBlocked = false;
 		static bool needCLFractal = true;
 		static clCore core;
-		// track coursor position
-		nav.coursorPos = ImGui::GetCursorScreenPos();
-		nav.coursorPosIo = io.MousePos;
-		
-
 		// only run at startup, maybe move somewhere else?
 		if (needCLFractal)
 		{
@@ -192,7 +187,20 @@ namespace mainView
 			{
 				imgBlocked = true;
 				dragZoom(cf, nav, io);
+				nav.dragStart.x = (int)((io.MousePos.x - ImGui::GetCursorScreenPos().x - ImGui::GetMouseDragDelta(0).x)); // / zoom_factor);
+				nav.dragStart.y = (int)((io.MousePos.y - ImGui::GetCursorScreenPos().y - ImGui::GetMouseDragDelta(0).y)); // / zoom_factor);
+				nav.newImgCenter = imgCoordinateCenterAfterZoom(cf, nav);
+				nav.newSubplaneCenter = cf.image.image2complex(nav.newImgCenter);
 				zoomImageInBox(textureColors, vec_img_f_offset, cf, nav);
+				refreshTexture(textureID, cf.image.size.x, cf.image.size.y, vec_img_f_offset);
+			}
+			else if (io.KeyAlt)
+			{
+				imgBlocked = true;
+				nav.dragStart.x = (int)((io.MousePos.x - ImGui::GetCursorScreenPos().x - ImGui::GetMouseDragDelta(0).x)); // / zoom_factor);
+				nav.dragStart.y = (int)((io.MousePos.y - ImGui::GetCursorScreenPos().y - ImGui::GetMouseDragDelta(0).y)); // / zoom_factor);
+				dragRotate(cf, nav, io);
+				rotateImageInBox(textureColors, vec_img_f_offset, cf, nav);
 				refreshTexture(textureID, cf.image.size.x, cf.image.size.y, vec_img_f_offset);
 			}
 		}
@@ -211,18 +219,23 @@ namespace mainView
 		{
 			nav.draggingZoom = false;
 			// calculate coordinate of pixel in the middle of the displayed image
-			cl_float2 new_image_center = get_image_center_after_zoom(cf, nav);
-			Complex new_center = cf.image.image2complex(new_image_center);
-			cf.image.center.x = new_center.x;
-			cf.image.center.y = new_center.y;
+			cf.image.center = nav.newSubplaneCenter;
 			cf.image.zoom *= nav.dragZoomFactor;
 			textureColors = vec_img_f_offset;
 			imgBlocked = false;
 		}
-		if (ImGui::Button("open"))
+		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && nav.draggingRotate)
 		{
-			openFileDialog();
+			nav.draggingRotate = false;
+			// calculate coordinate of pixel in the middle of the displayed image
+			cf.image.rotation = cf.image.rotation * nav.dragRotation;
+			textureColors = vec_img_f_offset;
+			imgBlocked = false;
 		}
+		//if (ImGui::Button("open"))
+		//{
+		//	openFileDialog();
+		//}
 		ImGui::End();
 		static char mainViewStr[] = "Main View";
 		ImGui::Begin(mainViewStr, nullptr, ImGuiWindowFlags_HorizontalScrollbar);

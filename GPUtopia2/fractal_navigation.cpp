@@ -17,6 +17,18 @@ void dragZoom(clFractal& cf, fractalNavigationParameters& nav, ImGuiIO& io)
 	nav.dragStart.y = (int)((io.MousePos.y - nav.coursorPos.y - nav.dragOffset.y));
 }
 
+void dragRotate(clFractal& cf, fractalNavigationParameters& nav, ImGuiIO& io)
+{
+	nav.draggingRotate = true;
+	float mouseToCenterX = nav.dragStart.x - cf.image.size.x / 2.f;
+	float mouseToCenterY = nav.dragStart.y - cf.image.size.y / 2.f;
+	float mouseStartToCenterX = mouseToCenterX - ImGui::GetMouseDragDelta(0).x;
+	float mouseStartToCenterY = mouseToCenterY - ImGui::GetMouseDragDelta(0).y;
+	float start_angle = -atan2(mouseStartToCenterX, mouseStartToCenterY);
+	nav.dragAngle = -atan2(mouseToCenterX, mouseToCenterY) - start_angle;
+	nav.dragRotation = Complex<float>(cos(nav.dragAngle), sin(nav.dragAngle));
+}
+
 void offsetImageInBox(const std::vector<color>& image, std::vector<color>& offsetImage, 
 	clFractal& cf, fractalNavigationParameters& nav)
 {
@@ -64,12 +76,40 @@ void zoomImageInBox(const std::vector<color>& image, std::vector<color>& offsetI
 	}
 }
 
-cl_float2 get_image_center_after_zoom(clFractal& cf, fractalNavigationParameters& nav)
+void rotateImageInBox(const std::vector<color>& image, std::vector<color>& offsetImage,
+	clFractal& cf, fractalNavigationParameters& nav)
 {
-	const cl_float2 oldCenter = { (float)cf.image.size.x / 2.f, (float)cf.image.size.y / 2.f };
-	const cl_float2 dragCenterDist = { (float)nav.dragStart.x - oldCenter.x, (float)nav.dragStart.y - oldCenter.y };
-	const cl_float2 ret = { oldCenter.x + dragCenterDist.x * nav.dragZoomFactor,
-							oldCenter.y + dragCenterDist.y * nav.dragZoomFactor };
+	/* zoom into the image using a pixel coordinate center and zoom factor */
+	int maxIndex = cf.image.size.x * cf.image.size.y;
+	std::fill(offsetImage.begin(), offsetImage.end(), 0.f);
+	const Complex zRot = Complex(std::cos(nav.dragAngle), std::sin(nav.dragAngle));
+	for (int y = 0; y < cf.image.size.y; y++)
+	{
+		for (int x = 0; x < cf.image.size.x; x++)
+		{
+			// find out which old pixel should be mapped to the zoomed image
+			// TODO: reverse lookup from new to old img to prevent black pixel glitch
+			int pixelIndexOld = y * cf.image.size.x + x;
+			const Complex<float> imgCenter = Complex(cf.image.size.x / 2.f, cf.image.size.y / 2.f);
+			Complex<float> pixelPosNew = (Complex<float>(x, y) - imgCenter) * zRot + imgCenter;
+			int xNew = (int)pixelPosNew.x;
+			int yNew = (int)pixelPosNew.y;
+			if (xNew >= 0 && yNew >= 0 && xNew < cf.image.size.x && yNew < cf.image.size.y) // check inf inside:
+			{
+				int pixelIndexNew = yNew * cf.image.size.x + xNew;
+				offsetImage[pixelIndexNew] = image[pixelIndexOld];
+			}
+		}
+	}
+}
+
+cl_float2 imgCoordinateCenterAfterZoom(clFractal& cf, fractalNavigationParameters& nav)
+{
+	const cl_float2 ret = {
+		nav.dragStart.x - (nav.dragStart.x - (float)cf.image.size.x / 2.f) / nav.dragZoomFactor,
+		nav.dragStart.y - (nav.dragStart.y - (float)cf.image.size.y / 2.f) / nav.dragZoomFactor
+	};
+	std::cout << "RET = (" << ret.x << ", " << ret.y << ")\n";
 	return ret;
 }
 
@@ -77,21 +117,9 @@ Complex<float> get_complex_offset(const int dx, const int dy, const clFractal& c
 {
 	const float dxFloat = (float)dx * cf.image.zoom;
 	const float dyFloat = (float)dy * cf.image.zoom;
-	const double xRange = cf.image.span.x / cf.image.zoom; // max(cf.image.complexSubplane.z * cf.image.aspectRatio, cf.image.complexSubplane.z) / cf.image.zoom;
-	const double yRange = cf.image.span.y / cf.image.zoom; // max(cf.image.complexSubplane.w, cf.image.complexSubplane.z) / cf.image.zoom;
+	const double xRange = cf.image.span.x / cf.image.zoom;
+	const double yRange = cf.image.span.y / cf.image.zoom;
 	double xOffset = -dxFloat / cf.image.size.x * xRange;
 	double yOffset = dyFloat / cf.image.size.y * yRange;
 	return Complex<float>(xOffset, yOffset) * cf.image.rotation;
 }
-
-//Complex<float> get_complex_coord(const cl_float2 p, const clFractal& cf)
-//{
-//	const cl_float2 center = { cf.image.complexSubplane.x, cf.image.complexSubplane.y };
-//	const cl_float2 span = { cf.image.complexSubplane.z, cf.image.complexSubplane.w };
-//	const cl_float2 relImgCoordinates = {
-//		p.x / (float)cf.image.size.x - 0.5,
-//		p.y / (float)cf.image.size.y - 0.5 };
-//	return Complex<float>(
-//		center.x + span.x * relImgCoordinates.x,
-//		center.y + span.y * relImgCoordinates.y);
-//}
