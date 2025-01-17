@@ -5,16 +5,16 @@ __init:
 __loop:
 //=========| coloring loop
 			// empty for smooth mandelbrot
-			int2 xy = revert_complex_coordinates(z, image_size, complex_subplane);
+			int2 xy = revert_complex_coordinates(z, image_size, complex_subplane, rot);
 			if (xy.x < image_size.x && xy.x >= 0 && xy.y < image_size.y && xy.y >= 0 && iter >= flameWarmup)
 			{
 				int4 color = getColor(gradient, @colorDensity * iter, nColors);
-				int pixelIndex = xy.y * image_size.x + xy.x;
+				int pixelIndex = (image_size.y - xy.y) * image_size.x + xy.x;
 				int4 col = getColor(gradient, @colorDensity * (float)iter / (float)maxIterations, nColors); // color;
 				// colors[pixelIndex] += (int4)(col.x, col.y, col.z, 256); // color;
 				// atomic_fetch_add_explicit(&hitCounts[hitY * width + hitX], 1, memory_order_relaxed);
 				atomic_fetch_add(&colorsR[pixelIndex], col.x); // , memory_order_relaxed, memory_scope_device);
-				atomic_fetch_add(&colorsG[pixelIndex], col.y); //, memory_order_relaxed);
+				atomic_fetch_add(&colorsG[pixelIndex], col.y); // , memory_order_relaxed);
 				atomic_fetch_add(&colorsB[pixelIndex], col.z); // , memory_order_relaxed);
 				atomic_fetch_add(&colorsA[pixelIndex], col.w); // , memory_order_relaxed);
 			}
