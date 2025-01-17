@@ -4,18 +4,24 @@
 //@__formulaFunctions
 //@__coloringFunctions
 
-float2 get_complex_coordinates(const float2 xy, const int2 img_size, const float4 cz)
+complex get_complex_coordinates(const float2 xy, const int2 img_size, const float4 cz, const complex rot)
 {
-    return (float2)(
-        cz.x + (xy.x / (float)img_size.x - 0.5f) * cz.z,
-        cz.y + (xy.y / (float)img_size.y - 0.5f) * cz.w);
+    complex z = (complex)(
+        (xy.x / (float)img_size.x - 0.5f) * cz.z, 
+        (xy.y / (float)img_size.y - 0.5f) * cz.w);
+    z = cmul(z, rot);
+    return z + cz.xy;
+    //    cz.x + (xy.x / (float)img_size.x - 0.5f) * cz.z,
+    //    cz.y + (xy.y / (float)img_size.y - 0.5f) * cz.w);
 }
 
-int2 revert_complex_coordinates(const float2 z, const int2 img_size, const float4 cz)
+int2 revert_complex_coordinates(const float2 z, const int2 img_size, const float4 cz, const complex rot)
 {
+    complex z_tmp = z - cz.xy;
+    z_tmp = cmul(z_tmp, conj(rot));
     return (int2)(
-        floor(((z.x - cz.x) / cz.z + 0.5f) * (img_size.x - 1)),
-        floor(((z.y - cz.y) / cz.w + 0.5f) * (img_size.y - 1)));
+        floor((z_tmp.x / cz.z + 0.5f) * (img_size.x - 1)),
+        floor((z_tmp.y / cz.w + 0.5f) * (img_size.y - 1)));
 }
 
 bool bailed_out(const float2 z, const float bailout)
@@ -28,18 +34,19 @@ __kernel void computeLoop(
     __global int const* yy,            // 1:  pixel y values
     const int2 image_size,             // 2:  image sizeX, image sizeY
     const float4 complex_subplane,     // 3:  {centerX, centerY, width, width / aspectRatio}
-    const int3 sampling,               // 4:  {sampleStart, sampleEnd, nSamplesTotal}
-    const int maxIterations,           // 5:  maxIterations
-    const float bailout,               // 6:  bailout value
-    const int nColors,                 // 7:  colors in gradient
-    __global const float4* gradient,   // 8:  gradient
-    __global atomic_uint* colorsR,     // 9:  output R
-    __global atomic_uint* colorsG,     // 10: output G
-    __global atomic_uint* colorsB,     // 11: output B
-    __global atomic_uint* colorsA,     // 12: output A
-    const int flamePointSelection,     // 13: discard points, used for flame
-    const int flameWarmup,             // 14: warmup before splatting flame samples
-    const int mode,                    // 15: mode (0 = escape time, 1 = flame)
+    const float2 rot,                  // 4:  complex rotation
+    const int3 sampling,               // 5:  {sampleStart, sampleEnd, nSamplesTotal}
+    const int maxIterations,           // 6:  maxIterations
+    const float bailout,               // 7:  bailout value
+    const int nColors,                 // 8:  colors in gradient
+    __global const float4* gradient,   // 9:  gradient
+    __global atomic_uint* colorsR,     // 10:  output R
+    __global atomic_uint* colorsG,     // 11: output G
+    __global atomic_uint* colorsB,     // 12: output B
+    __global atomic_uint* colorsA,     // 13: output A
+    const int flamePointSelection,     // 14: discard points, used for flame
+    const int flameWarmup,             // 15: warmup before splatting flame samples
+    const int mode,                    // 16: mode (0 = escape time, 1 = flame)
 //@__kernelArguments)
 {
     // Get Parallel Index
@@ -63,7 +70,7 @@ __kernel void computeLoop(
                 //float2 sample_position = (float2)(x, y) + offset_fac * (float2)(
                 //    tent(fracf((float)s * phi + tofloat(lowbias32((uint)(2 * pixelIdx))))),
                 //    tent(fracf((float)s / (float)sampling.z + tofloat(lowbias32((uint)(2 * pixelIdx + 1))))));
-                const float2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane);
+                const float2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane, rot);
                 //@__formulaInit
                 while (!bailed_out(z, bailout) && iter < maxIterations)
                 {
@@ -85,7 +92,7 @@ __kernel void computeLoop(
                 float2 sample_position = (float2)(x, y) + offset_fac * (float2)(
                     tent(fracf(fracf((float)s * inv_phi2A) + tofloat(lowbias32((uint)(2 * pixelIdx))))),
                     tent(fracf(fracf((float)s * inv_phi2B) + tofloat(lowbias32((uint)(2 * pixelIdx + 1))))));
-                const float2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane);
+                const float2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane, rot);
                 //@__formulaInit
                 //@__coloringInit
                 while (!bailed_out(z, bailout) && iter < maxIterations)
