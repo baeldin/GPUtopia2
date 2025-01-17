@@ -147,19 +147,23 @@
     <ClInclude Include="cl_fractal.h" />
     <ClInclude Include="cl_handler.h" />
     <ClInclude Include="color.h" />
+    <ClInclude Include="complex_number.h" />
     <ClInclude Include="cubic_spline.h" />
     <ClInclude Include="display.h" />
     <ClInclude Include="flameRenderSettings.h" />
     <ClInclude Include="formulaSettings.h" />
+    <ClInclude Include="fractal_navigation.h" />
     <ClInclude Include="glewGuard.h" />
     <ClInclude Include="gradient.h" />
     <ClInclude Include="imageSettings.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgExport.h" />
     <ClInclude Include="load_shaders.h" />
+    <ClInclude Include="openFile.h" />
     <ClInclude Include="parameterMaps.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cl_fractal.cpp" />
     <ClCompile Include="cl_handler.cpp" />
     <ClCompile Include="cl_core.cpp" />
     <ClCompile Include="cl_core.h" />
@@ -168,12 +172,14 @@
     <ClCompile Include="display.cpp" />
     <ClCompile Include="flameRenderSettings.cpp" />
     <ClCompile Include="formulaSettings.cpp" />
+    <ClCompile Include="fractal_navigation.cpp" />
     <ClCompile Include="gradient.cpp" />
     <ClCompile Include="imageSettings.cpp" />
     <ClCompile Include="info.cpp" />
     <ClCompile Include="info.h" />
     <ClCompile Include="load_shaders.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="openFile.cpp" />
     <ClCompile Include="sampling.cpp" />
     <ClCompile Include="test_gradients.cpp" />
     <ClCompile Include="test_gradients.h" />

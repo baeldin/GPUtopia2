@@ -81,6 +81,15 @@
     <ClInclude Include="cubic_spline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="complex_number.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fractal_navigation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openFile.h">
+      <Filter>Header Files\Ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -134,6 +143,15 @@
     <ClCompile Include="test_gradients.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fractal_navigation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openFile.cpp">
+      <Filter>Source Files\Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="cl_fractal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="vertex_shader.glsl">
@@ -184,10 +202,12 @@
     <None Include="clFragments\imgKernel.cl">
       <Filter>OpenCL Files</Filter>
     </None>
-    <None Include="clFragments\complex.cl" />
     <None Include="clFragments\fractalFormulas\manowar.cl" />
     <None Include="clFragments\coloringAlgorithms\abs.cl">
       <Filter>OpenCL Files\coloring</Filter>
+    </None>
+    <None Include="clFragments\complex.cl">
+      <Filter>OpenCL Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
