@@ -155,23 +155,24 @@ void clCore::setDefaultArguments(clFractal& cf)
         sizeof(int) * npixels, CL_MEM_READ_ONLY, "yy", &err);
     err = setKernelArg(this->kernel, 2, cf.image.size, "image_size");
     err = setKernelArg(this->kernel, 3, complexSubplane, "complex_subplane");
-    err = setKernelArg(this->kernel, 5, cf.maxIter, "iterations");
-    err = setKernelArg(this->kernel, 6, cf.bailout, "bailout");
-    err = setKernelArg(this->kernel, 7, cf.gradient.fineLength, "gradient_length");
-    this->gradientBuffer = setBufferKernelArg(this->kernel, 8, cf.gradient.fineColors.data(), 
+    err = setKernelArg(this->kernel, 4, cf.image.rotation, "rotation");
+    err = setKernelArg(this->kernel, 6, cf.maxIter, "iterations");
+    err = setKernelArg(this->kernel, 7, cf.bailout, "bailout");
+    err = setKernelArg(this->kernel, 8, cf.gradient.fineLength, "gradient_length");
+    this->gradientBuffer = setBufferKernelArg(this->kernel, 9, cf.gradient.fineColors.data(), 
         sizeof(float) * cf.gradient.fineLength * 4, CL_MEM_READ_ONLY, "gradient_colors", &err);
-    this->imgIntRBuffer = setBufferKernelArg(this->kernel, 9, cf.imgIntRData.data(),
+    this->imgIntRBuffer = setBufferKernelArg(this->kernel, 10, cf.imgIntRData.data(),
         sizeof(uint32_t) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
-    this->imgIntGBuffer = setBufferKernelArg(this->kernel, 10, cf.imgIntGData.data(),
+    this->imgIntGBuffer = setBufferKernelArg(this->kernel, 11, cf.imgIntGData.data(),
         sizeof(uint32_t) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
-    this->imgIntBBuffer = setBufferKernelArg(this->kernel, 11, cf.imgIntBData.data(),
+    this->imgIntBBuffer = setBufferKernelArg(this->kernel, 12, cf.imgIntBData.data(),
         sizeof(uint32_t) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
-    this->imgIntABuffer = setBufferKernelArg(this->kernel, 12, cf.imgIntAData.data(),
+    this->imgIntABuffer = setBufferKernelArg(this->kernel, 13, cf.imgIntAData.data(),
         sizeof(uint32_t) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
-    err = setKernelArg(this->kernel, 13, cf.flamePointSelection, "flamePointSelection");
-    err = setKernelArg(this->kernel, 14, cf.flameWarmup, "flameWarmup");
-    err = setKernelArg(this->kernel, 15, cf.mode, "fractal mode");
-    this->kernelArgumentCount = 16;
+    err = setKernelArg(this->kernel, 14, cf.flamePointSelection, "flamePointSelection");
+    err = setKernelArg(this->kernel, 15, cf.flameWarmup, "flameWarmup");
+    err = setKernelArg(this->kernel, 16, cf.mode, "fractal mode");
+    this->kernelArgumentCount = 17;
 }
 
 void clCore::setKernelFractalArgs(clFractal& cf)
@@ -306,9 +307,9 @@ void runKernelAsync(clFractal& cf, clCore& cc)
         cf.image.current_sample_count,
         cf.image.current_sample_count + 1,
         cf.image.target_sample_count };
-    std::cout << "Kernel called with sampling (" << sampling_info.x << " " << sampling_info.y << " " << sampling_info.z << ")\n";
-    std::cout << "Fractal image curent_sample_count = " << cf.image.current_sample_count << "\n";
-    err = cc.setKernelArg(cc.kernel, 4, sampling_info, "sampling_info");
+    // std::cout << "Kernel called with sampling (" << sampling_info.x << " " << sampling_info.y << " " << sampling_info.z << ")\n";
+    // std::cout << "Fractal image curent_sample_count = " << cf.image.current_sample_count << "\n";
+    err = cc.setKernelArg(cc.kernel, 5, sampling_info, "sampling_info");
     cc.runKernel(cf);
     cf.image.current_sample_count += 1;
     std::cout << "New fractal image curent_sample_count = " << cf.image.current_sample_count << "\n";
