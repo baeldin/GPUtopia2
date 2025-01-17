@@ -195,6 +195,7 @@
     <None Include="clFragments\complex.cl" />
     <None Include="clFragments\fractalFormulas\buddhabrot.cl" />
     <None Include="clFragments\fractalFormulas\burningship.cl" />
+    <None Include="clFragments\fractalFormulas\celtic_mb.cl" />
     <None Include="clFragments\fractalFormulas\coupling_loops.cl" />
     <None Include="clFragments\fractalFormulas\coupling_loops2.cl" />
     <None Include="clFragments\fractalFormulas\double_gnarl.cl" />
@@ -211,6 +212,7 @@
     <None Include="clFragments\fractalFormulas\mandeljulia.cl" />
     <None Include="clFragments\fractalFormulas\manowar.cl" />
     <None Include="clFragments\fractalFormulas\manowarB.cl" />
+    <None Include="clFragments\fractalFormulas\perpendicular.cl" />
     <None Include="clFragments\fractalFormulas\simonbrot.cl" />
     <None Include="clFragments\fractalFormulas\tricorn.cl" />
     <None Include="clFragments\full_template.cl" />

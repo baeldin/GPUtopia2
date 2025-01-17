@@ -248,6 +248,12 @@
     <None Include="clFragments\fractalFormulas\simonbrot.cl">
       <Filter>OpenCL Files\formulas</Filter>
     </None>
+    <None Include="clFragments\fractalFormulas\perpendicular.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\celtic_mb.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="clFragments\coloringAlgorithms\smoothMandelbroth.cl">
