@@ -66,10 +66,14 @@ void infoWindow(clFractal& cf, fractalNavigationParameters& nav)
 			"- dragStart.y = %d\n"
 			"- dragOffset.x = %d\n"
 			"- dragOffset.y = %d\n"
-			"- coursorPos.x = %d\n"
-			"- coursorPos.y = %d\n"
-			"- coursorPosIO.x = %d\n"
-			"- coursorPosIO.y = %d\n"
+			"- coursorPos.x = %f\n"
+			"- coursorPos.y = %f\n"
+			"- coursorPosIO.x = %f\n"
+			"- coursorPosIO.y = %f\n"
+			"- coursorPosInImage.x = %f\n"
+			"- coursorPosInImage.y = %f\n"
+			"- complexMousePos.x = %f\n"
+			"- complexMousePos.y = %f\n"
 			"Panning:\n"
 			"- draggingCenter = %d \n"
 			"- centerOffset.x = %f\n"
@@ -78,16 +82,26 @@ void infoWindow(clFractal& cf, fractalNavigationParameters& nav)
 			"- draggingZoom = %d \n"
 			"- imgDisplayCenter.x = %d \n"
 			"- imgDisplayCenter.y = %d \n"
-			"- dragZoomFactor = %f \n",
-			// genral
+			"- dragCenterDistance.x = %f\n"
+			"- dragCenterDistance.y = %f\n"
+			"- dragZoomFactor = %f \n"
+			"- newImgCenter.x = %f\n"
+			"- newImgCenter.y = %f\n"
+			"- nav.newSubplaneCenter.x = %f\n"
+			"- nav.newSubplaneCenter.y = %f\n",			
+			// general
 			nav.dragStart.x,
 			nav.dragStart.y,
 			nav.dragOffset.x,
 			nav.dragOffset.y,
 			nav.coursorPos.x,
 			nav.coursorPos.y,
-			io.MousePos.x,
-			io.MousePos.y,
+			nav.MousePos.x,
+			nav.MousePos.y,
+			nav.MousePosInImage.x,
+			nav.MousePosInImage.y,
+			nav.complexMousePos.x,
+			nav.complexMousePos.y,
 			// pan
 			nav.draggingCenter,
 			nav.centerOffset.x,
@@ -96,7 +110,13 @@ void infoWindow(clFractal& cf, fractalNavigationParameters& nav)
 			nav.draggingZoom,
 			nav.imgDisplayCenter.x,
 			nav.imgDisplayCenter.y,
-			nav.dragZoomFactor
+			nav.dragCenterDistance.x,
+			nav.dragCenterDistance.y,
+			nav.dragZoomFactor,
+			nav.newImgCenter.x,
+			nav.newImgCenter.y,
+			nav.newSubplaneCenter.x,
+			nav.newSubplaneCenter.y
 		);
 		ImGui::TreePop();
 	}
