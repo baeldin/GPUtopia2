@@ -35,3 +35,11 @@ const uint uint_max = 0xffffffffu;
 float tofloat(uint x) {
     return (float)x / (float)uint_max;
 }
+
+const float R2scale = 1.0f / (1 << 24);
+float2 R2_offset(const uint idx, const uint s)
+{
+    const uint R2offsetX = lowbias32(2 * idx) + 1052792407u * s;
+    const uint R2offsetY = lowbias32(2 * idx + 1) + 9237609411u * s;
+    return (float2)((R2offsetX >> 8) * R2scale, (R2offsetY >> 8) * R2scale);
+}

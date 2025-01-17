@@ -61,12 +61,13 @@ __kernel void computeLoop(
     {
         for (int s = sampling.x; s < sampling.y; s++)
         {
+            const float2 R2 = R2_offset(pixelIdx, s) - 0.5f;
             if (flamePointSelection > 0)
             {
                 int iter = 0;
                 float2 sample_position = (float2)(x, y) + offset_fac * (float2)(
-                    tent(fracf(fracf((float)s * inv_phi2A) + tofloat(lowbias32((uint)(2 * pixelIdx))))),
-                    tent(fracf(fracf((float)s * inv_phi2B) + tofloat(lowbias32((uint)(2 * pixelIdx + 1))))));
+                    tent(R2.x),
+                    tent(R2.y));
                 //float2 sample_position = (float2)(x, y) + offset_fac * (float2)(
                 //    tent(fracf((float)s * phi + tofloat(lowbias32((uint)(2 * pixelIdx))))),
                 //    tent(fracf((float)s / (float)sampling.z + tofloat(lowbias32((uint)(2 * pixelIdx + 1))))));
@@ -90,8 +91,8 @@ __kernel void computeLoop(
             {
                 int iter = 0;
                 float2 sample_position = (float2)(x, y) + offset_fac * (float2)(
-                    tent(fracf(fracf((float)s * inv_phi2A) + tofloat(lowbias32((uint)(2 * pixelIdx))))),
-                    tent(fracf(fracf((float)s * inv_phi2B) + tofloat(lowbias32((uint)(2 * pixelIdx + 1))))));
+                    tent(R2.x),
+                    tent(R2.y));
                 const float2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane, rot);
                 //@__formulaInit
                 //@__coloringInit
