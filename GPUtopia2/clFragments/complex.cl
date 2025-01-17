@@ -7,6 +7,7 @@ inline float real(complex z) { return z.x; }
 inline float imag(complex z) { return z.y; }
 inline float abs(complex z) { return length(z); }
 inline float carg(complex z) { return atan2(z.y, z.x); }
+inline complex conj(complex z) { return (complex)(z.x, -z.y); }
 inline complex cabs(complex z) { return (complex)(fabs(z.x), fabs(z.y)); }
 
 // operations with two complex arguments
