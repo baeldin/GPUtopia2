@@ -209,6 +209,45 @@
     <None Include="clFragments\complex.cl">
       <Filter>OpenCL Files</Filter>
     </None>
+    <None Include="clFragments\fractalFormulas\tricorn.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\julia.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\burningship.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\coupling_loops.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\coupling_loops2.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\double_gnarl.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\expmbhybrid.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\four_gnarls.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\mandala.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\mandelbrot2iters.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\mandeljulia.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\manowarB.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\simonbrot.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="clFragments\coloringAlgorithms\smoothMandelbroth.cl">
