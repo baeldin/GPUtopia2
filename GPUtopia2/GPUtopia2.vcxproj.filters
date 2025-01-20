@@ -254,6 +254,15 @@
     <None Include="clFragments\fractalFormulas\celtic_mb.cl">
       <Filter>OpenCL Files\formulas</Filter>
     </None>
+    <None Include="clFragments\fractalFormulas\heart_mb.cl">
+      <Filter>OpenCL Files\formulas</Filter>
+    </None>
+    <None Include="clFragments\diag_AA.cl">
+      <Filter>OpenCL Files</Filter>
+    </None>
+    <None Include="clFragments\diag_AA_col.cl">
+      <Filter>OpenCL Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="clFragments\coloringAlgorithms\smoothMandelbroth.cl">

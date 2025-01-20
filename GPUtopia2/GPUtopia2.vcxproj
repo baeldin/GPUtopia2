@@ -193,6 +193,8 @@
     <None Include="clFragments\coloringAlgorithms\dist.cl" />
     <None Include="clFragments\colors.cl" />
     <None Include="clFragments\complex.cl" />
+    <None Include="clFragments\diag_AA.cl" />
+    <None Include="clFragments\diag_AA_col.cl" />
     <None Include="clFragments\fractalFormulas\buddhabrot.cl" />
     <None Include="clFragments\fractalFormulas\burningship.cl" />
     <None Include="clFragments\fractalFormulas\celtic_mb.cl" />
@@ -205,6 +207,7 @@
     <None Include="clFragments\fractalFormulas\gnarl2.cl" />
     <None Include="clFragments\fractalFormulas\gnarlRK4.cl" />
     <None Include="clFragments\fractalFormulas\gnarl_with_MB.cl" />
+    <None Include="clFragments\fractalFormulas\heart_mb.cl" />
     <None Include="clFragments\fractalFormulas\julia.cl" />
     <None Include="clFragments\fractalFormulas\mandala.cl" />
     <None Include="clFragments\fractalFormulas\mandelbrot.cl" />
