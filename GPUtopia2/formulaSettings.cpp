@@ -16,6 +16,14 @@ void formulaSettingsWindow(clFractal& cf)
 		cf.makeCLCode();
 		cf.buildKernel = true;
 	}
+	ImGui::SameLine();
+	if (ImGui::Button("Load AA diag"))
+	{
+		cf.fractalCLFragmentFile = "clFragments/diag_AA.cl";
+		cf.coloringCLFragmentFile = "clFragments/diag_AA_col.cl";
+		cf.makeCLCode();
+		cf.buildKernel = true;
+	}
 	ImGui::DragFloat("Bailout", &cf.bailout, 4., 20000.);
 	ImGui::Text("Formula Parameters:");
 	for (auto& [key, val] : cf.params.fractalParameterMaps.integerParameters)
