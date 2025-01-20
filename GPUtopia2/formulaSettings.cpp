@@ -1,7 +1,8 @@
 #include "formulaSettings.h"
 
 
-void formulaSettingsWindow(clFractal& cf)
+
+void formulaSettingsWindow(clFractal& cf, clCore& cc)
 {
 	ImGui::Begin("Formulas");
 
@@ -15,6 +16,7 @@ void formulaSettingsWindow(clFractal& cf)
 		cf.coloringCLFragmentFile = std::string(coloringCLFragment);
 		cf.makeCLCode();
 		cf.buildKernel = true;
+		cc.stop = false;
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Load AA diag"))
