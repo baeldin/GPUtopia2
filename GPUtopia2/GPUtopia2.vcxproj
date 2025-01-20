@@ -144,6 +144,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="cl_error_handling.h" />
+    <ClInclude Include="cl_error_window.h" />
     <ClInclude Include="cl_fractal.h" />
     <ClInclude Include="cl_handler.h" />
     <ClInclude Include="color.h" />
@@ -163,6 +165,8 @@
     <ClInclude Include="parameterMaps.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cl_error_window.cpp" />
+    <ClCompile Include="cl_erro_handling.cpp" />
     <ClCompile Include="cl_fractal.cpp" />
     <ClCompile Include="cl_handler.cpp" />
     <ClCompile Include="cl_core.cpp" />
@@ -201,6 +205,7 @@
     <None Include="clFragments\fractalFormulas\coupling_loops.cl" />
     <None Include="clFragments\fractalFormulas\coupling_loops2.cl" />
     <None Include="clFragments\fractalFormulas\double_gnarl.cl" />
+    <None Include="clFragments\fractalFormulas\error.cl" />
     <None Include="clFragments\fractalFormulas\expmbhybrid.cl" />
     <None Include="clFragments\fractalFormulas\four_gnarls.cl" />
     <None Include="clFragments\fractalFormulas\gnarl.cl" />

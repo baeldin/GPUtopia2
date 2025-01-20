@@ -90,6 +90,12 @@
     <ClInclude Include="openFile.h">
       <Filter>Header Files\Ui</Filter>
     </ClInclude>
+    <ClInclude Include="cl_error_handling.h">
+      <Filter>Header Files\OpenCL</Filter>
+    </ClInclude>
+    <ClInclude Include="cl_error_window.h">
+      <Filter>Header Files\Ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -151,6 +157,12 @@
     </ClCompile>
     <ClCompile Include="cl_fractal.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cl_erro_handling.cpp">
+      <Filter>Source Files\OpenCL</Filter>
+    </ClCompile>
+    <ClCompile Include="cl_error_window.cpp">
+      <Filter>Source Files\Ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -262,6 +274,9 @@
     </None>
     <None Include="clFragments\diag_AA_col.cl">
       <Filter>OpenCL Files</Filter>
+    </None>
+    <None Include="clFragments\fractalFormulas\error.cl">
+      <Filter>OpenCL Files\formulas</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
