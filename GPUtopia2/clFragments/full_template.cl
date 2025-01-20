@@ -11,8 +11,6 @@ complex get_complex_coordinates(const float2 xy, const int2 img_size, const floa
         (xy.y / (float)img_size.y - 0.5f) * cz.w);
     z = cmul(z, rot);
     return z + cz.xy;
-    //    cz.x + (xy.x / (float)img_size.x - 0.5f) * cz.z,
-    //    cz.y + (xy.y / (float)img_size.y - 0.5f) * cz.w);
 }
 
 int2 revert_complex_coordinates(const float2 z, const int2 img_size, const float4 cz, const complex rot)
@@ -61,16 +59,13 @@ __kernel void computeLoop(
     {
         for (int s = sampling.x; s < sampling.y; s++)
         {
-            const float2 R2 = R2_offset(pixelIdx, s) - 0.5f;
+            const float2 R2 = R2_offset(pixelIdx, s);
             if (flamePointSelection > 0)
             {
                 int iter = 0;
                 float2 sample_position = (float2)(x, y) + offset_fac * (float2)(
                     tent(R2.x),
                     tent(R2.y));
-                //float2 sample_position = (float2)(x, y) + offset_fac * (float2)(
-                //    tent(fracf((float)s * phi + tofloat(lowbias32((uint)(2 * pixelIdx))))),
-                //    tent(fracf((float)s / (float)sampling.z + tofloat(lowbias32((uint)(2 * pixelIdx + 1))))));
                 const float2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane, rot);
                 //@__formulaInit
                 while (!bailed_out(z, bailout) && iter < maxIterations)
@@ -105,9 +100,6 @@ __kernel void computeLoop(
                 //@__coloringFinal
             }
         }
-        // colors[i].xyzw /= (float4)(sample_count, sample_count, sample_count, 1.f);
-        // colors[i] = linearToSRGB(colors[i]);
-        //colors[i].xyzw = (float4)((float)sampling.x, (float)sampling.y, (float)sampling.z, 1.);
     }
 }
 
