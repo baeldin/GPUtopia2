@@ -11,4 +11,6 @@
 #include "gradient.h"
 #include "display.h"
 
-void formulaSettingsWindow(clFractal& cf);
+class clCore;
+
+void formulaSettingsWindow(clFractal& cf, clCore& cc);
