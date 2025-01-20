@@ -36,6 +36,7 @@ public:
     cl::Buffer imgIntABuffer;
     cl::Buffer imgFloatBuffer;
     int currentRenderSize = 0;
+    bool stop = false; // global stop flat
     clCore() 
     {
         setContext();
@@ -43,9 +44,21 @@ public:
             compileImgKernel();
     }
     void setContext();
+    // fractal kernel
     void compileNewKernel(clFractal& cf);
+    cl_int programError = CL_SUCCESS;
+    cl_int compileError = CL_SUCCESS;
+    cl_int queueError = CL_SUCCESS;
+    cl_int kernelError = CL_SUCCESS;
+    cl_int errSum() const
+    {
+        return programError + compileError + queueError + kernelError;
+    }
+    std::string kernelBuildLog;
+    // image kernel
     void compileImgKernel();
     
+    // methods for setting arguments
     template <typename T>
     cl::Buffer setBufferKernelArg(cl::Kernel& currentKernel, int k, T* data, size_t size, cl_mem_flags mem_flag,
         const char* name, cl_int* err_out);
@@ -61,8 +74,12 @@ public:
     void setKernelFractalArgs(clFractal& cf);
     void setImgKernelArguments(clFractal& cf);
     void setDefaultArguments(clFractal& cf);
+
+    // run kernels
     void runKernel(clFractal& cf) const;
     void runImgKernel(clFractal& cf) const;
+
+    // read img data from buffer
     void getImg(std::vector<color>& img, clFractal& cf) const;
 
 };

@@ -24,6 +24,7 @@
 #include "complex_number.h"
 #include "fractal_navigation.h"
 #include "openFile.h"
+#include "cl_error_window.h"
 
 using std::string;
 

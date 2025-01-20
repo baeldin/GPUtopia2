@@ -52,13 +52,21 @@ namespace mainView
 		static std::vector<color> vec_img_f_offset(cf.image.size.x * cf.image.size.y, 0);
 		static bool imgBlocked = false;
 		static bool needCLFractal = true;
+		static bool showCoreError = false;
 		static clCore core;
 		// only run at startup, maybe move somewhere else?
 		if (needCLFractal)
 		{
 			cf.makeCLCode();
 			core.compileNewKernel(cf);
-			needCLFractal = false;
+			if (core.compileError == CL_SUCCESS)
+			{
+				needCLFractal = false;
+			}
+			else
+			{
+				needCLFractal = true;
+			}
 		}
 		// check if main viewport needs resizing
 		if (mainViewportSize.x != ImGui::GetContentRegionAvail().x ||
@@ -76,15 +84,19 @@ namespace mainView
 			cf_old.image = cf.image;
 		}
 		// check if a kernel rebuild is needed
-		if (cf.buildKernel)
+		if (cf.buildKernel and core.errSum() == 0)
 		{
 			std::cout << "Need a new kernel, compiling it now.\n - requesting new texture\n - requesting new image\n";
 			core.compileNewKernel(cf);
 			cf.status.runKernel = true;
 		}
-		static paramCollector params_old = cf.params;
+		if (core.errSum())
+		{
+			core.stop = true;
+			show_cl_error_window(cf, core);
+		}		static paramCollector params_old = cf.params;
 		static clFractalImage img_settings_old = cf.image;
-		formulaSettingsWindow(cf);
+		formulaSettingsWindow(cf, core);
 		imageSettingsWindow(cf, textureColors);
 		flameRenderSettingsWindow(cf);
 		infoWindow(cf, nav);
@@ -136,7 +148,7 @@ namespace mainView
 			cf.status.runImgKernel = false;
 		}
 		// check current image quality
-		if (!cf.running() and !cf.status.done)
+		if (!cf.running() and !cf.status.done and core.errSum() == 0)
 		{
 			if (cf.image.current_sample_count == cf.image.next_update_sample_count)
 			{

@@ -81,26 +81,20 @@ void clCore::compileNewKernel(clFractal& cf)
     std::string kernelCode = cf.fullCLcode;
     std::vector<std::string> programStrings;
     programStrings.push_back(kernelCode);
-    cl_int programErr;
-    this->program = cl::Program(this->context, programStrings, &programErr);
-    std::cout << programErr << "\n";
-    cl_int buildErr = CL_SUCCESS;
-    buildErr = this->program.build({ this->device }); // "-cl-std=CL2.0");
-    if (buildErr != CL_SUCCESS) {
+    this->program = cl::Program(this->context, programStrings, &this->programError);
+    this->compileError = this->program.build({ this->device }); // "-cl-std=CL2.0");
+    if (this->compileError != CL_SUCCESS) {
         std::string buildLog;
-        this->program.getBuildInfo(this->device, CL_PROGRAM_BUILD_LOG, &buildLog);
-        std::cerr << "Build failed; error code: " << buildErr
-            << ", build log:\n" << buildLog << std::endl;
+        this->program.getBuildInfo(this->device, CL_PROGRAM_BUILD_LOG, &this->kernelBuildLog);
     }
-    cl_int err;
-    this->queue = cl::CommandQueue(this->context, this->device, 0, &err);
-    if (err != CL_SUCCESS) {
-        std::cout << "Failed to create command queue. Error code: " << err << std::endl;
+    this->queue = cl::CommandQueue(this->context, this->device, 0, &this->queueError);
+    if (this->queueError != CL_SUCCESS) {
+        std::cout << "Failed to create command queue. Error code: " << this->queueError << std::endl;
     }
     std::string kernelFunctionName = "computeLoop"; // Replace with your actual kernel function name
-    this->kernel = cl::Kernel(this->program, kernelFunctionName.c_str(), &err);
-    if (err != CL_SUCCESS) {
-        std::cerr << "Failed to create kernel. Error code: " << err << std::endl;
+    this->kernel = cl::Kernel(this->program, kernelFunctionName.c_str(), &this->kernelError);
+    if (this->kernelError != CL_SUCCESS) {
+        std::cerr << "Failed to create kernel. Error code: " << this->kernelError << std::endl;
     }
     else {
         std::cout << "Kernel created successfully.\n";
