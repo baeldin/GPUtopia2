@@ -6,15 +6,13 @@ __init:
 
 //=====| coloring init 
 const int gaussIdx = floor(z.x + 10000) * 10000 + floor(z.y);
+const float dot_dist = 0.25 * @dot_size * @dot_size;
 __loop:
 //=========| coloring loop
 			// empty for smooth mandelbrot
 __final:
 //=====| coloring final
-// 		// this part has to set colors[i], the components have
-// 		// to be in [0., 1.]
-//
-		//colors[i].xyzw += getColor(gradient, @colorDensity * 0.01 * iter, nColors);
+// 		// this part has to set colorsR/G/B/A[i], 
 int4 outColor = 255;
 for (int sample = 0; sample <= @diag_sample_count; sample++)
 {
@@ -29,11 +27,17 @@ for (int sample = 0; sample <= @diag_sample_count; sample++)
 	{
 		sample_position = R2_offset(1, sample) - 0.5f;
 	}
-	else
+	else if (@pattern == 2)
 	{
-		sample_position = 0.f;
+		float2 sp = R2_offset_fine(1, sample);
+		sample_position = (float2)((float)sp.x - 0.5f, (float)sp.y - 0.5f);
 	}
-	if (abs(z - sample_position) < 0.5f * @dot_size)
+	else if (@pattern == 3)
+	{
+		double2 sp = R2_offset_fine64(1, sample);
+		sample_position = (float2)((float)sp.x - 0.5f, (float)sp.y - 0.5f);
+	}
+	if (dot(z - sample_position, z - sample_position) < dot_dist)
 	{
 		outColor = (int4)(150, 0, 0, 255);
 	}
