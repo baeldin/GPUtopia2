@@ -82,21 +82,21 @@ void rotateImageInBox(const std::vector<color>& image, std::vector<color>& offse
 	/* zoom into the image using a pixel coordinate center and zoom factor */
 	int maxIndex = cf.image.size.x * cf.image.size.y;
 	std::fill(offsetImage.begin(), offsetImage.end(), 0.f);
-	const Complex zRot = Complex(std::cos(nav.dragAngle), std::sin(nav.dragAngle));
+	const Complex zRot = Complex(std::cos(nav.dragAngle), std::sin(nav.dragAngle)).conj();
 	for (int y = 0; y < cf.image.size.y; y++)
 	{
 		for (int x = 0; x < cf.image.size.x; x++)
 		{
 			// find out which old pixel should be mapped to the zoomed image
 			// TODO: reverse lookup from new to old img to prevent black pixel glitch
-			int pixelIndexOld = y * cf.image.size.x + x;
+			int pixelIndexNew = y * cf.image.size.x + x;
 			const Complex<float> imgCenter = Complex(cf.image.size.x / 2.f, cf.image.size.y / 2.f);
-			Complex<float> pixelPosNew = (Complex<float>(x, y) - imgCenter) * zRot + imgCenter;
-			int xNew = (int)pixelPosNew.x;
-			int yNew = (int)pixelPosNew.y;
-			if (xNew >= 0 && yNew >= 0 && xNew < cf.image.size.x && yNew < cf.image.size.y) // check inf inside:
+			Complex<float> pixelPosOld = (Complex<float>(x, y) - imgCenter) * zRot + imgCenter;
+			int xOld = (int)pixelPosOld.x;
+			int yOld = (int)pixelPosOld.y;
+			if (xOld >= 0 && yOld >= 0 && xOld < cf.image.size.x && yOld < cf.image.size.y) // check inf inside:
 			{
-				int pixelIndexNew = yNew * cf.image.size.x + xNew;
+				int pixelIndexOld = yOld * cf.image.size.x + xOld;
 				offsetImage[pixelIndexNew] = image[pixelIndexOld];
 			}
 		}
