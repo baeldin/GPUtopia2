@@ -20,12 +20,12 @@ void dragZoom(clFractal& cf, fractalNavigationParameters& nav, ImGuiIO& io)
 void dragRotate(clFractal& cf, fractalNavigationParameters& nav, ImGuiIO& io)
 {
 	nav.draggingRotate = true;
-	float mouseToCenterX = nav.dragStart.x - cf.image.size.x / 2.f;
-	float mouseToCenterY = nav.dragStart.y - cf.image.size.y / 2.f;
-	float mouseStartToCenterX = mouseToCenterX - ImGui::GetMouseDragDelta(0).x;
-	float mouseStartToCenterY = mouseToCenterY - ImGui::GetMouseDragDelta(0).y;
-	float start_angle = -atan2(mouseStartToCenterX, mouseStartToCenterY);
-	nav.dragAngle = -atan2(mouseToCenterX, mouseToCenterY) - start_angle;
+	nav.mouseStartToCenterX = nav.dragStart.x - cf.image.size.x / 2.f;
+	nav.mouseStartToCenterY = nav.dragStart.y - cf.image.size.y / 2.f;
+	nav.mouseToCenterX = nav.dragStart.x + ImGui::GetMouseDragDelta(0).x - cf.image.size.x / 2.f;
+	nav.mouseToCenterY = nav.dragStart.y + ImGui::GetMouseDragDelta(0).y - cf.image.size.y / 2.f;
+	nav.startAngle = -atan2(nav.mouseStartToCenterY, nav.mouseStartToCenterX);
+	nav.dragAngle = atan2(nav.mouseToCenterY, nav.mouseToCenterX) + nav.startAngle;
 	nav.dragRotation = Complex<float>(cos(nav.dragAngle), sin(nav.dragAngle));
 }
 
