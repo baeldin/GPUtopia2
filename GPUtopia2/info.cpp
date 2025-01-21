@@ -1,6 +1,6 @@
 #include "info.h"
 
-void infoWindow(clFractal& cf, fractalNavigationParameters& nav)
+void infoWindow(clFractal& cf, fractalNavigationParameters& nav, ImFont* font_mono)
 {
 	static ImGuiIO& io = ImGui::GetIO();
 	ImGui::Begin("Info");
@@ -13,10 +13,9 @@ void infoWindow(clFractal& cf, fractalNavigationParameters& nav)
 			text = cf.fullCLcode.data();
 		}
 		static ImGuiInputTextFlags flags = 1 << 14; // read only ImGuiInputTextFlags_AllowTabInput;
-		//ImGui::CheckboxFlags("ImGuiInputTextFlags_ReadOnly", &flags, ImGuiInputTextFlags_ReadOnly);
-		//ImGui::CheckboxFlags("ImGuiInputTextFlags_AllowTabInput", &flags, ImGuiInputTextFlags_AllowTabInput);
-		//ImGui::CheckboxFlags("ImGuiInputTextFlags_CtrlEnterForNewLine", &flags, ImGuiInputTextFlags_CtrlEnterForNewLine);
-		ImGui::InputTextMultiline("##source", text, IM_ARRAYSIZE(text), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 60), flags);
+		ImGui::PushFont(font_mono);
+		ImGui::InputTextMultiline("##source", text, IM_ARRAYSIZE(text), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 30), flags);
+		ImGui::PopFont();
 		ImGui::TreePop();
 	}
 	bool ret = false;

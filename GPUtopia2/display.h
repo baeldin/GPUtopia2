@@ -35,5 +35,5 @@ void refreshTexture(GLuint& texture, const int sizeX, const int sizeY, std::vect
 
 namespace mainView
 {
-	void mainViewPort();
+	void mainViewPort(ImFont* font_mono);
 };

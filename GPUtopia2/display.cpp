@@ -36,7 +36,7 @@ void refreshTexture(GLuint& texture, const int sizeX, const int sizeY, std::vect
 
 namespace mainView
 {
-	void mainViewPort()
+	void mainViewPort(ImFont* font_mono)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		ImGui::Begin("Main View", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
@@ -93,13 +93,13 @@ namespace mainView
 		if (core.errSum())
 		{
 			core.stop = true;
-			show_cl_error_window(cf, core);
+			show_cl_error_window(cf, core, font_mono);
 		}		static paramCollector params_old = cf.params;
 		static clFractalImage img_settings_old = cf.image;
 		formulaSettingsWindow(cf, core);
 		imageSettingsWindow(cf, textureColors);
 		flameRenderSettingsWindow(cf);
-		infoWindow(cf, nav);
+		infoWindow(cf, nav, font_mono);
 		static int waitCounter = 0;
 		static bool force_img_update = false;
 		// only order rerun of imgKernel if flameRenderSettings change

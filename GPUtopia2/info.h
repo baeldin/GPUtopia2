@@ -12,4 +12,4 @@
 #include "display.h"
 #include "fractal_navigation.h"
 
-void infoWindow(clFractal& cf, fractalNavigationParameters& nav);
+void infoWindow(clFractal& cf, fractalNavigationParameters& nav, ImFont* font_mono);
