@@ -103,6 +103,15 @@ void clCore::compileNewKernel(clFractal& cf)
     this->kernelArgumentCount = 0;
 }
 
+void clCore::resetCore()
+{
+    this->programError = CL_SUCCESS;
+    this->compileError = CL_SUCCESS;
+    this->queueError = CL_SUCCESS;
+    this->kernelError = CL_SUCCESS;
+    this->stop = false;
+}
+
 template <typename T>
 void clCore::setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::pair<T, int>>& map)
 {

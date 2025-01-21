@@ -16,7 +16,7 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 		cf.coloringCLFragmentFile = std::string(coloringCLFragment);
 		cf.makeCLCode();
 		cf.buildKernel = true;
-		cc.stop = false;
+		cc.resetCore();
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Load AA diag"))
@@ -25,6 +25,7 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 		cf.coloringCLFragmentFile = "clFragments/diag_AA_col.cl";
 		cf.makeCLCode();
 		cf.buildKernel = true;
+		cc.resetCore();
 	}
 	ImGui::DragFloat("Bailout", &cf.bailout, 4., 20000.);
 	ImGui::Text("Formula Parameters:");

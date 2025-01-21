@@ -50,6 +50,7 @@ public:
     cl_int compileError = CL_SUCCESS;
     cl_int queueError = CL_SUCCESS;
     cl_int kernelError = CL_SUCCESS;
+    void resetCore();
     cl_int errSum() const
     {
         return programError + compileError + queueError + kernelError;
