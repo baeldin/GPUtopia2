@@ -78,7 +78,7 @@ void infoWindow(clFractal& cf, fractalNavigationParameters& nav, ImFont* font_mo
 			"- draggingCenter = %d \n"
 			"- centerOffset.x = %f\n"
 			"- centerOffset.y = %f\n"
-			"Panning:\n"
+			"Zooming:\n"
 			"- draggingZoom = %d \n"
 			"- imgDisplayCenter.x = %d \n"
 			"- imgDisplayCenter.y = %d \n"
@@ -88,7 +88,14 @@ void infoWindow(clFractal& cf, fractalNavigationParameters& nav, ImFont* font_mo
 			"- newImgCenter.x = %f\n"
 			"- newImgCenter.y = %f\n"
 			"- nav.newSubplaneCenter.x = %f\n"
-			"- nav.newSubplaneCenter.y = %f\n",			
+			"- nav.newSubplaneCenter.y = %f\n"
+			"Rotating:"
+			"- nav.mouseToCenterX = %f\n"
+			"- nav.mouseToCenterY = %f\n"
+			"- nav.mouseStartToCenterX = %f\n"
+			"- nav.mouseStartToCenterY = %f\n"
+			"- nav.startangle = %f\n"
+			"- nav.dragAngle = %f\n",
 			// general
 			nav.dragStart.x,
 			nav.dragStart.y,
@@ -116,8 +123,14 @@ void infoWindow(clFractal& cf, fractalNavigationParameters& nav, ImFont* font_mo
 			nav.newImgCenter.x,
 			nav.newImgCenter.y,
 			nav.newSubplaneCenter.x,
-			nav.newSubplaneCenter.y
-		);
+			nav.newSubplaneCenter.y,
+			nav.mouseToCenterX,
+			nav.mouseToCenterY,
+			nav.mouseStartToCenterX,
+			nav.mouseStartToCenterY,
+			nav.startAngle * 180.f / CL_M_PI,
+			nav.dragAngle * 180.f / CL_M_PI
+			);
 		ImGui::TreePop();
 	}
 

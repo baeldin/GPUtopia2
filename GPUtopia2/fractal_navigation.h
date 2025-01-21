@@ -32,6 +32,11 @@ struct fractalNavigationParameters
 	// rotating 
 	bool draggingRotate = false;
 	float dragAngle = 0.f;
+	float startAngle = 0.f;
+	float mouseToCenterX;
+	float mouseToCenterY;
+	float mouseStartToCenterX;
+	float mouseStartToCenterY;
 	Complex<float> dragRotation = Complex<float>(0.f, 0.f);
 };
 
