@@ -28,32 +28,30 @@ bool bailed_out(const float2 z, const float bailout)
     return bailedout;
 }
 __kernel void computeLoop(
-    __global int const* xx,            // 0:  pixel x values
-    __global int const* yy,            // 1:  pixel y values
-    const int2 image_size,             // 2:  image sizeX, image sizeY
-    const float4 complex_subplane,     // 3:  {centerX, centerY, width, width / aspectRatio}
-    const float2 rot,                  // 4:  complex rotation
-    const int3 sampling,               // 5:  {sampleStart, sampleEnd, nSamplesTotal}
-    const int maxIterations,           // 6:  maxIterations
-    const float bailout,               // 7:  bailout value
-    const int nColors,                 // 8:  colors in gradient
-    __global const float4* gradient,   // 9:  gradient
-    __global atomic_uint* colorsR,     // 10:  output R
-    __global atomic_uint* colorsG,     // 11: output G
-    __global atomic_uint* colorsB,     // 12: output B
-    __global atomic_uint* colorsA,     // 13: output A
-    const int flamePointSelection,     // 14: discard points, used for flame
-    const int flameWarmup,             // 15: warmup before splatting flame samples
-    const int mode,                    // 16: mode (0 = escape time, 1 = flame)
+    const int2 image_size,             // 0:  image sizeX, image sizeY
+    const float4 complex_subplane,     // 1:  {centerX, centerY, width, width / aspectRatio}
+    const float2 rot,                  // 2:  complex rotation
+    const int3 sampling,               // 3:  {sampleStart, sampleEnd, nSamplesTotal}
+    const int maxIterations,           // 4:  maxIterations
+    const float bailout,               // 5:  bailout value
+    const int nColors,                 // 6:  colors in gradient
+    __global const float4* gradient,   // 7:  gradient
+    __global atomic_uint* colorsR,     // 8:  output R
+    __global atomic_uint* colorsG,     // 9: output G
+    __global atomic_uint* colorsB,     // 10: output B
+    __global atomic_uint* colorsA,     // 11: output A
+    const int flamePointSelection,     // 12: discard points, used for flame
+    const int flameWarmup,             // 13: warmup before splatting flame samples
+    const int mode,                    // 14: mode (0 = escape time, 1 = flame)
 //@__kernelArguments)
 {
     // Get Parallel Index
     unsigned int i = get_global_id(0);
-    const int x = xx[i]; // Real Component
-    const int y = yy[i]; // Imaginary Component
-    const int pixelIdx = image_size.x * y + x;
+    const int pixelIdx = i;
+    const int y = (image_size.y - 1) - pixelIdx / image_size.x;
+    const int x = pixelIdx - image_size.x * (image_size.y - y - 1);
     const int sample_count = sampling.y - sampling.x;
-    int offset_fac = min(1, sampling.z - 1);
+    const int offset_fac = min(1, sampling.z - 1);
     bool use_point = true;
     // check if point is to be used
     {

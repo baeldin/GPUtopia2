@@ -130,52 +130,35 @@ void clCore::setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::
 
 void clCore::setDefaultArguments(clFractal& cf)
 {
-    std::vector<int>xx(cf.image.size.x * cf.image.size.y);
-    std::vector<int>yy(cf.image.size.x * cf.image.size.y);
-    const int npixels = cf.image.size.x * cf.image.size.y;
-    this->currentRenderSize = npixels;
-    int pixelIndex = 0;
-    for (int y = 0; y < cf.image.size.y; y++) {
-        for (int x = 0; x < cf.image.size.x; x++) {
-            pixelIndex = y * cf.image.size.x + x;
-            xx[pixelIndex] = x;
-            yy[pixelIndex] = cf.image.size.y - y;
-        }
-    }
-    // TODO: figure out if this is the part that breaks the image when resizing in the UI
-    cf.imgData.resize(4 * npixels, 0);
-    cf.imgIntRData.resize(npixels, 0);
-    cf.imgIntGData.resize(npixels, 0);
-    cf.imgIntBData.resize(npixels, 0);
-    cf.imgIntAData.resize(npixels, 0);
+    this->currentRenderSize = cf.image.size.x * cf.image.size.y;
+    cf.imgData.resize(4 * this->currentRenderSize, 0);
+    cf.imgIntRData.resize(this->currentRenderSize, 0);
+    cf.imgIntGData.resize(this->currentRenderSize, 0);
+    cf.imgIntBData.resize(this->currentRenderSize, 0);
+    cf.imgIntAData.resize(this->currentRenderSize, 0);
     cl_int3 sampling = { 0, fibonacci_number(cf.image.targetQuality), fibonacci_number(cf.image.targetQuality) };
     cl_int err;
     const cl_float4 complexSubplane = { cf.image.center.x, cf.image.center.y, cf.image.span.x, cf.image.span.y };
-    std::cout << "xx size is " << xx.size() << std::endl;
-    this->xBuffer = setBufferKernelArg(this->kernel, 0, xx.data(), 
-        sizeof(int) * npixels, CL_MEM_READ_ONLY, "xx", &err);
-    this->yBuffer = setBufferKernelArg(this->kernel, 1, yy.data(), 
-        sizeof(int) * npixels, CL_MEM_READ_ONLY, "yy", &err);
-    err = setKernelArg(this->kernel, 2, cf.image.size, "image_size");
-    err = setKernelArg(this->kernel, 3, complexSubplane, "complex_subplane");
-    err = setKernelArg(this->kernel, 4, cf.image.rotation, "rotation");
-    err = setKernelArg(this->kernel, 6, cf.maxIter, "iterations");
-    err = setKernelArg(this->kernel, 7, cf.bailout, "bailout");
-    err = setKernelArg(this->kernel, 8, cf.gradient.fineLength, "gradient_length");
-    this->gradientBuffer = setBufferKernelArg(this->kernel, 9, cf.gradient.fineColors.data(), 
+    err = setKernelArg(this->kernel, 0, cf.image.size, "image_size");
+    err = setKernelArg(this->kernel, 1, complexSubplane, "complex_subplane");
+    err = setKernelArg(this->kernel, 2, cf.image.rotation, "rotation");
+    err = setKernelArg(this->kernel, 4, cf.maxIter, "iterations");
+    err = setKernelArg(this->kernel, 5, cf.bailout, "bailout");
+    err = setKernelArg(this->kernel, 6, cf.gradient.fineLength, "gradient_length");
+    this->gradientBuffer = setBufferKernelArg(this->kernel, 7, cf.gradient.fineColors.data(),
         sizeof(float) * cf.gradient.fineLength * 4, CL_MEM_READ_ONLY, "gradient_colors", &err);
-    this->imgIntRBuffer = setBufferKernelArg(this->kernel, 10, cf.imgIntRData.data(),
-        sizeof(uint32_t) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
-    this->imgIntGBuffer = setBufferKernelArg(this->kernel, 11, cf.imgIntGData.data(),
-        sizeof(uint32_t) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
-    this->imgIntBBuffer = setBufferKernelArg(this->kernel, 12, cf.imgIntBData.data(),
-        sizeof(uint32_t) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
-    this->imgIntABuffer = setBufferKernelArg(this->kernel, 13, cf.imgIntAData.data(),
-        sizeof(uint32_t) * npixels, CL_MEM_WRITE_ONLY, "img", &err);
-    err = setKernelArg(this->kernel, 14, cf.flamePointSelection, "flamePointSelection");
-    err = setKernelArg(this->kernel, 15, cf.flameWarmup, "flameWarmup");
-    err = setKernelArg(this->kernel, 16, cf.mode, "fractal mode");
-    this->kernelArgumentCount = 17;
+    this->imgIntRBuffer = setBufferKernelArg(this->kernel, 8, cf.imgIntRData.data(),
+        sizeof(uint32_t) * this->currentRenderSize, CL_MEM_WRITE_ONLY, "img", &err);
+    this->imgIntGBuffer = setBufferKernelArg(this->kernel, 9, cf.imgIntGData.data(),
+        sizeof(uint32_t) * this->currentRenderSize, CL_MEM_WRITE_ONLY, "img", &err);
+    this->imgIntBBuffer = setBufferKernelArg(this->kernel, 10, cf.imgIntBData.data(),
+        sizeof(uint32_t) * this->currentRenderSize, CL_MEM_WRITE_ONLY, "img", &err);
+    this->imgIntABuffer = setBufferKernelArg(this->kernel, 11, cf.imgIntAData.data(),
+        sizeof(uint32_t) * this->currentRenderSize, CL_MEM_WRITE_ONLY, "img", &err);
+    err = setKernelArg(this->kernel, 12, cf.flamePointSelection, "flamePointSelection");
+    err = setKernelArg(this->kernel, 13, cf.flameWarmup, "flameWarmup");
+    err = setKernelArg(this->kernel, 14, cf.mode, "fractal mode");
+    this->kernelArgumentCount = 15;
 }
 
 void clCore::setKernelFractalArgs(clFractal& cf)
@@ -312,7 +295,7 @@ void runKernelAsync(clFractal& cf, clCore& cc)
         cf.image.target_sample_count };
     // std::cout << "Kernel called with sampling (" << sampling_info.x << " " << sampling_info.y << " " << sampling_info.z << ")\n";
     // std::cout << "Fractal image curent_sample_count = " << cf.image.current_sample_count << "\n";
-    err = cc.setKernelArg(cc.kernel, 5, sampling_info, "sampling_info");
+    err = cc.setKernelArg(cc.kernel, 3, sampling_info, "sampling_info");
     cc.runKernel(cf);
     cf.image.current_sample_count += 1;
     std::cout << "New fractal image curent_sample_count = " << cf.image.current_sample_count << "\n";
