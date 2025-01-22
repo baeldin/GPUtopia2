@@ -6,7 +6,7 @@
 using std::ostream;
 using std::basic_ostream;
 using std::cout;
-using namespace std;
+// using namespace std;
 
 template <class T>
 class Complex
