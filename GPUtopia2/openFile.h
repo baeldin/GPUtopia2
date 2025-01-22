@@ -3,7 +3,11 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
-#include <tchar.h>
-#include <iostream>
+#include <shobjidl.h> 
+#include <string>
+// #include <iostream>
+// #include <locale>
+// #include <codecvt>
+#include <cstdlib>
 
-void openFileDialog();
+void openFileDialog(std::string& fileName);

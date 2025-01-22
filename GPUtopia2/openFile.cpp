@@ -1,52 +1,48 @@
 #include "openFile.h"
 
-void openFileDialog() {
-    STARTUPINFO si = { 0 };
-    PROCESS_INFORMATION pi = { 0 };
-    SECURITY_ATTRIBUTES sa = { 0 };
-    HANDLE hReadPipe, hWritePipe;
 
-    sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-    sa.bInheritHandle = TRUE;
-    sa.lpSecurityDescriptor = NULL;
 
-    // Create a pipe for standard output redirection
-    if (!CreatePipe(&hReadPipe, &hWritePipe, &sa, 0)) {
-        std::cerr << "Error creating pipe." << std::endl;
-    }
+void openFileDialog(std::string& fileName)
+{
+    HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
+        COINIT_DISABLE_OLE1DDE);
+    if (SUCCEEDED(hr))
+    {
+        IFileOpenDialog* pFileOpen;
 
-    si.cb = sizeof(STARTUPINFO);
-    si.hStdOutput = hWritePipe;
-    si.dwFlags |= STARTF_USESTDHANDLES;
+        // Create the FileOpenDialog object.
+        hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
+            IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
 
-    // Specify the executable path of the subprocess (in this example, "subprocess.exe")
-    TCHAR szExePath[] = _T("./subprocess.exe");
+        if (SUCCEEDED(hr))
+        {
+            // Show the Open dialog box.
+            hr = pFileOpen->Show(NULL);
 
-    // Create the subprocess
-    // if (CreateProcess(NULL, szExePath, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)) {
-        std::cout << "Subprocess created successfully!" << std::endl;
+            // Get the file name from the dialog box.
+            if (SUCCEEDED(hr))
+            {
+                IShellItem* pItem;
+                hr = pFileOpen->GetResult(&pItem);
+                if (SUCCEEDED(hr))
+                {
+                    PWSTR pszFilePath;
+                    hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 
-        // Close the unused read pipe
-        CloseHandle(hWritePipe);
-
-        // Read and display output from the read pipe
-        char buffer[4096];
-        DWORD bytesRead; 
-        while (ReadFile(hReadPipe, buffer, sizeof(buffer), &bytesRead, NULL) && bytesRead > 0) {
-            std::cout.write(buffer, bytesRead);
+                    // Display the file name to the user.
+                    if (SUCCEEDED(hr))
+                    {
+                        std::wstring tmpFilePath(pszFilePath);
+                        size_t size;
+                        fileName.resize(tmpFilePath.length());
+                        wcstombs_s(&size, &fileName[0], fileName.size() + 1, tmpFilePath.c_str(), tmpFilePath.size());
+                    }
+                    pItem->Release();
+                }
+            }
+            pFileOpen->Release();
         }
-
-        // Close the read pipe
-        CloseHandle(hReadPipe);
-
-        // Wait for the subprocess to finish
-        WaitForSingleObject(pi.hProcess, INFINITE);
-
-        // Close process and thread handles
-        CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
-    // }
-    // else {
-    //     std::cerr << "Error creating subprocess." << std::endl;
-    // }
+        CoUninitialize();
+    }
+    // return 0;
 }
