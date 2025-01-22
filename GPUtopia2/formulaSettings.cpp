@@ -61,7 +61,8 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 	ImGui::DragInt("Gradient Nodes", &colorNodeCount, 1, 12);
 	if (ImGui::Button("Test Gradient"))
 	{
-		cf.gradient = Gradient();
+		//cf.gradient = Gradient();
+		cf.gradient = randomGradient(colorNodeCount);
 		// grad.printNodes();
 		// grad.printFine();
 		glDeleteTextures(1, &gradientTextureID);

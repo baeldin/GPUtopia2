@@ -5,6 +5,7 @@ void clFractalImage::updateComplexSubplane()
 {
     this->aspectRatio = (float)size.x / (float)size.y;
     this->span = { 4.f / zoom, 4.f / zoom / aspectRatio };
+    this->rotation = Complex<float>(cos(this->angle), sin(this->angle));
 }
 
 Complex<float> clFractalImage::image2complex(const cl_float2 xy) const

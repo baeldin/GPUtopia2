@@ -42,6 +42,7 @@ void imageSettingsWindow(clFractal& cf, std::vector<color>& img)
 	// static float yCenter = cf.image.center.y;
 	ImGui::InputInt("Iterations", &cf.maxIter, 1, 100);
 	ImGui::InputFloat("Zoom", &cf.image.zoom, 0.1f, 10.f);
+	ImGui::InputFloat("Rotation", &cf.image.angle, 0.1f, 45.f);
 	// static cl_float2 center = { cf.image.complexSubplane.x, cf.image.complexSubplane.y };
 	ImGui::SliderFloat("Center Real", &cf.image.center.x, xmin, xmax);
 	ImGui::SliderFloat("Center Imag", &cf.image.center.y, ymin, ymax);

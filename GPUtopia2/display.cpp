@@ -240,6 +240,7 @@ namespace mainView
 		{
 			nav.draggingRotate = false;
 			// calculate coordinate of pixel in the middle of the displayed image
+			cf.image.angle += nav.dragAngle;
 			cf.image.rotation = cf.image.rotation * nav.dragRotation;
 			textureColors = vec_img_f_offset;
 			imgBlocked = false;
