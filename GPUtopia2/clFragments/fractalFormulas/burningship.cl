@@ -1,13 +1,14 @@
 __parameters:
+float parameter expR = 2.;
+float parameter expI = 0.;
 __init:
 //=====| fractal formula init
-        float2 z = (float2)(0.f, 0.f);
+        complex z = z0;
+        complex exp = (complex)(@expR, @expI);   
 __loop:
 //=========| fractal formula loop
             z = fabs(z);
-            z = (float2)(
-                z.x * z.x - z.y * z.y + z0.x,
-                2.f * z.x * z.y + z0.y);
+            z = cpow(z, exp) + z0;
 __bailout:
 //=| factal bailout function
     // must always define bool bailedout!!!
