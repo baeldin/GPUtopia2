@@ -60,7 +60,7 @@ inline const bool operator==(const paramCollector& lhs, const paramCollector& rh
 // settings for the image generated from the fractal, including default values
 struct clFractalImage
 {
-	cl_int2 size = { 800, 600 };
+	cl_int2 size = { 1920, 1080 };
 	float aspectRatio = (float)size.x / (float)size.y;
 	Complex<float> center = Complex<float>(0., 0.);
 	Complex<float> rotation = Complex<float>(std::cos(angle), std::sin(angle));
@@ -83,6 +83,7 @@ struct clFractalImage
 		this->next_update_sample_count = 1;
 		this->target_sample_count = fibonacci_number(this->targetQuality);
 	}
+
 	// cl_float2 complex2image(Complex<float> z);
 	Complex<float> image2complex(const cl_float2 xy) const;
 	Complex<float> image2complex(const cl_int2 xy_int) const
@@ -167,7 +168,6 @@ public:
 	bool running() {
 		return this->status.kernelRunning or this->status.imgKernelRunning;
 	}
-
 };
 
 inline const bool operator==(const clFractal& lhs, const clFractal& rhs)
