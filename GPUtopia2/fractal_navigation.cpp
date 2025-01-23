@@ -26,7 +26,7 @@ void dragRotate(clFractal& cf, fractalNavigationParameters& nav, ImGuiIO& io)
 	nav.mouseToCenterY = nav.dragStart.y + ImGui::GetMouseDragDelta(0).y - cf.image.size.y / 2.f;
 	nav.startAngle = -atan2(nav.mouseStartToCenterY, nav.mouseStartToCenterX);
 	nav.dragAngle = atan2(nav.mouseToCenterY, nav.mouseToCenterX) + nav.startAngle;
-	nav.dragRotation = Complex<double>(cos(nav.dragAngle), sin(nav.dragAngle));
+	nav.dragRotation = Complex<float>(cos(nav.dragAngle), sin(nav.dragAngle));
 }
 
 void offsetImageInBox(const std::vector<color>& image, std::vector<color>& offsetImage, 
@@ -82,7 +82,7 @@ void rotateImageInBox(const std::vector<color>& image, std::vector<color>& offse
 	/* zoom into the image using a pixel coordinate center and zoom factor */
 	int maxIndex = cf.image.size.x * cf.image.size.y;
 	std::fill(offsetImage.begin(), offsetImage.end(), 0.f);
-	const Complex<double> zRot = Complex<double>(std::cos(nav.dragAngle), std::sin(nav.dragAngle)).conj();
+	const Complex zRot = Complex(std::cos(nav.dragAngle), std::sin(nav.dragAngle)).conj();
 	for (int y = 0; y < cf.image.size.y; y++)
 	{
 		for (int x = 0; x < cf.image.size.x; x++)
@@ -90,8 +90,8 @@ void rotateImageInBox(const std::vector<color>& image, std::vector<color>& offse
 			// find out which old pixel should be mapped to the zoomed image
 			// TODO: reverse lookup from new to old img to prevent black pixel glitch
 			int pixelIndexNew = y * cf.image.size.x + x;
-			const Complex<double> imgCenter = Complex<double>(cf.image.size.x / 2.f, cf.image.size.y / 2.f);
-			Complex<double> pixelPosOld = (Complex<double>(x, y) - imgCenter) * zRot + imgCenter;
+			const Complex<float> imgCenter = Complex(cf.image.size.x / 2.f, cf.image.size.y / 2.f);
+			Complex<float> pixelPosOld = (Complex<float>(x, y) - imgCenter) * zRot + imgCenter;
 			int xOld = (int)pixelPosOld.x;
 			int yOld = (int)pixelPosOld.y;
 			if (xOld >= 0 && yOld >= 0 && xOld < cf.image.size.x && yOld < cf.image.size.y) // check inf inside:
@@ -103,23 +103,23 @@ void rotateImageInBox(const std::vector<color>& image, std::vector<color>& offse
 	}
 }
 
-cl_double2 imgCoordinateCenterAfterZoom(clFractal& cf, fractalNavigationParameters& nav)
+cl_float2 imgCoordinateCenterAfterZoom(clFractal& cf, fractalNavigationParameters& nav)
 {
-	const cl_double2 ret = {
-		nav.dragStart.x - (nav.dragStart.x - (double)cf.image.size.x / 2.) / nav.dragZoomFactor,
-		nav.dragStart.y - (nav.dragStart.y - (double)cf.image.size.y / 2.) / nav.dragZoomFactor
+	const cl_float2 ret = {
+		nav.dragStart.x - (nav.dragStart.x - (float)cf.image.size.x / 2.f) / nav.dragZoomFactor,
+		nav.dragStart.y - (nav.dragStart.y - (float)cf.image.size.y / 2.f) / nav.dragZoomFactor
 	};
 	std::cout << "RET = (" << ret.x << ", " << ret.y << ")\n";
 	return ret;
 }
 
-Complex<double> get_complex_offset(const int dx, const int dy, const clFractal& cf)
+Complex<float> get_complex_offset(const int dx, const int dy, const clFractal& cf)
 {
-	const double dxDouble = (double)dx * cf.image.zoom;
-	const double dyDouble = (double)dy * cf.image.zoom;
+	const float dxFloat = (float)dx * cf.image.zoom;
+	const float dyFloat = (float)dy * cf.image.zoom;
 	const double xRange = cf.image.span.x / cf.image.zoom;
 	const double yRange = cf.image.span.y / cf.image.zoom;
-	double xOffset = -dxDouble / cf.image.size.x * xRange;
-	double yOffset = dyDouble / cf.image.size.y * yRange;
-	return Complex<double>(xOffset, yOffset) * cf.image.rotation();
+	double xOffset = -dxFloat / cf.image.size.x * xRange;
+	double yOffset = dyFloat / cf.image.size.y * yRange;
+	return Complex<float>(xOffset, yOffset) * cf.image.rotation;
 }

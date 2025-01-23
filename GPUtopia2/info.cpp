@@ -133,14 +133,7 @@ void infoWindow(clFractal& cf, fractalNavigationParameters& nav, ImFont* font_mo
 			);
 		ImGui::TreePop();
 	}
-	if (ImGui::TreeNode("Sample Timings"));
-	{
-		for (double t : cf.timings)
-		{
-			const std::string num = std::to_string(t);
-			ImGui::Text(num.c_str());
-		}
-		ImGui::TreePop();
-	}
+
+
 	ImGui::End();
 }

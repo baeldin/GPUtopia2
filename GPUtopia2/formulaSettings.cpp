@@ -39,15 +39,6 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 		cf.buildKernel = true;
 		cc.resetCore();
 	}
-	static bool useDouble = cf.useDouble;
-	ImGui::Checkbox("Double Precision", &useDouble);
-	if (!useDouble == cf.useDouble)
-	{
-		cf.useDouble = useDouble;
-		cf.makeCLCode();
-		cf.buildKernel = true;
-		cc.resetCore();
-	}
 	ImGui::DragFloat("Bailout", &cf.bailout, 4., 20000.);
 	ImGui::Text("Formula Parameters:");
 	for (auto& [key, val] : cf.params.fractalParameterMaps.integerParameters)

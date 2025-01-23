@@ -138,21 +138,10 @@ void clCore::setDefaultArguments(clFractal& cf)
     cf.imgIntAData.resize(this->currentRenderSize, 0);
     cl_int3 sampling = { 0, fibonacci_number(cf.image.targetQuality), fibonacci_number(cf.image.targetQuality) };
     cl_int err;
+    const cl_float4 complexSubplane = { cf.image.center.x, cf.image.center.y, cf.image.span.x, cf.image.span.y };
     err = setKernelArg(this->kernel, 0, cf.image.size, "image_size");
-    if (cf.useDouble)
-    {
-        const cl_double4 complexSubplane = { cf.image.center.x, cf.image.center.y, cf.image.span.x, cf.image.span.y };
-        err = setKernelArg(this->kernel, 1, complexSubplane, "complex_subplane");
-        const cl_double2 rot = { cf.image.rotation().x, cf.image.rotation().y };
-        err = setKernelArg(this->kernel, 2, rot, "rotation");
-    }
-    else
-    {
-        const cl_float4 complexSubplane = { (float)cf.image.center.x, (float)cf.image.center.y, (float)cf.image.span.x, (float)cf.image.span.y };
-        err = setKernelArg(this->kernel, 1, complexSubplane, "complex_subplane");
-        const cl_float2 rot = { (float)cf.image.rotation().x, (float)cf.image.rotation().y };
-        err = setKernelArg(this->kernel, 2, rot, "rotation");
-    }
+    err = setKernelArg(this->kernel, 1, complexSubplane, "complex_subplane");
+    err = setKernelArg(this->kernel, 2, cf.image.rotation, "rotation");
     err = setKernelArg(this->kernel, 4, cf.maxIter, "iterations");
     err = setKernelArg(this->kernel, 5, cf.bailout, "bailout");
     err = setKernelArg(this->kernel, 6, cf.gradient.fineLength, "gradient_length");
@@ -188,15 +177,11 @@ void clCore::runKernel(clFractal& cf) const
     cl_int err = CL_SUCCESS;
     cl::NDRange global_range = cl::NDRange(global_size);
     cl::NDRange local_range = cl::NDRange(local_size);
-    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
     err = this->queue.enqueueNDRangeKernel(this->kernel, cl::NullRange, global_range, local_range);
     if (err != CL_SUCCESS) {
         std::cerr << "Failed to enqueue kernel. Error code: " << err << std::endl;
     }
     this->queue.finish();
-    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
-    cf.timings.push_back(time_span.count());
 }
 
 void clCore::compileImgKernel()

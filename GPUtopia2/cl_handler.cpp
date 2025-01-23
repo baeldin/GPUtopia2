@@ -32,9 +32,6 @@ const std::string fin("__final:\n");
 const std::string fun("__functions:\n");
 const std::string eof("EOF");
 
-const std::string DPFlag("//@__DOUBLE");
-const std::string DPString("#define USE_DOUBLE");
-
 const std::string AAFlag("//@__AA");
 const std::string COFlag("//@__COLORING");
 const std::string CPFlag("//@__COMPLEX");
@@ -229,8 +226,6 @@ void clFractal::makeCLCode()
 	std::string coloringFunctions = getFragmentPart(coloringAlgorithmStr, fun, eof);
 
 	std::cout << "BEFORE:\n" << fullTemplateStr << std::endl;
-	if (this->useDouble)
-		fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(DPFlag), DPString);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(AAFlag), antiAliasingStr);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(COFlag), colorStr);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(CPFlag), complexStr);
