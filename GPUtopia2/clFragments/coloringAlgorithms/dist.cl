@@ -2,8 +2,8 @@ __parameters:
 float parameter colorDensity = 1.f;
 __init:
 //=====| coloring init
-		float2 z_old = z;
-		float d = 0.f;
+		complex z_old = z;
+		real d = 0.f;
 __loop:
 //=========| coloring loop
 			// empty for smooth mandelbrot
