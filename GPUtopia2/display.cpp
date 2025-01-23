@@ -117,6 +117,7 @@ namespace mainView
 			core.setKernelFractalArgs(cf);
 			cf.image.resetStatus();
 			cf.status.runKernel = true;
+			cf.timings.erase(cf.timings.begin(), cf.timings.end() - 1);
 			cf.status.done = false;
 			cf_old = cf;
 		}
@@ -241,7 +242,6 @@ namespace mainView
 			nav.draggingRotate = false;
 			// calculate coordinate of pixel in the middle of the displayed image
 			cf.image.angle += nav.dragAngle;
-			cf.image.rotation = cf.image.rotation * nav.dragRotation;
 			textureColors = vec_img_f_offset;
 			imgBlocked = false;
 		}
