@@ -10,6 +10,7 @@
 #include "cl_handler.h"
 #include "gradient.h"
 #include "display.h"
+#include "openFile.h"
 
 class clCore;
 

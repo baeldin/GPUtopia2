@@ -5,15 +5,27 @@
 void formulaSettingsWindow(clFractal& cf, clCore& cc)
 {
 	ImGui::Begin("Formulas");
-
-	static char formulaCLFragment[100] = "clFragments/fractalFormulas/mandelbrot.cl";
-	static char coloringCLFragment[100] = "clFragments/coloringAlgorithms/by_iteration.cl";
-	ImGui::InputText("Formula:", formulaCLFragment, 100);
-	ImGui::InputText("Coloring:", coloringCLFragment, 100);
-	if (ImGui::Button("Reload CL Fragments"))
+	// formula CL fragment
+	static std::string formulaCLFragment = cf.fractalCLFragmentFile; 
+	// formulaCLFragment = "clFragments/fractalFormulas/mandelbrot.cl";
+	if (ImGui::Button("Load Formula"))
 	{
-		cf.fractalCLFragmentFile = std::string(formulaCLFragment);
-		cf.coloringCLFragmentFile = std::string(coloringCLFragment);
+		openFileDialog(formulaCLFragment);
+		std::cout << "Setting formula fragment to " << formulaCLFragment << "\n";
+		// cf.fractalCLFragmentFile = formulaCLFragment;
+	}
+	ImGui::Text("", (char*)formulaCLFragment.c_str());
+	// coloring CL fragment
+	static std::string coloringCLFragment = cf.coloringCLFragmentFile; 
+	if (ImGui::Button("Load Coloring"))
+	{
+		openFileDialog(coloringCLFragment);
+	}
+	ImGui::InputText("", (char*)coloringCLFragment.c_str(), 100);
+	if (ImGui::Button("Reload all CL Fragments"))
+	{
+		cf.fractalCLFragmentFile = formulaCLFragment;
+		cf.coloringCLFragmentFile = coloringCLFragment;
 		cf.makeCLCode();
 		cf.buildKernel = true;
 		cc.resetCore();
@@ -72,5 +84,19 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 	}
 	ImGui::Image((void*)(intptr_t)gradientTextureID, ImVec2(400, 20));
 	ImGui::Checkbox("Vomit pixel contents", &cf.vomit);
+	if (cf.fractalCLFragmentFile != formulaCLFragment)
+	{
+		cf.fractalCLFragmentFile = formulaCLFragment;
+		cf.makeCLCode();
+		cf.buildKernel = true;
+		cc.resetCore();
+	}
+	if (cf.coloringCLFragmentFile != coloringCLFragment)
+	{
+		cf.coloringCLFragmentFile = coloringCLFragment;
+		cf.makeCLCode();
+		cf.buildKernel = true;
+		cc.resetCore();
+	}
 	ImGui::End();
 }

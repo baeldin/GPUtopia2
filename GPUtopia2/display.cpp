@@ -250,13 +250,6 @@ namespace mainView
 		ImGui::Begin(mainViewStr, nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 		ImGui::Image((void*)(intptr_t)textureID, ImVec2(
 			cf.image.size.x, cf.image.size.y)); // , texturesize);
-		static std::string fileName;
-		if (ImGui::Button("open"))
-		{
-			openFileDialog(fileName);
-		}
-		ImGui::Text(fileName.c_str());
-		
 		ImGui::End();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
