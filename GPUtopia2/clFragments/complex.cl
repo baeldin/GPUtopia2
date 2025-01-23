@@ -3,7 +3,7 @@ typedef real2 complex;
 // typedef float2 complex;
 
 #define i1 ((complex)(0, 1))
-#define half_pi 1.57079632679;
+const real half_pi 1.570796326794896619231321691639751442;
 
 inline real re(const complex z) { return z.x; }
 inline real im(const complex z) { return z.y; }
@@ -16,8 +16,6 @@ inline complex abs_squared(const complex z) { return (complex)(z.x * z.x, z.y * 
 inline complex cabs(const complex z) { return (complex)(absf(z.x), absf(z.y)); }
 
 // operations with two complex arguments
-// inline complex cadd(complex& z1, complex& z2) { return (complex)(z1.x + z2.x, z1.y + z2.y); }
-// inline complex csub(complex& z1, complex& z2) { return (complex)(z1.x - z2.x, z1.y - z2.y); }
 inline complex cmul(const complex z1, const complex z2) 
 { 
 	return (complex)(

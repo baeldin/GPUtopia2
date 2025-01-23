@@ -1,4 +1,4 @@
-#define USE_DOUBLE 1
+//@__DOUBLE
 #ifdef USE_DOUBLE
 typedef double real;
 typedef double2 real2;
@@ -16,10 +16,8 @@ typedef float4 real4;
 //@__formulaFunctions
 //@__coloringFunctions
 
-complex get_complex_coordinates(const real2 xy, const int2 img_size, const float4 cz_in, const float2 rot_in)
+complex get_complex_coordinates(const real2 xy, const int2 img_size, const real4 cz, const real2 rot)
 {
-    const real4 cz = { (real)cz_in.x, (real)cz_in.y, (real)cz_in.z, (real)cz_in.w };
-    const complex rot = { (real)rot_in.x, (real)rot_in.y };
     complex z = (complex)(
         (xy.x / (real)img_size.x - 0.5f) * cz.z, 
         (xy.y / (real)img_size.y - 0.5f) * cz.w);
@@ -27,10 +25,8 @@ complex get_complex_coordinates(const real2 xy, const int2 img_size, const float
     return z + cz.xy;
 }
 
-int2 revert_complex_coordinates(const real2 z, const int2 img_size, const float4 cz_in, const float2 rot_in)
+int2 revert_complex_coordinates(const real2 z, const int2 img_size, const real4 cz, const real2 rot)
 {
-    const real4 cz = { (real)cz_in.x, (real)cz_in.y, (real)cz_in.z, (real)cz_in.w };
-    const complex rot = { (real)rot_in.x, (real)rot_in.y };
     complex z_tmp = z - cz.xy;
     z_tmp = cmul(z_tmp, conj(rot));
     return (int2)(
@@ -45,8 +41,8 @@ bool bailed_out(const real2 z, const real bailout)
 }
 __kernel void computeLoop(
     const int2 image_size,             // 0:  image sizeX, image sizeY
-    const float4 complex_subplane,     // 1:  {centerX, centerY, width, width / aspectRatio}
-    const float2 rot,                  // 2:  complex rotation
+    const real4 complex_subplane,      // 1:  {centerX, centerY, width, width / aspectRatio}
+    const real2 rot,                   // 2:  complex rotation
     const int3 sampling,               // 3:  {sampleStart, sampleEnd, nSamplesTotal}
     const int maxIterations,           // 4:  maxIterations
     const float bailout,               // 5:  bailout value
