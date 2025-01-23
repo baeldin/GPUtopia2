@@ -44,8 +44,8 @@ public:
 	constexpr Complex operator- (const Complex& rhs) const {
 		return Complex(x - rhs.x, y - rhs.y);
 	}
-	constexpr Complex operator* (const Complex& rhs) const {
-		return Complex(x * rhs.x - y * rhs.y, x * rhs.y + y * rhs.x);
+	constexpr Complex operator* (const Complex<T>& rhs) const {
+		return Complex<T>(x * rhs.x - y * rhs.y, x * rhs.y + y * rhs.x);
 	}
 	constexpr Complex operator* (const double& rhs) const {
 		return Complex(x * rhs, y * rhs);
@@ -66,31 +66,31 @@ public:
 	}
 };
 
-inline const bool operator==(const Complex<float> lhs, const Complex<float> rhs)
+template <typename T>
+inline const bool operator==(const Complex<T> lhs, const Complex<T> rhs)
 {
 	return lhs.x == rhs.x && lhs.y == rhs.y;
 }
 
-inline const bool operator!=(const Complex<float> lhs, const Complex<float> rhs)
+template <typename T>
+inline const bool operator!=(const Complex<T> lhs, const Complex<T> rhs)
 {
 	return !(rhs == lhs);
 }
 
-inline const Complex<double>& operator/ (const float lhs, const Complex<double>& rhs) {
-	Complex<double> clhs(lhs);
+template <typename T>
+inline const Complex<T>& operator/ (const T lhs, const Complex<T>& rhs) {
+	Complex<T> clhs(lhs);
 	return clhs / rhs;
 }
 
-inline const Complex<double>& operator* (const float lhs, const Complex<double>& rhs) {
+template <typename T>
+inline const Complex<T>& operator* (const T lhs, const Complex<T>& rhs) {
 	return rhs * lhs;
 }
 
-inline const double cabs(const Complex<double>& z)
-{
-	return sqrt(z.x * z.x + z.y * z.y);
-}
-
-inline const float cabs(const Complex<float>& z)
+template <typename T>
+inline const T cabs(const Complex<T>& z)
 {
 	return sqrt(z.x * z.x + z.y * z.y);
 }
@@ -102,48 +102,48 @@ inline const Complex<T> abs(const Complex<T>& z)
 }
 
 template <typename T> // real base, complex exponent
-inline const Complex<double> exp(const Complex<T>& z) {
-	return Complex<double>(std::cos(z.y), std::sin(z.y)) * std::exp(z.x);
+inline const Complex<T> exp(const Complex<T>& z) {
+	return Complex<T>(std::cos(z.y), std::sin(z.y)) * std::exp(z.x);
 }
 
 template <typename T> // real base, complex exponent
-inline const Complex<double> ln(const Complex<T>& z) {
-	return Complex<double>(std::log(z.cabs()), std::atan2(z.y, z.x));
+inline const Complex<T> ln(const Complex<T>& z) {
+	return Complex<T>(std::log(z.cabs()), std::atan2(z.y, z.x));
 }
 
 template <typename T> // real base, complex exponent
-inline const Complex<double>& pow(const double& lhs, const Complex<T>& rhs)
+inline const Complex<T>& pow(const T& lhs, const Complex<T>& rhs)
 {
-	const Complex<double> z = Complex<double>(rhs.x, rhs.y) * std::log(lhs);
+	const Complex<T> z = Complex<T>(rhs.x, rhs.y) * std::log(lhs);
 	//cout << z << "\n";
 	return z.exp();
 }
 
 template <typename T> // complex base, real exponent
-inline const Complex<double>& pow(const Complex<T>& lhs, const double& rhs)
+inline const Complex<double>& pow(const Complex<T>& lhs, const T& rhs)
 {
-	return Complex<double>(std::cos(lhs.angle() * rhs), std::sin(lhs.angle() * rhs)) * std::pow(lhs.cabs(), rhs);
+	return Complex<T>(std::cos(lhs.angle() * rhs), std::sin(lhs.angle() * rhs)) * std::pow(lhs.cabs(), rhs);
 }
 
 template <typename T> // complex base, complex exponent
-inline const Complex<double>& pow(const Complex<T>& lhs, const Complex<T>& rhs)
+inline const Complex<T>& pow(const Complex<T>& lhs, const Complex<T>& rhs)
 {
 	const Complex<double> z = rhs * lhs.ln();
 	//cout << z << "\n";
 	return z.exp();
 }
 
-inline const Complex i(0., 1.);
+inline const Complex i1(0., 1.);
 inline const Complex invi(0., -1.);
 
 template <typename T> // real base, complex exponent
-inline const Complex<double> sin(const Complex<T>& z) {
-	return Complex<double>(0.5 * invi * (exp(i * z) - exp(invi * z)));
+inline const Complex<T> sin(const Complex<T>& z) {
+	return Complex<T>(0.5 * invi * (exp(i1 * z) - exp(invi * z)));
 }
 
 template <typename T> // real base, complex exponent
-inline const Complex<double> cos(const Complex<T>& z) {
-	return Complex<double>(0.5 * (exp(i * z) + exp(invi * z)));
+inline const Complex<T> cos(const Complex<T>& z) {
+	return Complex<T>(0.5 * (exp(i1 * z) + exp(invi * z)));
 }
 
 template <typename T>
