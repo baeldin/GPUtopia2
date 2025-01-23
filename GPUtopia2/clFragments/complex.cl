@@ -3,7 +3,7 @@ typedef real2 complex;
 // typedef float2 complex;
 
 #define i1 ((complex)(0, 1))
-const real half_pi 1.570796326794896619231321691639751442;
+#define half_pi 1.570796326794896619231321691639751442;
 
 inline real re(const complex z) { return z.x; }
 inline real im(const complex z) { return z.y; }
