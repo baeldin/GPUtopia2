@@ -1,5 +1,4 @@
-typedef float real;
-typedef float2 real2;
+
 typedef real2 complex;
 // typedef float2 complex;
 

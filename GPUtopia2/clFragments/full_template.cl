@@ -1,20 +1,36 @@
+#define USE_DOUBLE 1
+#ifdef USE_DOUBLE
+typedef double real;
+typedef double2 real2;
+typedef double4 real4;
+#else
+typedef float real;
+typedef float2 real2;
+typedef float4 real4;
+#endif
+
 //@__COLORING
 //@__AA
 //@__COMPLEX
+
 //@__formulaFunctions
 //@__coloringFunctions
 
-complex get_complex_coordinates(const float2 xy, const int2 img_size, const float4 cz, const complex rot)
+complex get_complex_coordinates(const real2 xy, const int2 img_size, const float4 cz_in, const float2 rot_in)
 {
+    const real4 cz = { (real)cz_in.x, (real)cz_in.y, (real)cz_in.z, (real)cz_in.w };
+    const complex rot = { (real)rot_in.x, (real)rot_in.y };
     complex z = (complex)(
-        (xy.x / (float)img_size.x - 0.5f) * cz.z, 
-        (xy.y / (float)img_size.y - 0.5f) * cz.w);
+        (xy.x / (real)img_size.x - 0.5f) * cz.z, 
+        (xy.y / (real)img_size.y - 0.5f) * cz.w);
     z = cmul(z, rot);
     return z + cz.xy;
 }
 
-int2 revert_complex_coordinates(const float2 z, const int2 img_size, const float4 cz, const complex rot)
+int2 revert_complex_coordinates(const real2 z, const int2 img_size, const float4 cz_in, const float2 rot_in)
 {
+    const real4 cz = { (real)cz_in.x, (real)cz_in.y, (real)cz_in.z, (real)cz_in.w };
+    const complex rot = { (real)rot_in.x, (real)rot_in.y };
     complex z_tmp = z - cz.xy;
     z_tmp = cmul(z_tmp, conj(rot));
     return (int2)(
@@ -22,7 +38,7 @@ int2 revert_complex_coordinates(const float2 z, const int2 img_size, const float
         floor((z_tmp.y / cz.w + 0.5f) * (img_size.y - 1)));
 }
 
-bool bailed_out(const float2 z, const float bailout)
+bool bailed_out(const real2 z, const real bailout)
 {
 //@__bailout
     return bailedout;
@@ -57,14 +73,14 @@ __kernel void computeLoop(
     {
         for (int s = sampling.x; s < sampling.y; s++)
         {
-            const float2 R2 = R2_offset(pixelIdx, s);
+            const real2 R2 = R2_offset(pixelIdx, s);
             if (flamePointSelection > 0)
             {
                 int iter = 0;
-                float2 sample_position = (float2)(x, y) + offset_fac * (float2)(
+                real2 sample_position = (real2)(x, y) + offset_fac * (real2)(
                     tent(R2.x),
                     tent(R2.y));
-                const float2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane, rot);
+                const real2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane, rot);
                 //@__formulaInit
                 while (!bailed_out(z, bailout) && iter < maxIterations)
                 {
@@ -83,10 +99,10 @@ __kernel void computeLoop(
             if (use_point)
             {
                 int iter = 0;
-                float2 sample_position = (float2)(x, y) + offset_fac * (float2)(
+                real2 sample_position = (real2)(x, y) + offset_fac * (real2)(
                     tent(R2.x),
                     tent(R2.y));
-                const float2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane, rot);
+                const real2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane, rot);
                 //@__formulaInit
                 //@__coloringInit
                 while (!bailed_out(z, bailout) && iter < maxIterations)
