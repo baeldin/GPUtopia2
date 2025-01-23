@@ -34,18 +34,18 @@ void save_to_png(const std::vector<color>& image_data, int imgWidth, const int i
 void imageSettingsWindow(clFractal& cf, std::vector<color>& img)
 {
 	ImGui::Begin("Image");
-	static float xmin = -5.f;
-	static float xmax = 5.f;
-	static float ymin = -5.f;
-	static float ymax = 5.f;
+	static double xmin = -5.f;
+	static double xmax = 5.f;
+	static double ymin = -5.f;
+	static double ymax = 5.f;
 	// static float xCenter = cf.image.center.x;
 	// static float yCenter = cf.image.center.y;
 	ImGui::InputInt("Iterations", &cf.maxIter, 1, 100);
-	ImGui::InputFloat("Zoom", &cf.image.zoom, 0.1f, 10.f);
+	ImGui::InputDouble("Zoom", &cf.image.zoom, 0.1f, 10.f);
 	ImGui::InputFloat("Rotation", &cf.image.angle, 0.1f, 45.f);
 	// static cl_float2 center = { cf.image.complexSubplane.x, cf.image.complexSubplane.y };
-	ImGui::SliderFloat("Center Real", &cf.image.center.x, xmin, xmax);
-	ImGui::SliderFloat("Center Imag", &cf.image.center.y, ymin, ymax);
+	ImGui::SliderScalar("Center Real", ImGuiDataType_Double , &cf.image.center.x, &xmin, &xmax);
+	ImGui::SliderScalar("Center Imag", ImGuiDataType_Double , &cf.image.center.y, &ymin, &ymax);
 	if (!ImGui::IsMouseDragging(ImGuiMouseButton_Left))
 	{
 		xmin = cf.image.center.x - 2.f / cf.image.zoom;
