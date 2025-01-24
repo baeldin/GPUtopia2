@@ -3,12 +3,12 @@
 std::string readCLFragmentFromFile(const std::string& clFileName)
 {
 	std::ifstream clFragmentFile;
-	std::cout << "Opening " << clFileName << std::endl;
+	// std::cout << "Opening " << clFileName << std::endl;
 	clFragmentFile.open(clFileName);
 	std::stringstream clFragmentSS;
 	clFragmentSS << clFragmentFile.rdbuf();
 	std::string clFragmentStr = clFragmentSS.str();
-	std::cout << "Read:\n" << clFragmentStr << std::endl;
+	// std::cout << "Read:\n" << clFragmentStr << std::endl;
 	return clFragmentStr;
 }
 
@@ -213,9 +213,9 @@ void clFractal::makeCLCode()
 	std::string colorStr = readCLFragmentFromFile("clFragments/colors.cl");
 	std::string complexStr = readCLFragmentFromFile("clFragments/complex.cl");
 
-	std::cout << fullTemplateStr << std::endl;
-	std::cout << fractalFormulaStr << std::endl;
-	std::cout << coloringAlgorithmStr << std::endl;
+	// std::cout << fullTemplateStr << std::endl;
+	// std::cout << fractalFormulaStr << std::endl;
+	// std::cout << coloringAlgorithmStr << std::endl;
 	
 	// get init, loop, bailout, and final fragments
 	// UF-style separation
@@ -228,7 +228,7 @@ void clFractal::makeCLCode()
 	std::string coloringFinal = getFragmentPart(coloringAlgorithmStr, fin, fun);
 	std::string coloringFunctions = getFragmentPart(coloringAlgorithmStr, fun, eof);
 
-	std::cout << "BEFORE:\n" << fullTemplateStr << std::endl;
+	// std::cout << "BEFORE:\n" << fullTemplateStr << std::endl;
 	if (this->useDouble)
 		fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(DPFlag), DPString);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(AAFlag), antiAliasingStr);
@@ -244,7 +244,7 @@ void clFractal::makeCLCode()
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(CFFlag), coloringFunctions);
 
 	paramCollector pc = parseParameters(fullTemplateStr, fractalFormulaStr, coloringAlgorithmStr);
-	std::cout << "AFTER:\n" << fullTemplateStr << std::endl;
+	// std::cout << "AFTER:\n" << fullTemplateStr << std::endl;
 
 	clFractal cf;
 	this->fullCLcode = fullTemplateStr;
