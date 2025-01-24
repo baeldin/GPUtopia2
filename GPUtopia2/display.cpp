@@ -94,12 +94,12 @@ namespace mainView
 			cf.status.runKernel = true;
 			cf.buildKernel = false;
 		}
-		if (core.imgKernel.errors.sum() > 0)
+		if (core.imgKernel.errors.sum() != 0)
 		{
 			core.stop = true;
 			show_cl_error_window(cf, core, font_mono);
 		}
-		else if (core.fractalKernel.errors.sum())
+		else if (core.fractalKernel.errors.sum() != 0)
 		{
 			core.stop = true;
 			show_cl_error_window(cf, core, font_mono);
