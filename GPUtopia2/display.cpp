@@ -54,12 +54,15 @@ namespace mainView
 		static bool needCLFractal = true;
 		static bool showCoreError = false;
 		static clCore core;
+		if (core.imgKernel.need)
+			core.compileImgKernel();
+
 		// only run at startup, maybe move somewhere else?
 		if (needCLFractal)
 		{
 			cf.makeCLCode();
-			core.compileNewKernel(cf);
-			if (core.compileError == CL_SUCCESS)
+			core.compileFractalKernel(cf.fullCLcode);
+			if (core.fractalKernel.errors.compileError == CL_SUCCESS)
 			{
 				needCLFractal = false;
 			}
@@ -84,17 +87,24 @@ namespace mainView
 			cf_old.image = cf.image;
 		}
 		// check if a kernel rebuild is needed
-		if (cf.buildKernel and core.errSum() == 0)
+		if (cf.buildKernel and core.fractalKernel.errors.sum() == 0)
 		{
 			std::cout << "Need a new kernel, compiling it now.\n - requesting new texture\n - requesting new image\n";
-			core.compileNewKernel(cf);
+			core.compileFractalKernel(cf.fullCLcode);
 			cf.status.runKernel = true;
+			cf.buildKernel = false;
 		}
-		if (core.errSum())
+		if (core.imgKernel.errors.sum() > 0)
 		{
 			core.stop = true;
 			show_cl_error_window(cf, core, font_mono);
-		}		static paramCollector params_old = cf.params;
+		}
+		else if (core.fractalKernel.errors.sum())
+		{
+			core.stop = true;
+			show_cl_error_window(cf, core, font_mono);
+		}		
+		static paramCollector params_old = cf.params;
 		static clFractalImage img_settings_old = cf.image;
 		formulaSettingsWindow(cf, core);
 		imageSettingsWindow(cf, textureColors);
@@ -113,8 +123,8 @@ namespace mainView
 			std::cout << "Parameters changed, updating cf.params.\n - requesting new Texture\n - requesting new image\n";
 			needCLFractal = false;
 			cf.image.updateComplexSubplane();
-			core.setDefaultArguments(cf);
-			core.setKernelFractalArgs(cf);
+			core.setDefaultFractalArguments(cf);
+			core.setFractalParameterArgs(cf);
 			cf.image.resetStatus();
 			cf.status.runKernel = true;
 			cf.timings.erase(cf.timings.begin(), cf.timings.end() - 1);
@@ -130,12 +140,12 @@ namespace mainView
 			if (cf.image.current_sample_count == 0)
 			{
 				cf.image.next_update_sample_count = 1;
-				core.setDefaultArguments(cf);
-				std::cout << "kernel currently has " << core.kernelArgumentCount << " arguments.'n";
-				core.setKernelFractalArgs(cf);
+				core.setDefaultFractalArguments(cf);
+				std::cout << "kernel currently has " << core.fractalKernel.argumentCount << " arguments.'n";
+				core.setFractalParameterArgs(cf);
 			}
 			cf.status.kernelRunning = true;
-			jt = std::jthread(&runKernelAsync, std::ref(cf), std::ref(core));
+			jt = std::jthread(&runFractalKernelAsync, std::ref(cf), std::ref(core));
 			jt.detach();
 			cf.status.runKernel = false;
 		}
@@ -149,7 +159,7 @@ namespace mainView
 			cf.status.runImgKernel = false;
 		}
 		// check current image quality
-		if (!cf.running() and !cf.status.done and core.errSum() == 0)
+		if (!cf.running() and !cf.status.done and core.fractalKernel.errors.sum() == 0)
 		{
 			if (cf.image.current_sample_count == cf.image.next_update_sample_count)
 			{

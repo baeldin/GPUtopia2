@@ -75,40 +75,46 @@ void clCore::setContext()
     this->context = context;
 }
 
-void clCore::compileNewKernel(clFractal& cf)
+void clCore::setQueue()
 {
-    cl::Program::Sources sources;
-    std::string kernelCode = cf.fullCLcode;
-    std::vector<std::string> programStrings;
-    programStrings.push_back(kernelCode);
-    this->program = cl::Program(this->context, programStrings, &this->programError);
-    this->compileError = this->program.build({ this->device }); // "-cl-std=CL2.0");
-    if (this->compileError != CL_SUCCESS) {
-        std::string buildLog;
-        this->program.getBuildInfo(this->device, CL_PROGRAM_BUILD_LOG, &this->kernelBuildLog);
-    }
     this->queue = cl::CommandQueue(this->context, this->device, 0, &this->queueError);
     if (this->queueError != CL_SUCCESS) {
         std::cout << "Failed to create command queue. Error code: " << this->queueError << std::endl;
     }
-    std::string kernelFunctionName = "computeLoop"; // Replace with your actual kernel function name
-    this->kernel = cl::Kernel(this->program, kernelFunctionName.c_str(), &this->kernelError);
-    if (this->kernelError != CL_SUCCESS) {
-        std::cerr << "Failed to create kernel. Error code: " << this->kernelError << std::endl;
+}
+
+cl_int clCore::compileNewKernel(clKernelContainer& kc, const std::string& fullCLcode, 
+    const std::string kernelFunctionName)
+{
+    std::vector<std::string> programStrings;
+    programStrings.push_back(fullCLcode);
+    kc.program = cl::Program(this->context, programStrings, &kc.errors.programError);
+    kc.errors.compileError = kc.program.build({ this->device }); // "-cl-std=CL2.0");
+    if (kc.errors.compileError != CL_SUCCESS) {
+        kc.program.getBuildInfo(this->device, CL_PROGRAM_BUILD_LOG, &kc.buildLog);
+        return kc.errors.compileError;
+    }
+    kc.kernel = cl::Kernel(kc.program, kernelFunctionName.c_str(), &kc.errors.kernelError);
+    if (kc.errors.kernelError != CL_SUCCESS) {
+        std::cerr << "Failed to create kernel. Error code: " << kc.errors.kernelError << std::endl;
+        return kc.errors.kernelError;
     }
     else {
-        std::cout << "Kernel created successfully.\n";
-        cf.buildKernel = false;
+        std::cout << kernelFunctionName << " created successfully.\n";
     }
-    this->kernelArgumentCount = 0;
+    kc.argumentCount = 0;
+    kc.need = false;
 }
 
 void clCore::resetCore()
 {
-    this->programError = CL_SUCCESS;
-    this->compileError = CL_SUCCESS;
     this->queueError = CL_SUCCESS;
-    this->kernelError = CL_SUCCESS;
+    this->imgKernel.errors.programError = CL_SUCCESS;
+    this->imgKernel.errors.compileError = CL_SUCCESS;
+    this->imgKernel.errors.kernelError = CL_SUCCESS;
+    this->fractalKernel.errors.programError = CL_SUCCESS;
+    this->fractalKernel.errors.compileError = CL_SUCCESS;
+    this->fractalKernel.errors.kernelError = CL_SUCCESS;
     this->stop = false;
 }
 
@@ -119,7 +125,7 @@ void clCore::setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::
     for (auto const& [key, val] : map)
     {
         std::cout << "Setting kernel argument " << key << " at position " << val.second << " with value " << val.first << std::endl;
-        const uint32_t currentArgumentIndex = val.second + this->kernelArgumentCount;
+        const uint32_t currentArgumentIndex = val.second + this->fractalKernel.argumentCount;
         err = setKernelArg(currentKernel, currentArgumentIndex, val.first, key.c_str());
         if (err != CL_SUCCESS)
         {
@@ -128,7 +134,7 @@ void clCore::setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::
     }
 }
 
-void clCore::setDefaultArguments(clFractal& cf)
+void clCore::setDefaultFractalArguments(clFractal& cf)
 {
     this->currentRenderSize = cf.image.size.x * cf.image.size.y;
     cf.imgData.resize(4 * this->currentRenderSize, 0);
@@ -138,49 +144,54 @@ void clCore::setDefaultArguments(clFractal& cf)
     cf.imgIntAData.resize(this->currentRenderSize, 0);
     cl_int3 sampling = { 0, fibonacci_number(cf.image.targetQuality), fibonacci_number(cf.image.targetQuality) };
     cl_int err;
-    err = setKernelArg(this->kernel, 0, cf.image.size, "image_size");
+    err = setKernelArg(this->fractalKernel.kernel, 0, cf.image.size, "image_size");
     if (cf.useDouble)
     {
         const cl_double4 complexSubplane = { cf.image.center.x, cf.image.center.y, cf.image.span.x, cf.image.span.y };
-        err = setKernelArg(this->kernel, 1, complexSubplane, "complex_subplane");
+        err = setKernelArg(this->fractalKernel.kernel, 1, complexSubplane, "complex_subplane");
         const cl_double2 rot = { cf.image.rotation().x, cf.image.rotation().y };
-        err = setKernelArg(this->kernel, 2, rot, "rotation");
+        err = setKernelArg(this->fractalKernel.kernel, 2, rot, "rotation");
     }
     else
     {
         const cl_float4 complexSubplane = { (float)cf.image.center.x, (float)cf.image.center.y, (float)cf.image.span.x, (float)cf.image.span.y };
-        err = setKernelArg(this->kernel, 1, complexSubplane, "complex_subplane");
+        err = setKernelArg(this->fractalKernel.kernel, 1, complexSubplane, "complex_subplane");
         const cl_float2 rot = { (float)cf.image.rotation().x, (float)cf.image.rotation().y };
-        err = setKernelArg(this->kernel, 2, rot, "rotation");
+        err = setKernelArg(this->fractalKernel.kernel, 2, rot, "rotation");
     }
-    err = setKernelArg(this->kernel, 4, cf.maxIter, "iterations");
-    err = setKernelArg(this->kernel, 5, cf.bailout, "bailout");
-    err = setKernelArg(this->kernel, 6, cf.gradient.fineLength, "gradient_length");
-    this->gradientBuffer = setBufferKernelArg(this->kernel, 7, cf.gradient.fineColors.data(),
+    err = setKernelArg(this->fractalKernel.kernel, 4, cf.maxIter, "iterations");
+    err = setKernelArg(this->fractalKernel.kernel, 5, cf.bailout, "bailout");
+    err = setKernelArg(this->fractalKernel.kernel, 6, cf.gradient.fineLength, "gradient_length");
+    this->gradientBuffer = setBufferKernelArg(this->fractalKernel.kernel, 7, cf.gradient.fineColors.data(),
         sizeof(float) * cf.gradient.fineLength * 4, CL_MEM_READ_ONLY, "gradient_colors", &err);
-    this->imgIntRBuffer = setBufferKernelArg(this->kernel, 8, cf.imgIntRData.data(),
+    this->imgIntRBuffer = setBufferKernelArg(this->fractalKernel.kernel, 8, cf.imgIntRData.data(),
         sizeof(uint32_t) * this->currentRenderSize, CL_MEM_WRITE_ONLY, "img", &err);
-    this->imgIntGBuffer = setBufferKernelArg(this->kernel, 9, cf.imgIntGData.data(),
+    this->imgIntGBuffer = setBufferKernelArg(this->fractalKernel.kernel, 9, cf.imgIntGData.data(),
         sizeof(uint32_t) * this->currentRenderSize, CL_MEM_WRITE_ONLY, "img", &err);
-    this->imgIntBBuffer = setBufferKernelArg(this->kernel, 10, cf.imgIntBData.data(),
+    this->imgIntBBuffer = setBufferKernelArg(this->fractalKernel.kernel, 10, cf.imgIntBData.data(),
         sizeof(uint32_t) * this->currentRenderSize, CL_MEM_WRITE_ONLY, "img", &err);
-    this->imgIntABuffer = setBufferKernelArg(this->kernel, 11, cf.imgIntAData.data(),
+    this->imgIntABuffer = setBufferKernelArg(this->fractalKernel.kernel, 11, cf.imgIntAData.data(),
         sizeof(uint32_t) * this->currentRenderSize, CL_MEM_WRITE_ONLY, "img", &err);
-    err = setKernelArg(this->kernel, 12, cf.flamePointSelection, "flamePointSelection");
-    err = setKernelArg(this->kernel, 13, cf.flameWarmup, "flameWarmup");
-    err = setKernelArg(this->kernel, 14, cf.mode, "fractal mode");
-    this->kernelArgumentCount = 15;
+    err = setKernelArg(this->fractalKernel.kernel, 12, cf.flamePointSelection, "flamePointSelection");
+    err = setKernelArg(this->fractalKernel.kernel, 13, cf.flameWarmup, "flameWarmup");
+    err = setKernelArg(this->fractalKernel.kernel, 14, cf.mode, "fractal mode");
+    this->fractalKernel.argumentCount = 15;
 }
 
-void clCore::setKernelFractalArgs(clFractal& cf)
+void clCore::setFractalParameterArgs(clFractal& cf)
 {
-    setMapOfArgs(this->kernel, cf.params.fractalParameterMaps.integerParameters);
-    setMapOfArgs(this->kernel, cf.params.fractalParameterMaps.floatParameters);
-    setMapOfArgs(this->kernel, cf.params.coloringParameterMaps.integerParameters);
-    setMapOfArgs(this->kernel, cf.params.coloringParameterMaps.floatParameters);
+    setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.integerParameters);
+    setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.floatParameters);
+    setMapOfArgs(this->fractalKernel.kernel, cf.params.coloringParameterMaps.integerParameters);
+    setMapOfArgs(this->fractalKernel.kernel, cf.params.coloringParameterMaps.floatParameters);
 }
 
-void clCore::runKernel(clFractal& cf) const
+void clCore::compileFractalKernel(const std::string fullCLcode)
+{
+    this->compileNewKernel(this->fractalKernel, fullCLcode, "computeLoop");
+}
+
+void clCore::runFractalKernel(clFractal& cf) const
 {
     cl_int local_size = WG_SIZE;
     cl_int global_size = ceil(
@@ -189,7 +200,7 @@ void clCore::runKernel(clFractal& cf) const
     cl::NDRange global_range = cl::NDRange(global_size);
     cl::NDRange local_range = cl::NDRange(local_size);
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-    err = this->queue.enqueueNDRangeKernel(this->kernel, cl::NullRange, global_range, local_range);
+    err = this->queue.enqueueNDRangeKernel(this->fractalKernel.kernel, cl::NullRange, global_range, local_range);
     if (err != CL_SUCCESS) {
         std::cerr << "Failed to enqueue kernel. Error code: " << err << std::endl;
     }
@@ -201,31 +212,8 @@ void clCore::runKernel(clFractal& cf) const
 
 void clCore::compileImgKernel()
 {
-    cl::Program::Sources sources;
-    std::vector<std::string> programStrings;
     const std::string img_processing_kernel = readCLFragmentFromFile("clFragments/imgKernel.cl");
-    programStrings.push_back(img_processing_kernel);
-    cl_int programErr;
-    this->program = cl::Program(this->context, programStrings, &programErr);
-    std::cout << programErr << "\n";
-    cl_int buildErr = CL_SUCCESS;
-    buildErr = this->program.build({ this->device }); // "-cl-std=CL2.0");
-    if (buildErr != CL_SUCCESS) {
-        std::string buildLog;
-        this->program.getBuildInfo(this->device, CL_PROGRAM_BUILD_LOG, &buildLog);
-        std::cerr << "Image kernel build failed; error code: " << buildErr
-            << ", build log:\n" << buildLog << std::endl;
-    }
-    cl_int err;
-    std::string kernelFunctionName = "imgProcessing"; // Replace with your actual kernel function name
-    this->imgKernel = cl::Kernel(this->program, kernelFunctionName.c_str(), &err);
-    if (err != CL_SUCCESS) {
-        std::cerr << "Failed to create image kernel. Error code: " << err << std::endl;
-    }
-    else {
-        std::cout << "Image kernel created successfully.\n";
-    }
-    this->imgKernelArgumentCount = 0;
+    this->compileNewKernel(this->imgKernel, img_processing_kernel, "imgProcessing");
 }
 
 void clCore::setImgKernelArguments(clFractal& cf)
@@ -235,35 +223,35 @@ void clCore::setImgKernelArguments(clFractal& cf)
     cl_int err;
     cf.imgData.resize(cf.image.size.x * cf.image.size.y);
     //const uint32_t maxVal = sampling.z * cf.maxIter;
-    setReusedBufferArgument(this->imgKernel,
+    setReusedBufferArgument(this->imgKernel.kernel,
         0, this->imgIntRBuffer,
         "intImgBuffer");
-    setReusedBufferArgument(this->imgKernel,
+    setReusedBufferArgument(this->imgKernel.kernel,
         1, this->imgIntGBuffer,
         "intImgBuffer");
-    setReusedBufferArgument(this->imgKernel,
+    setReusedBufferArgument(this->imgKernel.kernel,
         2, this->imgIntBBuffer,
         "intImgBuffer");
-    setReusedBufferArgument(this->imgKernel,
+    setReusedBufferArgument(this->imgKernel.kernel,
         3, this->imgIntABuffer,
         "intImgBuffer");
     // only for flame mode, currenly unused in the kernel
-    this->imgFloatBuffer = setBufferKernelArg(this->imgKernel,
+    this->imgFloatBuffer = setBufferKernelArg(this->imgKernel.kernel,
         5, cf.imgData.data(), sizeof(float) * 4 * this->currentRenderSize, CL_MEM_WRITE_ONLY,
         "imgFloatColorValues", &err);
-    err = setKernelArg(this->imgKernel,
+    err = setKernelArg(this->imgKernel.kernel,
         7, cf.mode,
         "image processing mode (escape time/flame)");
-    err = setKernelArg(this->imgKernel,
+    err = setKernelArg(this->imgKernel.kernel,
         8, cf.flameRenderSettings.x,
         "flame render brightness");
-    err = setKernelArg(this->imgKernel,
+    err = setKernelArg(this->imgKernel.kernel,
         9, cf.flameRenderSettings.y,
         "flame render gamma");
-    err = setKernelArg(this->imgKernel,
+    err = setKernelArg(this->imgKernel.kernel,
         10, cf.flameRenderSettings.z,
         "flame reimageKernelArgumentCountnder vibrancy");
-    this->imgKernelArgumentCount = 11;
+    this->imgKernel.argumentCount = 11;
 }
 
 void clCore::runImgKernel(clFractal& cf) const
@@ -274,7 +262,7 @@ void clCore::runImgKernel(clFractal& cf) const
     cl_int err = CL_SUCCESS;
     cl::NDRange global_range = cl::NDRange(global_size);
     cl::NDRange local_range = cl::NDRange(local_size);
-    err = this->queue.enqueueNDRangeKernel(this->imgKernel, cl::NullRange, global_range, local_range);
+    err = this->queue.enqueueNDRangeKernel(this->imgKernel.kernel, cl::NullRange, global_range, local_range);
     if (err != CL_SUCCESS) {
         std::cerr << "Failed to enqueue image kernel. Error code: " << err << std::endl;
     }
@@ -282,7 +270,7 @@ void clCore::runImgKernel(clFractal& cf) const
     if (cf.vomit)
     {
         std::vector<uint32_t> imgInt(4 * this->currentRenderSize, 0);
-        queue.enqueueReadBuffer(this->imgIntBuffer, CL_TRUE, 0, sizeof(cl_int4) * this->currentRenderSize, imgInt.data());
+        queue.enqueueReadBuffer(this->imgIntABuffer, CL_TRUE, 0, sizeof(cl_int4) * this->currentRenderSize, imgInt.data());
         for (int ii = 0; ii < currentRenderSize * 4; ii++)
             std::cout << imgInt[ii] << " ";
         std::cout << std::endl;    
@@ -301,7 +289,7 @@ void clCore::getImg(std::vector<color>& img, clFractal& cf) const
     cf.status.updateImage = false;
 }
 
-void runKernelAsync(clFractal& cf, clCore& cc)
+void runFractalKernelAsync(clFractal& cf, clCore& cc)
 {
     cl_int err = 0;
     cl_int3 sampling_info = {
@@ -310,8 +298,8 @@ void runKernelAsync(clFractal& cf, clCore& cc)
         cf.image.target_sample_count };
     // std::cout << "Kernel called with sampling (" << sampling_info.x << " " << sampling_info.y << " " << sampling_info.z << ")\n";
     // std::cout << "Fractal image curent_sample_count = " << cf.image.current_sample_count << "\n";
-    err = cc.setKernelArg(cc.kernel, 3, sampling_info, "sampling_info");
-    cc.runKernel(cf);
+    err = cc.setKernelArg(cc.fractalKernel.kernel, 3, sampling_info, "sampling_info");
+    cc.runFractalKernel(cf);
     cf.image.current_sample_count += 1;
     std::cout << "New fractal image curent_sample_count = " << cf.image.current_sample_count << "\n";
     cf.status.kernelRunning = false;
@@ -326,8 +314,8 @@ void runImgKernelAsync(clFractal& cf, clCore& cc)
         cf.image.target_sample_count }; 
     std::cout << "ImageKernel called with sampling (" << sampling_info.x << " " << sampling_info.y << " " << sampling_info.z << ")\n";
     const uint32_t maxVal = sampling_info.y * cf.maxIter;
-    err = cc.setKernelArg(cc.imgKernel, 4, maxVal, "histogram theoretical max");
-    err = cc.setKernelArg(cc.imgKernel, 6, sampling_info, "sampling info");
+    err = cc.setKernelArg(cc.imgKernel.kernel, 4, maxVal, "histogram theoretical max");
+    err = cc.setKernelArg(cc.imgKernel.kernel, 6, sampling_info, "sampling info");
     cc.setImgKernelArguments(cf);
     cc.runImgKernel(cf);
     cf.status.done = cf.image.current_sample_count == cf.image.target_sample_count ? true : false;

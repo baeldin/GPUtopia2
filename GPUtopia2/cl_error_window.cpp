@@ -4,7 +4,7 @@ void show_cl_error_window(clFractal& cf, const clCore& cc, ImFont* font_mono)
 {
 	ImGui::Begin("OpenCL Error");
 	static std::istringstream iss;
-	iss = std::istringstream(cc.kernelBuildLog);
+	iss = std::istringstream(cc.fractalKernel.buildLog);
 	ImGui::PushFont(font_mono);
 	for (std::string line; std::getline(iss, line); )
 	{
