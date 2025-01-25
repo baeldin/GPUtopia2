@@ -137,7 +137,7 @@ void clCore::setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::
 void clCore::setDefaultFractalArguments(clFractal& cf)
 {
     this->currentRenderSize = cf.image.size.x * cf.image.size.y;
-    cf.imgData.resize(4 * this->currentRenderSize, 0);
+    // cf.imgData.resize(this->currentRenderSize, 0);
     cf.imgIntRGBAData.resize(this->currentRenderSize, 0);
     cl_int3 sampling = { 0, fibonacci_number(cf.image.targetQuality), fibonacci_number(cf.image.targetQuality) };
     cl_int err;
@@ -214,10 +214,10 @@ void clCore::setImgKernelArguments(clFractal& cf)
     setReusedBufferArgument(this->imgKernel.kernel,
         0, this->imgIntRGBABuffer,
         "intImgBuffer");
-    std::cout << sizeof(float) * 4 * this->currentRenderSize << "\n";
-    std::cout << cf.imgData.size() * sizeof(float) * 4 << "\n";
+    std::cout << "sizeof(float) * 4 * this->currentRenderSize: " << sizeof(float) * 4 * this->currentRenderSize << "\n";
+    std::cout << "cf.imgData.size() * sizeof(color): " << cf.imgData.size() * sizeof(color) << "\n";
     this->imgFloatBuffer = setBufferKernelArg(this->imgKernel.kernel,
-        2, cf.imgData.data(), sizeof(float) * 4 * this->currentRenderSize, CL_MEM_WRITE_ONLY,
+        2, cf.imgData.data(), sizeof(color) * this->currentRenderSize, CL_MEM_WRITE_ONLY,
         "imgFloatColorValues", &err);
     err = setKernelArg(this->imgKernel.kernel,
         4, cf.mode,
