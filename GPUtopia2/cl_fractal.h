@@ -140,10 +140,7 @@ public:
 	std::string fractalCLFragmentFile = "clFragments/fractalFormulas/mandelbrot.cl";
 	std::string coloringCLFragmentFile = "clFragments/coloringAlgorithms/by_iteration.cl";
 	std::string fullCLcode = "";
-	std::vector<int> imgIntRData;
-	std::vector<int> imgIntGData;
-	std::vector<int> imgIntBData;
-	std::vector<int> imgIntAData;
+	std::vector<int> imgIntRGBAData;
 	std::vector<color> imgData;
 	std::vector<double> timings = { 0 };
 	bool useDouble = false;

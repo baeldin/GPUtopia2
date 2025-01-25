@@ -54,10 +54,7 @@ public:
     clKernelContainer imgKernel;
     // buffers
     cl::Buffer gradientBuffer;
-    cl::Buffer imgIntRBuffer;
-    cl::Buffer imgIntGBuffer;
-    cl::Buffer imgIntBBuffer;
-    cl::Buffer imgIntABuffer;
+    cl::Buffer imgIntRGBABuffer;
     cl::Buffer imgFloatBuffer;
     // other
     cl_int queueError = CL_SUCCESS;

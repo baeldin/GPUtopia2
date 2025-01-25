@@ -26,17 +26,14 @@ float4 logscale(float4 acc, float brightness, float max_density)
 }
 
 __kernel void imgProcessing(
-    __global const int* inColorsR,   // accumulated int R
-    __global const int* inColorsG,   // accumulated int G
-    __global const int* inColorsB,   // accumulated int B
-    __global const int* inColorsA,   // accumulated int A
-    const int inColorsMaxValues,     // max value per component (r, g, b, alpha)
-    __global float4* outColors,      // output float4 colors
-    const int3 sampling,             // sampling info
-    const int mode,                  // mode (0 = escape time, 1 = flame)
-    const float brightness,          // flame brightness
-    const float gamma,               // flame gamma
-    const float vibrancy)            // flame vibrancy
+    __global const int4* inColorsRGBA, // 0 accumulated int R
+    const int inColorsMaxValues,       // 1 guessed max value for flames
+    __global float4* outColors,        // 2 output float4 colors
+    const int3 sampling,               // 3 sampling info
+    const int mode,                    // 4 mode (0 = escape time, 1 = flame)
+    const float brightness,            // 5 flame brightness
+    const float gamma,                 // 6 flame gamma
+    const float vibrancy)              // 7 flame vibrancy
 {
     unsigned int i = get_global_id(0);
 
@@ -47,20 +44,12 @@ __kernel void imgProcessing(
     {
         // do ET stuff
         const float invFactor = 1.f / (float)(256 * sampling.y);
-        outColors[i] = linearToSRGB((float4)(
-            invFactor * (float)inColorsR[i],
-            invFactor * (float)inColorsG[i],
-            invFactor * (float)inColorsB[i],
-            invFactor * (float)inColorsA[i]));
+        outColors[i] = linearToSRGB(invFactor * convert_float4(inColorsRGBA[i]));
     }
     else if (mode == 1) // something something log
     {
 
-        float4 tmpColor = inv256 * (float4)(
-            (float)inColorsR[i],
-            (float)inColorsG[i],
-            (float)inColorsB[i],
-            (float)inColorsA[i]);
+        float4 tmpColor = inv256 * convert_float4(inColorsRGBA[i]);
         float ls = log10(1.f + brightness * tmpColor.w / (float)inColorsMaxValues) / (float)tmpColor.w;
         tmpColor = ls * tmpColor;
         tmpColor = pow(tmpColor, inv_gamma);

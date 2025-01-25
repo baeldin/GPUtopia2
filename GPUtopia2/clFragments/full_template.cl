@@ -48,13 +48,10 @@ __kernel void computeLoop(
     const float bailout,               // 5:  bailout value
     const int nColors,                 // 6:  colors in gradient
     __global const float4* gradient,   // 7:  gradient
-    __global atomic_uint* colorsR,     // 8:  output R
-    __global atomic_uint* colorsG,     // 9: output G
-    __global atomic_uint* colorsB,     // 10: output B
-    __global atomic_uint* colorsA,     // 11: output A
-    const int flamePointSelection,     // 12: discard points, used for flame
-    const int flameWarmup,             // 13: warmup before splatting flame samples
-    const int mode,                    // 14: mode (0 = escape time, 1 = flame)
+    __global atomic_uint* colorsRGBA,  // 8:  output R
+    const int flamePointSelection,     // 9: discard points, used for flame
+    const int flameWarmup,             // 10: warmup before splatting flame samples
+    const int mode,                    // 11: mode (0 = escape time, 1 = flame)
 //@__kernelArguments)
 {
     // Get Parallel Index
