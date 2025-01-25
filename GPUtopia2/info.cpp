@@ -2,15 +2,27 @@
 
 void infoWindow(clFractal& cf, fractalNavigationParameters& nav, ImFont* font_mono)
 {
-	static ImGuiIO& io = ImGui::GetIO();
+	//static ImGuiIO& io = ImGui::GetIO();
 	ImGui::Begin("Info");
 	if (ImGui::TreeNode("Full OpenCL Code"))
 	{
 		//ImGui::TextWrapped("lolwhat"); // cf.fullCLcode.c_str());
 		static char* text = (char*)" ";
 		static uint32_t txtLen = 0;
-		if (ImGui::Button("reload")) {
-			text = cf.fullCLcode.data();
+		static std::string strCode;
+		static std::stringstream issCode;
+		static std::istringstream issCodeRaw = std::istringstream(cf.fullCLcode);
+		if (ImGui::Button("reload")) 
+		{
+			uint32_t lineNumber = 0;
+			for (std::string line; std::getline(issCodeRaw, line); )
+			{
+				lineNumber++;
+				issCode << std::setw(5) << std::setfill(' ') << lineNumber << " " << line << "\n";
+				
+			}
+			strCode = issCode.str();
+			text = strCode.data();
 		}
 		static ImGuiInputTextFlags flags = 1 << 14; // read only ImGuiInputTextFlags_AllowTabInput;
 		ImGui::PushFont(font_mono);
@@ -133,7 +145,7 @@ void infoWindow(clFractal& cf, fractalNavigationParameters& nav, ImFont* font_mo
 			);
 		ImGui::TreePop();
 	}
-	if (ImGui::TreeNode("Sample Timings"));
+	if (ImGui::TreeNode("Sample Timings"))
 	{
 		for (double t : cf.timings)
 		{
