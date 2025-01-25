@@ -35,6 +35,7 @@ void show_cl_error_window(clFractal& cf, const clCore& cc, ImFont* font_mono)
 	for (std::string line; std::getline(issFractalKernelBuildLog, line); )
 	{
 		ImGui::Text(line.c_str());
-	}	ImGui::PopFont();
+	}	
+	ImGui::PopFont();
 	ImGui::End();
 }

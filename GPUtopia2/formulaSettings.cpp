@@ -14,14 +14,14 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 		std::cout << "Setting formula fragment to " << formulaCLFragment << "\n";
 		// cf.fractalCLFragmentFile = formulaCLFragment;
 	}
-	ImGui::Text("", (char*)formulaCLFragment.c_str());
+	ImGui::Text("##formulaCLFragment", (char*)formulaCLFragment.c_str());
 	// coloring CL fragment
 	static std::string coloringCLFragment = cf.coloringCLFragmentFile; 
 	if (ImGui::Button("Load Coloring"))
 	{
 		openFileDialog(coloringCLFragment);
 	}
-	ImGui::InputText("", (char*)coloringCLFragment.c_str(), 100);
+	ImGui::InputText("##coloringCLFragment", (char*)coloringCLFragment.c_str(), 100);
 	if (ImGui::Button("Reload all CL Fragments"))
 	{
 		cf.fractalCLFragmentFile = formulaCLFragment;
