@@ -138,7 +138,7 @@ void clCore::setDefaultFractalArguments(clFractal& cf)
 {
     this->currentRenderSize = cf.image.size.x * cf.image.size.y;
     // cf.imgData.resize(this->currentRenderSize, 0);
-    cf.imgIntRGBAData.resize(this->currentRenderSize, 0);
+    cf.imgIntRGBAData.resize(4 * this->currentRenderSize, 0);
     cl_int3 sampling = { 0, fibonacci_number(cf.image.targetQuality), fibonacci_number(cf.image.targetQuality) };
     cl_int err;
     err = setKernelArg(this->fractalKernel.kernel, 0, cf.image.size, "image_size");
@@ -160,9 +160,9 @@ void clCore::setDefaultFractalArguments(clFractal& cf)
     err = setKernelArg(this->fractalKernel.kernel, 5, cf.bailout, "bailout");
     err = setKernelArg(this->fractalKernel.kernel, 6, cf.gradient.fineLength, "gradient_length");
     this->gradientBuffer = setBufferKernelArg(this->fractalKernel.kernel, 7, cf.gradient.fineColors.data(),
-        sizeof(float) * cf.gradient.fineLength * 4, CL_MEM_READ_ONLY, "gradient_colors", &err);
+        sizeof(cl_float) * cf.gradient.fineLength * 4, CL_MEM_READ_ONLY, "gradient_colors", &err);
     this->imgIntRGBABuffer = setBufferKernelArg(this->fractalKernel.kernel, 8, cf.imgIntRGBAData.data(),
-        sizeof(uint32_t) * this->currentRenderSize, CL_MEM_WRITE_ONLY, "img", &err);
+        4 * sizeof(cl_int) * this->currentRenderSize, CL_MEM_WRITE_ONLY, "img", &err);
     err = setKernelArg(this->fractalKernel.kernel, 9, cf.flamePointSelection, "flamePointSelection");
     err = setKernelArg(this->fractalKernel.kernel, 10, cf.flameWarmup, "flameWarmup");
     err = setKernelArg(this->fractalKernel.kernel, 11, cf.mode, "fractal mode");
@@ -214,10 +214,10 @@ void clCore::setImgKernelArguments(clFractal& cf)
     setReusedBufferArgument(this->imgKernel.kernel,
         0, this->imgIntRGBABuffer,
         "intImgBuffer");
-    std::cout << "sizeof(float) * 4 * this->currentRenderSize: " << sizeof(float) * 4 * this->currentRenderSize << "\n";
-    std::cout << "cf.imgData.size() * sizeof(color): " << cf.imgData.size() * sizeof(color) << "\n";
+    std::cout << "sizeof(float) * 4 * this->currentRenderSize: " << sizeof(cl_float) * 4 * this->currentRenderSize << "\n";
+    std::cout << "cf.imgData.size() * sizeof(color): " << cf.imgData.size() * sizeof(cl_float4) << "\n";
     this->imgFloatBuffer = setBufferKernelArg(this->imgKernel.kernel,
-        2, cf.imgData.data(), sizeof(color) * this->currentRenderSize, CL_MEM_WRITE_ONLY,
+        2, cf.imgData.data(), sizeof(cl_float4) * this->currentRenderSize, CL_MEM_WRITE_ONLY,
         "imgFloatColorValues", &err);
     err = setKernelArg(this->imgKernel.kernel,
         4, cf.mode,
