@@ -13,10 +13,11 @@ __loop:
 				int4 col = getColor(gradient, @colorDensity * (float)iter / (float)maxIterations, nColors); // color;
 				// colors[pixelIndex] += (int4)(col.x, col.y, col.z, 256); // color;
 				// atomic_fetch_add_explicit(&hitCounts[hitY * width + hitX], 1, memory_order_relaxed);
-				atomic_fetch_add(&colorsR[pixelIndex], col.x); // , memory_order_relaxed, memory_scope_device);
-				atomic_fetch_add(&colorsG[pixelIndex], col.y); // , memory_order_relaxed);
-				atomic_fetch_add(&colorsB[pixelIndex], col.z); // , memory_order_relaxed);
-				atomic_fetch_add(&colorsA[pixelIndex], col.w); // , memory_order_relaxed);
+				setColor(colorsRGBA, col, pixelIndex);
+				//atomic_fetch_add(&colorsRGBA[4 * pixelIndex    ], col.x); // , memory_order_relaxed, memory_scope_device); // , memory_scope_device);
+				//atomic_fetch_add(&colorsRGBA[4 * pixelIndex + 1], col.y); // , memory_order_relaxed, memory_scope_device);
+				//atomic_fetch_add(&colorsRGBA[4 * pixelIndex + 2], col.z); // , memory_order_relaxed, memory_scope_device);
+				//atomic_fetch_add(&colorsRGBA[4 * pixelIndex + 3], col.w); // , memory_order_relaxed, memory_scope_device);
 			}
 			//int xx = 500 * z.x;
 			//int yy = 500 * z.y;
