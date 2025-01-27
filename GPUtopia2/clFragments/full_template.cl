@@ -1,4 +1,5 @@
 //@__DOUBLE
+//@__MODE
 #ifdef USE_DOUBLE
 typedef double real;
 typedef double2 real2;
@@ -48,7 +49,11 @@ __kernel void computeLoop(
     const float bailout,               // 5:  bailout value
     const int nColors,                 // 6:  colors in gradient
     __global const float4* gradient,   // 7:  gradient
+#ifdef FLAME
     __global atomic_uint* colorsRGBA,  // 8:  output R
+#else
+    __global uint* colorsRGBA,  // 8:  output R
+#endif
     const int flamePointSelection,     // 9: discard points, used for flame
     const int flameWarmup,             // 10: warmup before splatting flame samples
     const int mode,                    // 11: mode (0 = escape time, 1 = flame)

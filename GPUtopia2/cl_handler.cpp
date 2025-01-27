@@ -34,6 +34,8 @@ const std::string eof("EOF");
 
 const std::string DPFlag("//@__DOUBLE");
 const std::string DPString("#define USE_DOUBLE");
+const std::string FLFlag("//@__MODE");
+const std::string FLString("#define FLAME");
 
 const std::string AAFlag("//@__AA");
 const std::string COFlag("//@__COLORING");
@@ -231,6 +233,8 @@ void clFractal::makeCLCode()
 	// std::cout << "BEFORE:\n" << fullTemplateStr << std::endl;
 	if (this->useDouble)
 		fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(DPFlag), DPString);
+	if (this->mode == 1)
+		fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(FLFlag), FLString);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(AAFlag), antiAliasingStr);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(COFlag), colorStr);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(CPFlag), complexStr);

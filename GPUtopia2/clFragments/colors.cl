@@ -63,3 +63,22 @@ int4 getColor(const float4* colors, const float idxIn, const int nColors)
 			colors[colorIndex1], colors[colorIndex2]));
 	return toIntColor(outColor);
 }
+
+#ifdef FLAME
+void setColor(atomic_uint* colorsRGBA, const int4 col, const int pixelIndex)
+{
+	atomic_fetch_add_explicit(&colorsRGBA[4 * pixelIndex    ], col.x, memory_order_relaxed, memory_scope_device); // , memory_scope_device);
+	atomic_fetch_add_explicit(&colorsRGBA[4 * pixelIndex + 1], col.y, memory_order_relaxed, memory_scope_device);
+	atomic_fetch_add_explicit(&colorsRGBA[4 * pixelIndex + 2], col.z, memory_order_relaxed, memory_scope_device);
+	atomic_fetch_add_explicit(&colorsRGBA[4 * pixelIndex + 3], col.w, memory_order_relaxed, memory_scope_device);
+}
+#else
+void setColor(uint* colorsRGBA, const int4 col, const int pixelIndex)
+{
+	colorsRGBA[4 * pixelIndex    ] += col.x;
+	colorsRGBA[4 * pixelIndex + 1] += col.y;
+	colorsRGBA[4 * pixelIndex + 2] += col.z;
+	colorsRGBA[4 * pixelIndex + 3] += col.w; 
+}
+#endif
+
