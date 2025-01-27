@@ -11,3 +11,4 @@
 #include <cstdlib>
 
 void openFileDialog(std::string& fileName);
+void saveFileDialog(std::string& fileName);

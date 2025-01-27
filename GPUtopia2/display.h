@@ -23,7 +23,7 @@
 #include "sampling.h"
 #include "complex_number.h"
 #include "fractal_navigation.h"
-#include "openFile.h"
+#include "selectFile.h"
 #include "cl_error_window.h"
 
 using std::string;

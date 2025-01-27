@@ -163,7 +163,7 @@
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgExport.h" />
     <ClInclude Include="load_shaders.h" />
-    <ClInclude Include="openFile.h" />
+    <ClInclude Include="selectFile.h" />
     <ClInclude Include="parameterMaps.h" />
   </ItemGroup>
   <ItemGroup>
@@ -185,7 +185,7 @@
     <ClCompile Include="info.h" />
     <ClCompile Include="load_shaders.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="openFile.cpp" />
+    <ClCompile Include="selectFile.cpp" />
     <ClCompile Include="sampling.cpp" />
     <ClCompile Include="test_gradients.cpp" />
     <ClCompile Include="test_gradients.h" />

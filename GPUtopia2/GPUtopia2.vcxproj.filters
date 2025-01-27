@@ -87,7 +87,7 @@
     <ClInclude Include="fractal_navigation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="openFile.h">
+    <ClInclude Include="selectFile.h">
       <Filter>Header Files\Ui</Filter>
     </ClInclude>
     <ClInclude Include="cl_error_handling.h">
@@ -152,7 +152,7 @@
     <ClCompile Include="fractal_navigation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="openFile.cpp">
+    <ClCompile Include="selectFile.cpp">
       <Filter>Source Files\Ui</Filter>
     </ClCompile>
     <ClCompile Include="cl_fractal.cpp">

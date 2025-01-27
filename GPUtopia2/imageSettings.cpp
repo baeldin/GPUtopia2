@@ -62,7 +62,9 @@ void imageSettingsWindow(clFractal& cf, std::vector<color>& img)
 	ImGui::InputText("File Name:", (char*)outName.c_str(), 256);
 	if (ImGui::Button("Save"))
 	{
-		save_to_png(img, cf.image.size.x, cf.image.size.y, (char*)outName.c_str());
+		std::string fileName;
+		saveFileDialog(fileName);
+		save_to_png(img, cf.image.size.x, cf.image.size.y, (char*)fileName.c_str());
 	}
 	ImGui::End();
 }

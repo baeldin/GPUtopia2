@@ -14,7 +14,7 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 		std::cout << "Setting formula fragment to " << formulaCLFragment << "\n";
 		// cf.fractalCLFragmentFile = formulaCLFragment;
 	}
-	ImGui::Text("##formulaCLFragment", (char*)formulaCLFragment.c_str());
+	ImGui::InputText("##formulaCLFragment", (char*)formulaCLFragment.c_str(), 100);
 	// coloring CL fragment
 	static std::string coloringCLFragment = cf.coloringCLFragmentFile; 
 	if (ImGui::Button("Load Coloring"))
