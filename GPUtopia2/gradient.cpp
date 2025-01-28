@@ -39,6 +39,23 @@ Gradient::Gradient(int length_, std::vector<color> colors_, std::vector<int> loc
 	fill();
 }
 
+Gradient::Gradient(int length_, std::vector<color> colors_, std::vector<int> locations_,
+	std::vector<int> fillOrder_) {
+	length = length_;
+	nodeColors = colors_;
+	nodeLocation = locations_;
+	nodeCount = locations_.size();
+	nodeLocationsOld = std::vector<int>(nodeCount);
+	nodeIndex = std::vector<int>(nodeCount);
+	fillOrder = fillOrder_;
+	for (int ii = 0; ii < nodeCount; ii++)
+	{
+		nodeIndex[ii] = ii;
+	}
+	fillOrder = fillOrder_;
+	fill();
+}
+
 std::vector<int> Gradient::getFillOrder(const std::vector<int>& nodeLocations)
 {
 	std::vector<int> fO(nodeCount);
@@ -217,9 +234,9 @@ std::vector<std::vector<color>> Gradient::drawWithRGBlines(const int sizeX, cons
 			std::max<int>(0, (int)((1.f - current_color.b) * (sizeY - 1))) };
 		for (int jj = 0; jj < sizeY; jj++)
 		{
-			gradientPictures[0][sizeX * jj + ii] = (jj == curveValues[0]) ? (ii % 4 < 2) ? color(0) : color(1) : current_color;
-			gradientPictures[1][sizeX * jj + ii] = (jj == curveValues[1]) ? (ii % 4 < 2) ? color(0) : color(1) : current_color;
-			gradientPictures[2][sizeX * jj + ii] = (jj == curveValues[2]) ? (ii % 4 < 2) ? color(0) : color(1) : current_color;
+			gradientPictures[0][sizeX * jj + ii] = (jj == curveValues[0]) ? (ii % 4 < 2) ? color(0.f) : color(1.f) : current_color;
+			gradientPictures[1][sizeX * jj + ii] = (jj == curveValues[1]) ? (ii % 4 < 2) ? color(0.f) : color(1.f) : current_color;
+			gradientPictures[2][sizeX * jj + ii] = (jj == curveValues[2]) ? (ii % 4 < 2) ? color(0.f) : color(1.f) : current_color;
 		}
 	}
 	for (int jj = 0; jj < nodeColors.size(); jj++)
@@ -277,7 +294,7 @@ void Gradient::drawRline(const int sizeX, const int sizeY, std::vector<color> gr
 	{
 		color current_color = get_color((float)ii / sizeX);
 		int curveValue = std::max(0, (int)((1.f - current_color.r) * (sizeY - 1)));
-		color lineColor = (ii % 2 == 0) ? color(0) : color(1);
+		color lineColor = (ii % 2 == 0) ? color(0.f) : color(1.f);
 		gradientImg[curveValue * sizeX + ii] = lineColor;
 		gradientImg[0] = color(1, 1, 1);
 	}
@@ -372,8 +389,8 @@ color Gradient::get_color_cubic(float xidx) const
 
 	}
 	int peviousIndex = (nextIndex < 1) ? nextIndex + nodeCount - 1 : nextIndex - 1;
-	std::vector<float> spline_indices(4, 0);
-	std::vector<color> spline_colors(4, 0);
+	std::vector<float> spline_indices(4, 0.f);
+	std::vector<color> spline_colors(4, 0.f);
 	for (int jj = 0; jj < 4; jj++)
 	{
 		int fetch_index = nextIndex - 2 + jj;
@@ -391,7 +408,7 @@ color Gradient::get_color_cubic(float xidx) const
 
 std::vector<color> Gradient::getGradientImg(const int width, const int height)
 {
-	std::vector<color> img(width * height, 0);
+	std::vector<color> img(width * height, 0.f);
 	for (int y = 0; y < height; y++)
 	{
 		for (int x = 0; x < width; x++)
