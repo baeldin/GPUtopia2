@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <string>
 
-// #include "color.h"
+#include "color.h"
 #include "cubic_spline.h"
 
 
@@ -32,6 +32,7 @@ public:
 	std::string name = "DefaultName";
 	Gradient();
 	Gradient(int length_, std::vector<color> colors_, std::vector<int> locations_);
+	Gradient(int length_, std::vector<color> colors_, std::vector<int> locations_, std::vector<int> fillOrder_);
 	color get_color(float xidx, const float density, const float offset, const bool repeat) const;
 	color getColor(const int N) const { return nodeColors[N]; }
 	// index from pos in draw sequence

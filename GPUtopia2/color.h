@@ -10,6 +10,8 @@ float clamp(const float x);
 float sRGBtoLinear(const float x);
 float linearToSRGB(const float x);
 
+constexpr float inv255 = 1.f / 255.f;
+
 struct color
 {
     float r;
@@ -27,6 +29,14 @@ struct color
     {
         r = r_; g = g_; b = b_; a = a_;
     }
+    color(const uint32_t UFint) {
+        const int ib = UFint / 65536;
+        const int ig = (UFint - b * 65536) / 256;
+        const int ir = (UFint - b * 65536 - g * 256) / 256;
+        r = (float)ir * inv255;
+        g = (float)ig * inv255;
+        b = (float)ib * inv255;
+    }
     color operator+ (const color& c) {
         return color(r + c.r, g + c.g, b + c.b, a + c.a); }
     color operator* (const float& x) { 
@@ -42,7 +52,9 @@ struct color
         return *this;
     }
     cl_float4 to_cl_float4() { return cl_float4({ r, g, b, a }); }
-
+    uint32_t toUFint() const {
+        return 65536 * (int)(b * 255) + 256 * (int)(g * 255) + (int)(r * 255);
+    }
 };
 
 inline const bool operator==(const color& lhs, const color& rhs)
