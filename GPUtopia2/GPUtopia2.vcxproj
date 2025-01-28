@@ -162,6 +162,7 @@
     <ClInclude Include="imageSettings.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgExport.h" />
+    <ClInclude Include="json.hpp" />
     <ClInclude Include="load_shaders.h" />
     <ClInclude Include="selectFile.h" />
     <ClInclude Include="parameterMaps.h" />

@@ -96,6 +96,9 @@
     <ClInclude Include="cl_error_window.h">
       <Filter>Header Files\Ui</Filter>
     </ClInclude>
+    <ClInclude Include="json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
