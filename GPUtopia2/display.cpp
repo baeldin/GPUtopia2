@@ -49,7 +49,7 @@ namespace mainView
 		static clFractal cf_old;
 		static fractalNavigationParameters nav;
 		static std::vector<color> textureColors(cf.image.size.x * cf.image.size.y);
-		static std::vector<color> vec_img_f_offset(cf.image.size.x * cf.image.size.y, 0);
+		static std::vector<color> vec_img_f_offset(cf.image.size.x * cf.image.size.y, 0.f);
 		static bool imgBlocked = false;
 		static bool needCLFractal = true;
 		static bool showCoreError = false;
@@ -259,7 +259,28 @@ namespace mainView
 		static char mainViewStr[] = "Main View";
 		ImGui::Begin(mainViewStr, nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 		ImGui::Image((void*)(intptr_t)textureID, ImVec2(
-			cf.image.size.x, cf.image.size.y)); // , texturesize);
+		cf.image.size.x, cf.image.size.y)); 
+		if (ImGui::Button("Save Fractal"))
+		{
+			std::string path;
+			saveFileDialog(path);
+			nlohmann:json json = cf.toExport();
+			std::ofstream outFile(path);
+			outFile << json.dump();
+			outFile.close();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Load Fractal"))
+		{
+			std::string path;
+			openFileDialog(path);
+			std::ifstream inFile(path);
+			std::string jsonStr;
+			inFile >> jsonStr;
+			json back_json = json::parse(jsonStr);
+			auto cfm = back_json.get<clFractalMinimal>();
+			cf = clFractal(cfm);
+		}
 		ImGui::End();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}

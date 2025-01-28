@@ -1,6 +1,12 @@
 #pragma once
 #include <map>
 #include <cmath>
+#include <fstream>
+#include <iostream>
+
+#include "json.hpp"
+using json = nlohmann::json;
+
 #include "gradient.h"
 #include "sampling.h"
 #include "complex_number.h"
@@ -129,6 +135,44 @@ struct clFractalStatus
 	bool done = false;
 };
 
+class clFractal;
+
+struct clFractalMinimal
+{
+	double centerX;
+	double centerY;
+	double zoom;
+	double angle;
+	int sizeX;
+	int sizeY;
+	int quality;
+	float brightness;
+	float gamma;
+	float vibrancy;
+	int maxIter;
+	int mode;
+	int pointSelection;
+	std::map<std::string, std::pair<int, int>> fractalIntParameters;
+	std::map<std::string, std::pair<float, int>> fractalFloatParameters;
+	std::map<std::string, std::pair<bool, int>> fractalBoolParameters;
+	std::map<std::string, std::pair<int, int>> coloringIntParameters;
+	std::map<std::string, std::pair<float, int>> coloringFloatParameters;
+	std::map<std::string, std::pair<bool, int>> coloringBoolParameters;
+	std::vector<std::pair<int, int>> gradientColors;
+	std::vector<int> gradientFillOrder;
+	std::string fractalCLFragmentFile;
+	std::string coloringCLFragmentFile;
+	clFractalMinimal() {}
+	clFractalMinimal(const clFractal* cf);
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(clFractalMinimal,
+		centerX, centerY, zoom, angle, sizeX, sizeY, quality,
+		brightness, gamma, vibrancy, maxIter, mode, pointSelection,
+		fractalIntParameters, fractalFloatParameters, fractalBoolParameters,
+		coloringIntParameters, coloringFloatParameters, coloringBoolParameters,
+		gradientColors, gradientFillOrder,
+		fractalCLFragmentFile, coloringCLFragmentFile);
+};
+
 // Fractal class that holds parameters, names of the code fragmens, and the full
 // CL code of the fractal + coloring
 class clFractal
@@ -155,6 +199,7 @@ public:
 	cl_int flameWarmup = 0;
 	clFractalStatus status;
 	clFractal() : gradient() {}
+	clFractal(const clFractalMinimal& cfm);
 	void makeCLCode();
 	void setFractalCLFragmentFile(const char* fil) {
 		fractalCLFragmentFile = std::string(fil);
@@ -165,6 +210,7 @@ public:
 	bool running() {
 		return this->status.kernelRunning or this->status.imgKernelRunning;
 	}
+	clFractalMinimal toExport() { return clFractalMinimal(this); }
 };
 
 inline const bool operator==(const clFractal& lhs, const clFractal& rhs)
