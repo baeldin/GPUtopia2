@@ -10,5 +10,5 @@
 // #include <codecvt>
 #include <cstdlib>
 
-void openFileDialog(std::string& fileName);
-void saveFileDialog(std::string& fileName);
+void openFileDialog(std::string& fileName, bool& success);
+void saveFileDialog(std::string& fileName, bool& success);

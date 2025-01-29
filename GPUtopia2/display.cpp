@@ -38,8 +38,6 @@ namespace mainView
 {
 	void mainViewPort(ImFont* font_mono)
 	{
-		ImGuiIO& io = ImGui::GetIO();
-		ImGui::Begin("Main View", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 		static GLuint textureID;
 		static bool updateTexture = false;
 		static bool refreshDefaultArguments = true;
@@ -103,11 +101,86 @@ namespace mainView
 		{
 			core.stop = true;
 			show_cl_error_window(cf, core, font_mono);
-		}		
+		}
+		ImGuiIO& io = ImGui::GetIO();
+		if (ImGui::BeginMainMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				// Disabling fullscreen would allow the window to be moved to the front of other windows,
+				// which we can't undo at the moment without finer window depth/z control.
+				if (ImGui::MenuItem("Open"))
+				{
+					bool success = false;
+					std::string path;
+					saveFileDialog(path, success);
+					if (success)
+					{
+						json json = cf.toExport();
+						std::ofstream outFile(path);
+						outFile << json.dump();
+						outFile.close();
+					}
+				}
+				if (ImGui::MenuItem("Save"))
+				{
+					std::string path;
+					bool success = false;
+					openFileDialog(path, success);
+					if (success)
+					{
+						std::ifstream inFile(path);
+					    std:cout << path << "\n";
+						std::string jsonStr;
+						inFile >> jsonStr;
+						json back_json = json::parse(jsonStr);
+						auto cfm = back_json.get<clFractalMinimal>();
+						cf = clFractal(cfm);
+					}
+				}
+				if (ImGui::MenuItem("Export Image"))
+				{
+					bool success = false;
+					std::string fileName;
+					saveFileDialog(fileName, success);
+					if (success)
+						save_to_png(textureColors, cf.image.size.x, cf.image.size.y, (char*)fileName.c_str());
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Edit"))
+			{
+				if (ImGui::MenuItem("TODO: Undo"))
+				{
+					// undo
+				}
+				if (ImGui::MenuItem("TODO: Redo"))
+				{
+					// redo
+				}
+				if (ImGui::MenuItem("TODO: Copy"))
+				{
+					// redo
+				}
+				if (ImGui::MenuItem("TODO: Paste"))
+				{
+					// redo
+				}
+				if (ImGui::MenuItem("TODO: Copy Image"))
+				{
+					// redo
+				}
+				ImGui::EndMenu();
+
+			}
+			ImGui::EndMainMenuBar();
+		}
+		ImGui::Begin("Main View", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
+	
 		static paramCollector params_old = cf.params;
 		static clFractalImage img_settings_old = cf.image;
 		formulaSettingsWindow(cf, core);
-		imageSettingsWindow(cf, textureColors);
+		imageSettingsWindow(cf);
 		flameRenderSettingsWindow(cf);
 		infoWindow(cf, nav, font_mono);
 		static int waitCounter = 0;
@@ -260,28 +333,8 @@ namespace mainView
 		ImGui::Begin(mainViewStr, nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 		ImGui::Image((void*)(intptr_t)textureID, ImVec2(
 		cf.image.size.x, cf.image.size.y)); 
-		if (ImGui::Button("Save Fractal"))
-		{
-			std::string path;
-			saveFileDialog(path);
-			nlohmann:json json = cf.toExport();
-			std::ofstream outFile(path);
-			outFile << json.dump();
-			outFile.close();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Load Fractal"))
-		{
-			std::string path;
-			openFileDialog(path);
-			std::ifstream inFile(path);
-			std::string jsonStr;
-			inFile >> jsonStr;
-			json back_json = json::parse(jsonStr);
-			auto cfm = back_json.get<clFractalMinimal>();
-			cf = clFractal(cfm);
-		}
 		ImGui::End();
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 };

@@ -10,16 +10,24 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 	// formulaCLFragment = "clFragments/fractalFormulas/mandelbrot.cl";
 	if (ImGui::Button("Load Formula"))
 	{
-		openFileDialog(formulaCLFragment);
+		bool success = false;
+		std::string newFormulaCLFragment;
+		openFileDialog(newFormulaCLFragment, success);
+		if (success)
+			cf.fractalCLFragmentFile = newFormulaCLFragment;
 		std::cout << "Setting formula fragment to " << formulaCLFragment << "\n";
-		// cf.fractalCLFragmentFile = formulaCLFragment;
 	}
 	ImGui::InputText("##formulaCLFragment", (char*)formulaCLFragment.c_str(), 100);
 	// coloring CL fragment
 	static std::string coloringCLFragment = cf.coloringCLFragmentFile; 
 	if (ImGui::Button("Load Coloring"))
 	{
-		openFileDialog(coloringCLFragment);
+		bool success = false;
+		std::string newFormulaCLFragment;
+		openFileDialog(newFormulaCLFragment, success);
+		if (success)
+			cf.coloringCLFragmentFile = newFormulaCLFragment;
+		std::cout << "Setting coloring fragment to " << formulaCLFragment << "\n";
 	}
 	ImGui::InputText("##coloringCLFragment", (char*)coloringCLFragment.c_str(), 100);
 	if (ImGui::Button("Reload all CL Fragments"))

@@ -2,8 +2,9 @@
 
 
 
-void openFileDialog(std::string& fileName)
+void openFileDialog(std::string& fileName, bool& success)
 {
+    
     HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
         COINIT_DISABLE_OLE1DDE);
     if (SUCCEEDED(hr))
@@ -36,6 +37,7 @@ void openFileDialog(std::string& fileName)
                         size_t size;
                         fileName.resize(tmpFilePath.length());
                         wcstombs_s(&size, &fileName[0], fileName.size() + 1, tmpFilePath.c_str(), tmpFilePath.size());
+                        success = true;
                     }
                     pItem->Release();
                 }
@@ -47,8 +49,9 @@ void openFileDialog(std::string& fileName)
     // return 0;
 }
 
-void saveFileDialog(std::string& fileName)
+void saveFileDialog(std::string& fileName, bool& success)
 {
+    success = false;
     HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
         COINIT_DISABLE_OLE1DDE);
     if (SUCCEEDED(hr))
@@ -81,6 +84,7 @@ void saveFileDialog(std::string& fileName)
                         size_t size;
                         fileName.resize(tmpFilePath.length());
                         wcstombs_s(&size, &fileName[0], fileName.size() + 1, tmpFilePath.c_str(), tmpFilePath.size());
+                        success = true;
                     }
                     pItem->Release();
                 }

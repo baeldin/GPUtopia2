@@ -31,7 +31,7 @@ void save_to_png(const std::vector<color>& image_data, int imgWidth, const int i
 }
 
 
-void imageSettingsWindow(clFractal& cf, std::vector<color>& img)
+void imageSettingsWindow(clFractal& cf)
 {
 	ImGui::Begin("Image");
 	static double xmin = -5.f;
@@ -60,11 +60,5 @@ void imageSettingsWindow(clFractal& cf, std::vector<color>& img)
 	ImGui::Combo("Tonemapping Mode", &cf.mode, tonemappingItems, IM_ARRAYSIZE(tonemappingItems));
 	static std::string outName = "out.png";
 	ImGui::InputText("File Name:", (char*)outName.c_str(), 256);
-	if (ImGui::Button("Save"))
-	{
-		std::string fileName;
-		saveFileDialog(fileName);
-		save_to_png(img, cf.image.size.x, cf.image.size.y, (char*)fileName.c_str());
-	}
 	ImGui::End();
 }
