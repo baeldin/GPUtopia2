@@ -45,29 +45,28 @@ namespace mainView
 		static ImVec2 mainViewportSize = ImGui::GetContentRegionAvail();
 		static clFractal cf;
 		static clFractal cf_old;
+		static std::vector<clFractalMinimal> history; // = { cf.toExport() }; // history vector
+		static int historyIndex = -1;
+		static bool undone = false;
+		static bool redone = false;
 		static fractalNavigationParameters nav;
 		static std::vector<color> textureColors(cf.image.size.x * cf.image.size.y);
 		static std::vector<color> vec_img_f_offset(cf.image.size.x * cf.image.size.y, 0.f);
 		static bool imgBlocked = false;
-		static bool needCLFractal = true;
+		static bool startup = true;
 		static bool showCoreError = false;
 		static clCore core;
 		if (core.imgKernel.need)
 			core.compileImgKernel();
-
 		// only run at startup, maybe move somewhere else?
-		if (needCLFractal)
+		while (startup)
 		{
-			cf.makeCLCode();
-			core.compileFractalKernel(cf.fullCLcode);
-			if (core.fractalKernel.errors.compileError == CL_SUCCESS)
-			{
-				needCLFractal = false;
-			}
-			else
-			{
-				needCLFractal = true;
-			}
+			// cf.verbosity = 2;
+			cf.makeCLCode(NEW_FILES);
+			cf.buildKernel = true;
+			std::cout << "Doing the starting thing " << startup << "\n";
+			startup = false;
+			cf_old.image.zoom = -1.; // just ANY difference will do for startup
 		}
 		// check if main viewport needs resizing
 		if (mainViewportSize.x != ImGui::GetContentRegionAvail().x ||
@@ -87,10 +86,9 @@ namespace mainView
 		// check if a kernel rebuild is needed
 		if (cf.buildKernel and core.fractalKernel.errors.sum() == 0)
 		{
-			std::cout << "Need a new kernel, compiling it now.\n - requesting new texture\n - requesting new image\n";
 			core.compileFractalKernel(cf.fullCLcode);
-			cf.status.runKernel = true;
 			cf.buildKernel = false;
+			cf.status.runKernel = true;
 		}
 		if (core.imgKernel.errors.sum() != 0)
 		{
@@ -111,19 +109,6 @@ namespace mainView
 				// which we can't undo at the moment without finer window depth/z control.
 				if (ImGui::MenuItem("Open"))
 				{
-					bool success = false;
-					std::string path;
-					saveFileDialog(path, success);
-					if (success)
-					{
-						json json = cf.toExport();
-						std::ofstream outFile(path);
-						outFile << json.dump();
-						outFile.close();
-					}
-				}
-				if (ImGui::MenuItem("Save"))
-				{
 					std::string path;
 					bool success = false;
 					openFileDialog(path, success);
@@ -138,6 +123,19 @@ namespace mainView
 						cf = clFractal(cfm);
 					}
 				}
+				if (ImGui::MenuItem("Save As"))
+				{
+					bool success = false;
+					std::string path;
+					saveFileDialog(path, success);
+					if (success)
+					{
+						json json = cf.toExport();
+						std::ofstream outFile(path);
+						outFile << json.dump();
+						outFile.close();
+					}
+				}
 				if (ImGui::MenuItem("Export Image"))
 				{
 					bool success = false;
@@ -150,17 +148,58 @@ namespace mainView
 			}
 			if (ImGui::BeginMenu("Edit"))
 			{
-				if (ImGui::MenuItem("TODO: Undo"))
+				if (ImGui::MenuItem("Undo"))
 				{
-					// undo
+					if (historyIndex > 0)
+					{
+						historyIndex--;
+						cf = clFractal(history[historyIndex]);
+						if (cf.fractalCLFragmentFile != cf_old.fractalCLFragmentFile ||
+							cf.coloringCLFragmentFile != cf_old.coloringCLFragmentFile)
+						{
+							cf.makeCLCode();
+							// cf.buildKernel = true;
+							core.resetCore();
+							core.compileFractalKernel(cf.fullCLcode);
+						}
+						cf.image.resetStatus();
+						cf.status.runKernel = true;
+						cf.timings.erase(cf.timings.begin(), cf.timings.end());
+						cf.status.done = false;
+						cf_old = cf;
+						std::cout << "History index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
+						redone = false;
+						undone = true;
+					}
 				}
-				if (ImGui::MenuItem("TODO: Redo"))
+				if (ImGui::MenuItem("Redo"))
 				{
-					// redo
+					if (historyIndex < history.size() - 1)
+					{
+						historyIndex++;
+						cf = clFractal(history[historyIndex]);
+						if (cf.fractalCLFragmentFile != cf_old.fractalCLFragmentFile ||
+							cf.coloringCLFragmentFile != cf_old.coloringCLFragmentFile)
+						{
+							cf.makeCLCode();
+							// cf.buildKernel = true;
+							core.resetCore();
+							core.compileFractalKernel(cf.fullCLcode);
+						}
+						cf.image.resetStatus();
+						cf.status.runKernel = true;
+						cf.timings.erase(cf.timings.begin(), cf.timings.end());
+						cf.status.done = false;
+						cf_old = cf;
+						std::cout << "History index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
+						undone = false;
+						redone = true;
+					}
 				}
 				if (ImGui::MenuItem("TODO: Copy"))
 				{
-					// redo
+					clFractalMinimal exp = cf.toExport();
+
 				}
 				if (ImGui::MenuItem("TODO: Paste"))
 				{
@@ -176,7 +215,6 @@ namespace mainView
 			ImGui::EndMainMenuBar();
 		}
 		ImGui::Begin("Main View", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
-	
 		static paramCollector params_old = cf.params;
 		static clFractalImage img_settings_old = cf.image;
 		formulaSettingsWindow(cf, core);
@@ -187,45 +225,81 @@ namespace mainView
 		static bool force_img_update = false;
 		// only order rerun of imgKernel if flameRenderSettings change
 		if (cf.flameRenderSettings != cf_old.flameRenderSettings and !cf.running()) {
-			std::cout << "Fractal's flameRenderSettings changed, demanding new run of imgKernel.\n";
 			cf.status.runImgKernel = true;
+			if (historyIndex < history.size() - 1)
+			{
+				std::cout << "We are not at the end of history, but the fractal was changed:\n";
+				const int historyEnd = history.size();
+				for (int ii = historyIndex; ii < historyEnd; ii++)
+				{
+					std::cout << "Popping history[" << ii << "]\n";
+					history.pop_back();
+				}
+				historyIndex--;
+				std::cout << "##################################\nHistory index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
+			}
+			history.push_back(cf.toExport());
+			historyIndex++;
+			undone = false;
+			redone = false;
+			std::cout << "History index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
 			cf_old.flameRenderSettings = cf.flameRenderSettings;
 		}
 		// 
 		if (cf != cf_old) { //}&& waitCounter == 0) {
-			std::cout << "Parameters changed, updating cf.params.\n - requesting new Texture\n - requesting new image\n";
-			needCLFractal = false;
+			if (cf.newCLFragmentQueued())
+			{
+				if (cf.newFractalCLFragmentQueued())
+					cf.popFractalCLFragmentQueue();
+				if (cf.newColoringCLFragmentQueued())
+					cf.popColoringCLFragmentQueue();
+				cf.makeCLCode(NEW_FILES);
+				core.resetCore();
+				core.compileFractalKernel(cf.fullCLcode);
+			}
 			cf.image.updateComplexSubplane();
 			core.setDefaultFractalArguments(cf);
 			core.setFractalParameterArgs(cf);
 			cf.image.resetStatus();
 			cf.status.runKernel = true;
-			cf.timings.erase(cf.timings.begin(), cf.timings.end() - 1);
+			cf.timings.erase(cf.timings.begin(), cf.timings.end());
 			cf.status.done = false;
+			if (historyIndex < history.size() - 1)
+			{
+				std::cout << "We are not at the end of history, but the fractal was changed:\n";
+				const int historyEnd = history.size();
+				for (int ii = historyIndex; ii < historyEnd; ii++)
+				{
+					std::cout << "Popping history[" << ii << "]\n";
+					history.pop_back();
+				}
+				historyIndex--;
+				std::cout << "##################################\nHistory index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
+			}
+			history.push_back(cf.toExport());
+			historyIndex++;
+			undone = false;
+			redone = false;
+			std::cout << "##################################\nHistory index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
 			cf_old = cf;
 		}
-
 		glViewport(0, 0, mainViewportSize.x, mainViewportSize.y);
 		// first draw the image
 		static bool running = false;
 		static std::jthread jt;
 		if (cf.status.runKernel and !cf.running() and cf.image.current_sample_count < cf.image.target_sample_count) {
-			if (cf.image.current_sample_count == 0)
+			if (cf.image.current_sample_count == 0) // if we are restarting
 			{
-				cf.image.next_update_sample_count = 1;
 				core.setDefaultFractalArguments(cf);
-				std::cout << "kernel currently has " << core.fractalKernel.argumentCount << " arguments.'n";
 				core.setFractalParameterArgs(cf);
 			}
+			cf.status.runKernel = false; 
 			cf.status.kernelRunning = true;
 			jt = std::jthread(&runFractalKernelAsync, std::ref(cf), std::ref(core));
 			jt.detach();
-			cf.status.runKernel = false;
 		}
 
 		if (cf.status.runImgKernel and !cf.running()) {
-			std::cout << "Need a new image, setting kernel args and running kernel.\n";
-			std::cout << "sampling info is (" << cf.image.current_sample_count << ", " << cf.image.target_sample_count << ")\n";
 			cf.status.imgKernelRunning = true;
 			jt = std::jthread(&runImgKernelAsync, std::ref(cf), std::ref(core));
 			jt.detach();
@@ -263,10 +337,7 @@ namespace mainView
 		}
 		// create texture from the image
 		if (updateTexture) {
-			std::cout << "Need a new texture, deleting old and remaking using the new image.\n";
 			glDeleteTextures(1, &textureID);
-			std::cout << "IMAGE SIZE: " << cf.image.size.x << ", " << cf.image.size.y << "(" << cf.image.size.x * cf.image.size.y << ")\n";
-			std::cout << textureColors.size() << "\n";
 			makeTexture(textureID, cf.image.size.x, cf.image.size.y, textureColors);
 			updateTexture = false;
 		}
@@ -317,6 +388,9 @@ namespace mainView
 			// calculate coordinate of pixel in the middle of the displayed image
 			cf.image.center = nav.newSubplaneCenter;
 			cf.image.zoom *= nav.dragZoomFactor;
+			std::cout << "cf.image.center.x " << cf.image.center.x << "\n";
+			std::cout << "cf.image.center.y " << cf.image.center.y << "\n";
+			std::cout << "cf.image.zoom " << cf.image.zoom << "\n";
 			textureColors = vec_img_f_offset;
 			imgBlocked = false;
 		}
