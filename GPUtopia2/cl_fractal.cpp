@@ -4,6 +4,8 @@ clFractalMinimal::clFractalMinimal(const clFractal* cf)
 {
     centerX = cf->image.center.x;
     centerY = cf->image.center.y;
+    spanX = cf->image.span.x;
+    spanY = cf->image.span.y;
     zoom = cf->image.zoom;
     angle = cf->image.angle;
     sizeX = cf->image.size.x;
@@ -14,6 +16,7 @@ clFractalMinimal::clFractalMinimal(const clFractal* cf)
     vibrancy = cf->flameRenderSettings.z;
     maxIter = cf->maxIter;
     mode = cf->mode;
+    useDouble = cf->useDouble;
     pointSelection = cf->flamePointSelection;
     fractalIntParameters = cf->params.fractalParameterMaps.integerParameters;
     fractalFloatParameters = cf->params.fractalParameterMaps.floatParameters;
@@ -36,6 +39,8 @@ clFractal::clFractal(const clFractalMinimal& cfm)
 {
     this->image.center.x = cfm.centerX;
     this->image.center.y = cfm.centerY;
+    this->image.span.x = cfm.spanX;
+    this->image.span.y = cfm.spanY;
     this->image.zoom = cfm.zoom;
     this->image.angle = cfm.angle;
     this->image.size.x = cfm.sizeX;
@@ -46,6 +51,7 @@ clFractal::clFractal(const clFractalMinimal& cfm)
     this->flameRenderSettings.z = cfm.vibrancy;
     this->maxIter = cfm.maxIter;
     this->mode = cfm.mode;
+    this->useDouble = cfm.useDouble;
     this->flamePointSelection = cfm.pointSelection;
     this->params.fractalParameterMaps.integerParameters = cfm.fractalIntParameters;
     this->params.fractalParameterMaps.floatParameters = cfm.fractalFloatParameters;
@@ -64,6 +70,8 @@ clFractal::clFractal(const clFractalMinimal& cfm)
         nodeLocations.push_back(cfm.gradientColors[ii].first);
     }
     this->gradient = Gradient(cfm.gradientColors.size(), nodeColors, nodeLocations, cfm.gradientFillOrder);
+    this->fractalCLFragmentFile = cfm.fractalCLFragmentFile;
+    this->coloringCLFragmentFile = cfm.coloringCLFragmentFile;
 }
 
 // update coordinates within the complex plane if zoom or aspect ratio is changed

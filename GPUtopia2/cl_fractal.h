@@ -11,6 +11,9 @@ using json = nlohmann::json;
 #include "sampling.h"
 #include "complex_number.h"
 
+#define NEW_FILES true
+#define SAME_FILES false
+
 inline const bool operator==(const cl_int2& lhs, const cl_int2& rhs)
 {
 	return
@@ -141,6 +144,8 @@ struct clFractalMinimal
 {
 	double centerX;
 	double centerY;
+	double spanX;
+	double spanY;
 	double zoom;
 	double angle;
 	int sizeX;
@@ -152,6 +157,7 @@ struct clFractalMinimal
 	int maxIter;
 	int mode;
 	int pointSelection;
+	bool useDouble;
 	std::map<std::string, std::pair<int, int>> fractalIntParameters;
 	std::map<std::string, std::pair<float, int>> fractalFloatParameters;
 	std::map<std::string, std::pair<bool, int>> fractalBoolParameters;
@@ -181,8 +187,14 @@ public:
 	paramCollector params;
 	clFractalImage image;
 	Gradient gradient;
+	// TODO: think of a better solution to avoid collisions from the two places that can set
+	// a new file: load function vs. undo/redo :-(
 	std::string fractalCLFragmentFile = "clFragments/fractalFormulas/mandelbrot.cl";
+	std::string fractalCLFragmentFileUi = "clFragments/fractalFormulas/mandelbrot.cl";
+	std::string fractalCLFragmentFileHist = "clFragments/fractalFormulas/mandelbrot.cl";
 	std::string coloringCLFragmentFile = "clFragments/coloringAlgorithms/by_iteration.cl";
+	std::string coloringCLFragmentFileUi = "clFragments/coloringAlgorithms/by_iteration.cl";
+	std::string coloringCLFragmentFileHist = "clFragments/coloringAlgorithms/by_iteration.cl";
 	std::string fullCLcode = "";
 	std::vector<int> imgIntRGBAData;
 	std::vector<color> imgData;
@@ -198,9 +210,10 @@ public:
 	cl_int flamePointSelection = 0;
 	cl_int flameWarmup = 0;
 	clFractalStatus status;
+	uint32_t verbosity = 0;
 	clFractal() : gradient() {}
 	clFractal(const clFractalMinimal& cfm);
-	void makeCLCode();
+	void makeCLCode(const bool sameFiles = NEW_FILES);
 	void setFractalCLFragmentFile(const char* fil) {
 		fractalCLFragmentFile = std::string(fil);
 	}
@@ -210,6 +223,51 @@ public:
 	bool running() {
 		return this->status.kernelRunning or this->status.imgKernelRunning;
 	}
+	bool newFractalCLFragmentQueued() const
+	{
+		return (
+			this->fractalCLFragmentFile != this->fractalCLFragmentFileHist ||
+			this->fractalCLFragmentFile != this->fractalCLFragmentFileUi);
+	}
+	bool newColoringCLFragmentQueued() const
+	{
+		return (
+			this->coloringCLFragmentFile != this->coloringCLFragmentFileHist ||
+			this->coloringCLFragmentFile != this->coloringCLFragmentFileUi);
+	}
+	std::string getQueuedFractalCLFile() const
+	{
+		if (fractalCLFragmentFile != fractalCLFragmentFileUi)
+			return fractalCLFragmentFileUi;
+		if (fractalCLFragmentFile != fractalCLFragmentFileHist)
+			return fractalCLFragmentFileHist;
+		else // this should never happen
+			return std::string("void");
+	}
+	std::string getQueuedColoringCLFile() const
+	{
+		if (coloringCLFragmentFile != coloringCLFragmentFileUi)
+			return coloringCLFragmentFileUi;
+		if (coloringCLFragmentFile != coloringCLFragmentFileHist)
+			return coloringCLFragmentFileHist;
+		else // this should never happen
+			return std::string("void");
+	}
+	void popFractalCLFragmentQueue()
+	{
+		const std::string newFractalCLFile = this->getQueuedFractalCLFile();
+		this->fractalCLFragmentFile = newFractalCLFile;
+		this->fractalCLFragmentFileHist = newFractalCLFile;
+		this->fractalCLFragmentFileUi = newFractalCLFile;
+	}
+	void popColoringCLFragmentQueue()
+	{
+		const std::string newColoringCLFile = this->getQueuedColoringCLFile();
+		this->coloringCLFragmentFile = newColoringCLFile;
+		this->coloringCLFragmentFileHist = newColoringCLFile;
+		this->coloringCLFragmentFileUi = newColoringCLFile;
+	}
+	bool newCLFragmentQueued() { return (newFractalCLFragmentQueued() || newColoringCLFragmentQueued()); }
 	clFractalMinimal toExport() { return clFractalMinimal(this); }
 };
 
@@ -218,12 +276,17 @@ inline const bool operator==(const clFractal& lhs, const clFractal& rhs)
 	return (
 		lhs.params == rhs.params &&
 		lhs.image == rhs.image &&
-		lhs.buildKernel == rhs.buildKernel &&
+		// lhs.buildKernel == rhs.buildKernel &&
 		lhs.fractalCLFragmentFile == rhs.fractalCLFragmentFile &&
+		lhs.fractalCLFragmentFileHist == rhs.fractalCLFragmentFileHist &&
+		lhs.fractalCLFragmentFileUi == rhs.fractalCLFragmentFileUi &&
 		lhs.coloringCLFragmentFile == rhs.coloringCLFragmentFile &&
-		lhs.fullCLcode == rhs.fullCLcode &&
+		lhs.coloringCLFragmentFileHist == rhs.coloringCLFragmentFileHist &&
+		lhs.coloringCLFragmentFileUi == rhs.coloringCLFragmentFileUi &&
+		// lhs.fullCLcode == rhs.fullCLcode &&
 		lhs.maxIter == rhs.maxIter &&
 		lhs.bailout == rhs.bailout &&
+		lhs.useDouble == rhs.useDouble &&
 		//lhs.gradient == rhs.gradient &&
 		lhs.mode == rhs.mode &&
 		// lhs.flameRenderSettings == rhs.flameRenderSettings &&
