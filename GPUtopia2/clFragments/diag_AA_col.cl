@@ -16,35 +16,13 @@ __final:
 int4 outColor = 255;
 for (int sample = 0; sample <= @diag_sample_count; sample++)
 {
-	float2 sample_position = 0.f;
-	if (@pattern == 0)
-	{
-		sample_position = (float2)(
-			-0.5f + fracf((float)sample * inv_phi2A),
-			-0.5f + fracf((float)sample * inv_phi2B));
-	}
-	else if (@pattern == 1)
-	{
-		sample_position = R2_offset(1, sample) - 0.5f;
-	}
-	else if (@pattern == 2)
-	{
-		float2 sp = R2_offset_fine(1, sample);
-		sample_position = (float2)((float)sp.x - 0.5f, (float)sp.y - 0.5f);
-	}
-	else if (@pattern == 3)
-	{
-		double2 sp = R2_offset_fine64(1, sample);
-		sample_position = (float2)((float)sp.x - 0.5f, (float)sp.y - 0.5f);
-	}
+	real2 sample_position = 0.f;
+	sample_position = R2_offset(1, sample) - 0.5f;
 	if (dot(z - sample_position, z - sample_position) < dot_dist)
 	{
 		outColor = (int4)(150, 0, 0, 255);
 	}
 }
-atomic_fetch_add(&colorsR[i], outColor.x); // , memory_order_relaxed, memory_scope_device);
-atomic_fetch_add(&colorsG[i], outColor.y); //, memory_order_relaxed);
-atomic_fetch_add(&colorsB[i], outColor.z); // , memory_order_relaxed);
-atomic_fetch_add(&colorsA[i], outColor.w); // , memory_order_relaxed);
+setColor(colorsRGBA, outColor, pixelIdx);
 __functions:
 // void
