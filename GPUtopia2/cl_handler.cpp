@@ -79,8 +79,8 @@ std::string fillKernelParamBlock(std::istringstream& paramList, std::string& ful
 		std::string newParameterName = parType + inParameterName;
 		trimTrailingCharacters(fractalParameterLine, ";");
 		kernelParameterBlock += fractalParameterLine + ",\n";
-		std::cout << fractalParameterLine << "\n";
-		std::cout << "Replacing " << oldParameterName << " with " << newParameterName << std::endl;
+		// std::cout << fractalParameterLine << "\n";
+		// std::cout << "Replacing " << oldParameterName << " with " << newParameterName << std::endl;
 		fullStr = std::regex_replace(fullStr, std::regex(oldParameterName), newParameterName);
 
 	}
@@ -96,7 +96,7 @@ void addParam(parameterMaps& m,	const std::string name, const std::string type,
 {
 	if (type == "int")
 	{ 
-		std::cout << "Storing " << name << " for pos " << index << " as " << type << " with value: " << value << std::endl;
+		// std::cout << "Storing " << name << " for pos " << index << " as " << type << " with value: " << value << std::endl;
 		int p;
 		sscanf_s(value.c_str(), "%d", &p);
 		m.integerParameters[name] = std::make_pair(p, index);
@@ -104,7 +104,7 @@ void addParam(parameterMaps& m,	const std::string name, const std::string type,
 	}
 	else if (type == "float")
 	{
-		std::cout << "Storing " << name << " for pos " << index << " as " << type << " with value: " << value << std::endl;
+		// std::cout << "Storing " << name << " for pos " << index << " as " << type << " with value: " << value << std::endl;
 		float p;
 		sscanf_s(value.c_str(), "%f", &p);
 		std::pair val = std::make_pair(p, index);
@@ -169,11 +169,11 @@ paramCollector parseKernelParameterBlock(std::string& kpb)
 	trimTrailingCharacters(kpb_noValues, ",\n");
 	// kpb_noValues += ")";
 	kpb = kpb_noValues;
-	std::cout << "========= DUMP MAP CONTENT =============\n";
-	for (auto const& [key, val] : pc.coloringParameterMaps.floatParameters) {
-		std::cout << key << ": " << val.first << ", " << val.second << std::endl;
-	}
-	std::cout << "Map has size " << pc.coloringParameterMaps.floatParameters.size() << std::endl;
+	// std::cout << "========= DUMP MAP CONTENT =============\n";
+	// for (auto const& [key, val] : pc.coloringParameterMaps.floatParameters) {
+		// std::cout << key << ": " << val.first << ", " << val.second << std::endl;
+	// }
+	// std::cout << "Map has size " << pc.coloringParameterMaps.floatParameters.size() << std::endl;
 	return pc;
 }
 
@@ -181,26 +181,26 @@ paramCollector parseParameters(std::string& fullStr, const std::string& fractalF
 {
 	std::string formulaParamStr = getFragmentPart(fractalFormula, par, ini);
 	std::string coloringParamStr = getFragmentPart(coloringAlgorithm, par, ini);
-	std::cout << coloringParamStr << std::endl;
+	// std::cout << coloringParamStr << std::endl;
 	std::istringstream sf(formulaParamStr.c_str());
 	std::istringstream sc(coloringParamStr.c_str());
-	std::cout << "======================= RAW PARAMETER BLOCK ====================\n";
-	std::cout << formulaParamStr << std::endl;
-	std::cout << coloringParamStr << std::endl;
-	std::cout << "======================= END RAW PARAMETER BLOCK ================\n";	
+	// std::cout << "======================= RAW PARAMETER BLOCK ====================\n";
+	// std::cout << formulaParamStr << std::endl;
+	// std::cout << coloringParamStr << std::endl;
+	// std::cout << "======================= END RAW PARAMETER BLOCK ================\n";	
 	std::string parameterLine;
 	std::string kernelParameterBlock = fillKernelParamBlock(sf, fullStr, fPar);
 	kernelParameterBlock += fillKernelParamBlock(sc, fullStr, cPar);
 	trimTrailingCharacters(kernelParameterBlock, ",\n");
-	std::cout << "======================= KERNEL PARAMETER BLOCK =================\n";
-	std::cout << kernelParameterBlock << std::endl;
-	std::cout << "======================= END KERNEL PARAMETER BLOCK =============\n";
+	// std::cout << "======================= KERNEL PARAMETER BLOCK =================\n";
+	// std::cout << kernelParameterBlock << std::endl;
+	// std::cout << "======================= END KERNEL PARAMETER BLOCK =============\n";
 	paramCollector pc = parseKernelParameterBlock(kernelParameterBlock);
 	fullStr = std::regex_replace(fullStr, std::regex(kernelArgFlag), kernelParameterBlock);
 	return pc;
 }
 
-void clFractal::makeCLCode()
+void clFractal::makeCLCode(const bool newFiles)
 {
 	std::string full_template("clFragments/full_template.cl");
 	std::string fullTemplateStr = readCLFragmentFromFile(full_template);
@@ -250,8 +250,9 @@ void clFractal::makeCLCode()
 	paramCollector pc = parseParameters(fullTemplateStr, fractalFormulaStr, coloringAlgorithmStr);
 	// std::cout << "AFTER:\n" << fullTemplateStr << std::endl;
 
-	clFractal cf;
+	// clFractal cf;
 	this->fullCLcode = fullTemplateStr;
-	this->params = pc;
+	if (newFiles)
+		this->params = pc;
 	
 }
