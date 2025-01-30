@@ -109,7 +109,6 @@ cl_double2 imgCoordinateCenterAfterZoom(clFractal& cf, fractalNavigationParamete
 		nav.dragStart.x - (nav.dragStart.x - (double)cf.image.size.x / 2.) / nav.dragZoomFactor,
 		nav.dragStart.y - (nav.dragStart.y - (double)cf.image.size.y / 2.) / nav.dragZoomFactor
 	};
-	std::cout << "RET = (" << ret.x << ", " << ret.y << ")\n";
 	return ret;
 }
 
