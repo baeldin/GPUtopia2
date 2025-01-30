@@ -78,12 +78,12 @@ public:
     // methods for setting arguments
     template <typename T>
     cl::Buffer setBufferKernelArg(cl::Kernel& currentKernel, int k, T* data, size_t size, cl_mem_flags mem_flag,
-        const char* name, cl_int* err_out);
-    void setReusedBufferArgument(cl::Kernel& currentKernel, int k, cl::Buffer& buff, const char* name = "unnamed_reused_buffer_kernel_arg");
+        const char* name, cl_int* err_out, const int verbosity);
+    void setReusedBufferArgument(cl::Kernel& currentKernel, int k, cl::Buffer& buff, const char* name = "unnamed_reused_buffer_kernel_arg", const int verbosity = 99);
     template <typename T>
-    cl_int setKernelArg(cl::Kernel& currentKernel, int arg_idx, T& arg, const char* name = "unnamed_kernel_arg");
+    cl_int setKernelArg(cl::Kernel& currentKernel, int arg_idx, T& arg, const char* name = "unnamed_kernel_arg", const int verbosity = 99);
     template <typename T>
-    void setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::pair<T, int>>& map);
+    void setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::pair<T, int>>& map, const int verbosity = 99);
     
     void setFractalParameterArgs(clFractal& cf);
     void setImgKernelArguments(clFractal& cf);
