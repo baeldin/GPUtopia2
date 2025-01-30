@@ -370,3 +370,4 @@ FodyWeavers.xsd
 # Ignore installed packages from vcpkg
 vcpkg_installed/
 /GPUtopia2/imgui.ini
+/GPUtopia2/*.clf
