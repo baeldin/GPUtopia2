@@ -5,54 +5,41 @@
 void formulaSettingsWindow(clFractal& cf, clCore& cc)
 {
 	ImGui::Begin("Formulas");
-	// formula CL fragment
-	static std::string formulaCLFragment = cf.fractalCLFragmentFile; 
-	// formulaCLFragment = "clFragments/fractalFormulas/mandelbrot.cl";
 	if (ImGui::Button("Load Formula"))
 	{
 		bool success = false;
-		std::string newFormulaCLFragment;
-		openFileDialog(newFormulaCLFragment, success);
+		std::string newFractalCLFragment;
+		openFileDialog(newFractalCLFragment, success);
 		if (success)
-			cf.fractalCLFragmentFile = newFormulaCLFragment;
-		std::cout << "Setting formula fragment to " << formulaCLFragment << "\n";
+			cf.fractalCLFragmentFileUi = newFractalCLFragment;
 	}
-	ImGui::InputText("##formulaCLFragment", (char*)formulaCLFragment.c_str(), 100);
 	// coloring CL fragment
-	static std::string coloringCLFragment = cf.coloringCLFragmentFile; 
 	if (ImGui::Button("Load Coloring"))
 	{
 		bool success = false;
-		std::string newFormulaCLFragment;
-		openFileDialog(newFormulaCLFragment, success);
+		std::string newColoringCLFragment;
+		openFileDialog(newColoringCLFragment, success);
 		if (success)
-			cf.coloringCLFragmentFile = newFormulaCLFragment;
-		std::cout << "Setting coloring fragment to " << formulaCLFragment << "\n";
+			cf.coloringCLFragmentFileUi = newColoringCLFragment;
 	}
-	ImGui::InputText("##coloringCLFragment", (char*)coloringCLFragment.c_str(), 100);
-	if (ImGui::Button("Reload all CL Fragments"))
+	if (ImGui::Button("Reload CL Fragments"))
 	{
-		cf.fractalCLFragmentFile = formulaCLFragment;
-		cf.coloringCLFragmentFile = coloringCLFragment;
-		cf.makeCLCode();
+		cf.makeCLCode(SAME_FILES);
 		cf.buildKernel = true;
 		cc.resetCore();
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Load AA diag"))
 	{
-		cf.fractalCLFragmentFile = "clFragments/diag_AA.cl";
-		cf.coloringCLFragmentFile = "clFragments/diag_AA_col.cl";
-		cf.makeCLCode();
-		cf.buildKernel = true;
-		cc.resetCore();
+		cf.fractalCLFragmentFileUi = "clFragments/diag_AA.cl";
+		cf.coloringCLFragmentFileUi = "clFragments/diag_AA_col.cl";
 	}
 	static bool useDouble = cf.useDouble;
 	ImGui::Checkbox("Double Precision", &useDouble);
 	if (!useDouble == cf.useDouble)
 	{
 		cf.useDouble = useDouble;
-		cf.makeCLCode();
+		cf.makeCLCode(SAME_FILES);
 		cf.buildKernel = true;
 		cc.resetCore();
 	}
@@ -101,19 +88,5 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 	}
 	ImGui::Image((void*)(intptr_t)gradientTextureID, ImVec2(400, 20));
 	ImGui::Checkbox("Vomit pixel contents", &cf.vomit);
-	if (cf.fractalCLFragmentFile != formulaCLFragment)
-	{
-		cf.fractalCLFragmentFile = formulaCLFragment;
-		cf.makeCLCode();
-		cf.buildKernel = true;
-		cc.resetCore();
-	}
-	if (cf.coloringCLFragmentFile != coloringCLFragment)
-	{
-		cf.coloringCLFragmentFile = coloringCLFragment;
-		cf.makeCLCode();
-		cf.buildKernel = true;
-		cc.resetCore();
-	}
 	ImGui::End();
 }
