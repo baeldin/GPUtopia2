@@ -281,6 +281,9 @@
     <None Include="clFragments\fractalFormulas\error.cl">
       <Filter>OpenCL Files\formulas</Filter>
     </None>
+    <None Include="clFragments\coloringAlgorithms\gaussian_integer.cl">
+      <Filter>OpenCL Files\coloring</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="clFragments\coloringAlgorithms\smoothMandelbroth.cl">

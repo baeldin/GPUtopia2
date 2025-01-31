@@ -198,6 +198,7 @@
     <None Include="clFragments\coloringAlgorithms\by_iteration.cl" />
     <None Include="clFragments\coloringAlgorithms\debug_gradient.cl" />
     <None Include="clFragments\coloringAlgorithms\dist.cl" />
+    <None Include="clFragments\coloringAlgorithms\gaussian_integer.cl" />
     <None Include="clFragments\colors.cl" />
     <None Include="clFragments\complex.cl" />
     <None Include="clFragments\diag_AA.cl" />
