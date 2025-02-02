@@ -4,11 +4,11 @@ float parameter expI = 0.;
 __init:
 //=====| fractal formula init
         complex z = z0;
-        complex exp = (complex)(@expR, @expI);   
+        complex exp1 = (complex)(@expR, @expI);   
 __loop:
 //=========| fractal formula loop
             z = fabs(z);
-            z = cpow(z, exp) + z0;
+            z = cpow(z, exp1) + z0;
 __bailout:
 //=| factal bailout function
     // must always define bool bailedout!!!
