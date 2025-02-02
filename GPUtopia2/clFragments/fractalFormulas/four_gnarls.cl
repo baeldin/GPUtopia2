@@ -1,25 +1,25 @@
 __parameters:
-    real parameter c1 = 0.01f;
-    real parameter f1 = 5.f
-    real parameter c2 = 0.01f;
-    real parameter f2 = 10.f
-    real parameter pentarlOffset = 0.2f;
-    real parameter offsetReal = 0.f;
-    real parameter offsetImag = 0.001f;
+    float parameter c1 = 0.01f;
+    float parameter f1 = 5.f
+    float parameter c2 = 0.01f;
+    float parameter f2 = 10.f
+    float parameter pentarlOffset = 0.2f;
+    float parameter offsetReal = 0.f;
+    float parameter offsetImag = 0.001f;
 __init:
 //=====| fractal formula init
         complex z = z0;
-        real os = @pentarlOffset;
+        const real os = @pentarlOffset;
         const real pi = 3.1415926f;
         const real deg2rad = pi / 180.f;
-        real a1 = cos(deg2rad * 72.f);
-        real a2 = cos(deg2rad * 144.f);
-        real a3 = a1;
-        real a4 = a2;
-        real b1 = sin(deg2rad * 72.f);
-        real b2 = sin(deg2rad * 144.f);
-        real b3 = -b1;
-        real b4 = -b2; 
+        const real a1 = cos(deg2rad * 72.f);
+        const real a2 = cos(deg2rad * 144.f);
+        const real a3 = a1;
+        const real a4 = a2;
+        const real b1 = sin(deg2rad * 72.f);
+        const real b2 = sin(deg2rad * 144.f);
+        const real b3 = -b1;
+        const real b4 = -b2; 
 __loop:
 //=========| fractal formula loop
             z += (real2)(
