@@ -155,6 +155,7 @@ struct clFractalMinimal
 	float gamma;
 	float vibrancy;
 	int maxIter;
+	double bailout;
 	int mode;
 	int pointSelection;
 	bool useDouble;
@@ -172,7 +173,7 @@ struct clFractalMinimal
 	clFractalMinimal(const clFractal* cf);
 	NLOHMANN_DEFINE_TYPE_INTRUSIVE(clFractalMinimal,
 		centerX, centerY, zoom, angle, sizeX, sizeY, quality,
-		brightness, gamma, vibrancy, maxIter, mode, pointSelection,
+		brightness, gamma, vibrancy, maxIter, bailout, mode, pointSelection, useDouble,
 		fractalIntParameters, fractalFloatParameters, fractalBoolParameters,
 		coloringIntParameters, coloringFloatParameters, coloringBoolParameters,
 		gradientColors, gradientFillOrder,

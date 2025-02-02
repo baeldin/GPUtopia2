@@ -15,6 +15,7 @@ clFractalMinimal::clFractalMinimal(const clFractal* cf)
     gamma = cf->flameRenderSettings.y;
     vibrancy = cf->flameRenderSettings.z;
     maxIter = cf->maxIter;
+    bailout = cf->bailout;
     mode = cf->mode;
     useDouble = cf->useDouble;
     pointSelection = cf->flamePointSelection;
@@ -50,6 +51,7 @@ clFractal::clFractal(const clFractalMinimal& cfm)
     this->flameRenderSettings.y = cfm.gamma;
     this->flameRenderSettings.z = cfm.vibrancy;
     this->maxIter = cfm.maxIter;
+    this->bailout = cfm.bailout;
     this->mode = cfm.mode;
     this->useDouble = cfm.useDouble;
     this->flamePointSelection = cfm.pointSelection;
@@ -71,7 +73,11 @@ clFractal::clFractal(const clFractalMinimal& cfm)
     }
     this->gradient = Gradient(cfm.gradientColors.size(), nodeColors, nodeLocations, cfm.gradientFillOrder);
     this->fractalCLFragmentFile = cfm.fractalCLFragmentFile;
+    this->fractalCLFragmentFileUi = cfm.fractalCLFragmentFile;
+    this->fractalCLFragmentFileHist= cfm.fractalCLFragmentFile;
     this->coloringCLFragmentFile = cfm.coloringCLFragmentFile;
+    this->coloringCLFragmentFileUi = cfm.coloringCLFragmentFile;
+    this->coloringCLFragmentFileHist = cfm.coloringCLFragmentFile;
 }
 
 // update coordinates within the complex plane if zoom or aspect ratio is changed
