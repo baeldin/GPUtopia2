@@ -216,9 +216,20 @@ namespace mainView
 					// redo
 				}
 				ImGui::EndMenu();
-
 			}
-			ImGui::EndMainMenuBar();
+			if (ImGui::BeginMenu("Fractal"))
+			{
+				if (ImGui::MenuItem("Reset Location"))
+				{
+					cf.image.center.x = 0.;
+					cf.image.center.y = 0.;
+					cf.image.zoom = 1.;
+					cf.image.angle = 0.;
+					cf.image.updateComplexSubplane();
+				}
+				ImGui::EndMenu();
+			}
+				ImGui::EndMainMenuBar();
 		}
 		ImGui::Begin("Main View", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 		static paramCollector params_old = cf.params;
