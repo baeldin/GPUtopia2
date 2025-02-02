@@ -121,6 +121,12 @@ namespace mainView
 						json back_json = json::parse(jsonStr);
 						auto cfm = back_json.get<clFractalMinimal>();
 						cf = clFractal(cfm);
+						cf.makeCLCode(SAME_FILES);
+						cf.image.size.x = 800;
+						cf.image.size.y = 600;
+						// cf.buildKernel = true;
+						core.resetCore();
+						core.compileFractalKernel(cf.fullCLcode);
 					}
 				}
 				if (ImGui::MenuItem("Save As"))
@@ -254,6 +260,12 @@ namespace mainView
 				if (cf.newColoringCLFragmentQueued())
 					cf.popColoringCLFragmentQueue();
 				cf.makeCLCode(NEW_FILES);
+				core.resetCore();
+				core.compileFractalKernel(cf.fullCLcode);
+			}
+			if (cf.useDouble != cf_old.useDouble)
+			{
+				cf.makeCLCode(SAME_FILES);
 				core.resetCore();
 				core.compileFractalKernel(cf.fullCLcode);
 			}
