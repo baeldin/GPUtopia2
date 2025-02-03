@@ -262,14 +262,17 @@ void clCore::getImg(std::vector<color>& img, clFractal& cf) const
 
 void runFractalKernelAsync(clFractal& cf, clCore& cc)
 {
-    cl_int err = 0;
-    cl_int3 sampling_info = {
-        cf.image.current_sample_count,
-        cf.image.current_sample_count + 1,
-        cf.image.target_sample_count };
-    err = cc.setKernelArg(cc.fractalKernel.kernel, 3, sampling_info, "sampling_info", cf.verbosity);
-    cc.runFractalKernel(cf);
-    cf.image.current_sample_count += 1;
+    while (cf.image.current_sample_count < cf.image.next_update_sample_count && !cf.stop)
+    {
+        cl_int err = 0;
+        cl_int3 sampling_info = {
+            cf.image.current_sample_count,
+            cf.image.current_sample_count + 1,
+            cf.image.target_sample_count };
+        err = cc.setKernelArg(cc.fractalKernel.kernel, 3, sampling_info, "sampling_info", cf.verbosity);
+        cc.runFractalKernel(cf);
+        cf.image.current_sample_count += 1;
+    }
     cf.status.kernelRunning = false;
 }
 

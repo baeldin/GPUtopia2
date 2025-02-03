@@ -264,47 +264,52 @@ namespace mainView
 		}
 		// 
 		if (cf != cf_old) { //}&& waitCounter == 0) {
-			if (cf.newCLFragmentQueued())
+			cf.stop = true;
+			if (!cf.running());
 			{
-				if (cf.newFractalCLFragmentQueued())
-					cf.popFractalCLFragmentQueue();
-				if (cf.newColoringCLFragmentQueued())
-					cf.popColoringCLFragmentQueue();
-				cf.makeCLCode(NEW_FILES);
-				core.resetCore();
-				core.compileFractalKernel(cf.fullCLcode);
-			}
-			if (cf.useDouble != cf_old.useDouble)
-			{
-				cf.makeCLCode(SAME_FILES);
-				core.resetCore();
-				core.compileFractalKernel(cf.fullCLcode);
-			}
-			cf.image.updateComplexSubplane();
-			core.setDefaultFractalArguments(cf);
-			core.setFractalParameterArgs(cf);
-			cf.image.resetStatus();
-			cf.status.runKernel = true;
-			cf.timings.erase(cf.timings.begin(), cf.timings.end());
-			cf.status.done = false;
-			if (historyIndex < history.size() - 1)
-			{
-				std::cout << "We are not at the end of history, but the fractal was changed:\n";
-				const int historyEnd = history.size();
-				for (int ii = historyIndex; ii < historyEnd; ii++)
+				if (cf.newCLFragmentQueued())
 				{
-					std::cout << "Popping history[" << ii << "]\n";
-					history.pop_back();
+					if (cf.newFractalCLFragmentQueued())
+						cf.popFractalCLFragmentQueue();
+					if (cf.newColoringCLFragmentQueued())
+						cf.popColoringCLFragmentQueue();
+					cf.makeCLCode(NEW_FILES);
+					core.resetCore();
+					core.compileFractalKernel(cf.fullCLcode);
 				}
-				historyIndex--;
+				if (cf.useDouble != cf_old.useDouble)
+				{
+					cf.makeCLCode(SAME_FILES);
+					core.resetCore();
+					core.compileFractalKernel(cf.fullCLcode);
+				}
+				cf.image.updateComplexSubplane();
+				core.setDefaultFractalArguments(cf);
+				core.setFractalParameterArgs(cf);
+				cf.image.resetStatus();
+				cf.status.runKernel = true;
+				cf.timings.erase(cf.timings.begin(), cf.timings.end());
+				cf.status.done = false;
+				if (historyIndex < history.size() - 1)
+				{
+					std::cout << "We are not at the end of history, but the fractal was changed:\n";
+					const int historyEnd = history.size();
+					for (int ii = historyIndex; ii < historyEnd; ii++)
+					{
+						std::cout << "Popping history[" << ii << "]\n";
+						history.pop_back();
+					}
+					historyIndex--;
+					std::cout << "##################################\nHistory index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
+				}
+				history.push_back(cf.toExport());
+				historyIndex++;
+				undone = false;
+				redone = false;
 				std::cout << "##################################\nHistory index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
+				cf_old = cf;
+				cf.stop = false;
 			}
-			history.push_back(cf.toExport());
-			historyIndex++;
-			undone = false;
-			redone = false;
-			std::cout << "##################################\nHistory index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
-			cf_old = cf;
 		}
 		glViewport(0, 0, mainViewportSize.x, mainViewportSize.y);
 		// first draw the image
