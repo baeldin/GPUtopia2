@@ -6,27 +6,36 @@ void infoWindow(clFractal& cf, fractalNavigationParameters& nav, ImFont* font_mo
 	ImGui::Begin("Info");
 	if (ImGui::TreeNode("Full OpenCL Code"))
 	{
-		//ImGui::TextWrapped("lolwhat"); // cf.fullCLcode.c_str());
-		static char* text = (char*)" ";
-		static uint32_t txtLen = 0;
-		static std::string strCode;
-		static std::stringstream issCode;
-		static std::istringstream issCodeRaw = std::istringstream(cf.fullCLcode);
-		if (ImGui::Button("reload")) 
+		// Using a static vector to hold the text buffer
+		static std::vector<char> textBuffer;
+
+		if (ImGui::Button("reload"))
 		{
+			std::stringstream issCode;
 			uint32_t lineNumber = 0;
+			std::istringstream issCodeRaw(cf.fullCLcode);
 			for (std::string line; std::getline(issCodeRaw, line); )
 			{
 				lineNumber++;
 				issCode << std::setw(5) << std::setfill(' ') << lineNumber << " " << line << "\n";
-				
 			}
-			strCode = issCode.str();
-			text = strCode.data();
+			std::string strCode = issCode.str();
+
+			// Resize buffer to fit new string, including null terminator.
+			textBuffer.resize(strCode.size() + 1);
+			memcpy(textBuffer.data(), strCode.c_str(), strCode.size() + 1);
 		}
-		static ImGuiInputTextFlags flags = 1 << 14; // read only ImGuiInputTextFlags_AllowTabInput;
+
+		// If textBuffer is empty, initialize it to an empty string.
+		if (textBuffer.empty())
+			textBuffer.push_back('\0');
+
+		// If you want it to be read-only, add the read-only flag.
+		static ImGuiInputTextFlags flags = ImGuiInputTextFlags_ReadOnly;
+
 		ImGui::PushFont(font_mono);
-		ImGui::InputTextMultiline("##source", text, IM_ARRAYSIZE(text), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 30), flags);
+		ImGui::InputTextMultiline("##source", textBuffer.data(), textBuffer.size(),
+			ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 30), flags);
 		ImGui::PopFont();
 		ImGui::TreePop();
 	}
