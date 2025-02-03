@@ -200,6 +200,7 @@ public:
 	std::vector<int> imgIntRGBAData;
 	std::vector<color> imgData;
 	std::vector<double> timings = { 0 };
+	bool stop = false;
 	bool useDouble = false;
 	bool vomit = false;
 	int mode = 0;
