@@ -371,3 +371,4 @@ FodyWeavers.xsd
 vcpkg_installed/
 /GPUtopia2/imgui.ini
 /GPUtopia2/*.clf
+/GPUtopia2/clFragments/fractalFormulas/wide pentarls
