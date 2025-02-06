@@ -5,23 +5,35 @@
 void formulaSettingsWindow(clFractal& cf, clCore& cc)
 {
 	ImGui::Begin("Formulas");
+	static std::string formulaName = "Mandelbrot";
 	if (ImGui::Button("Load Formula"))
 	{
 		bool success = false;
 		std::string newFractalCLFragment;
-		openFileDialog(newFractalCLFragment, success);
+		openFileDialog(newFractalCLFragment, success, L"cl", L"GPUtopia CL Fragment (*.cl)");
 		if (success)
+		{
 			cf.fractalCLFragmentFileUi = newFractalCLFragment;
+			std::filesystem::path p(newFractalCLFragment);
+			formulaName = p.stem().string();
+		}
 	}
+	ImGui::Text(formulaName.c_str());
 	// coloring CL fragment
+	static std::string coloringName = "by_iteration";
 	if (ImGui::Button("Load Coloring"))
 	{
 		bool success = false;
 		std::string newColoringCLFragment;
-		openFileDialog(newColoringCLFragment, success);
+		openFileDialog(newColoringCLFragment, success, L"cl", L"GPUtopia CL Fragment (*.cl)");
 		if (success)
+		{
 			cf.coloringCLFragmentFileUi = newColoringCLFragment;
+			std::filesystem::path p(newColoringCLFragment);
+			coloringName = p.stem().string();
+		}
 	}
+	ImGui::Text(coloringName.c_str());
 	if (ImGui::Button("Reload CL Fragments"))
 	{
 		cf.makeCLCode(SAME_FILES);

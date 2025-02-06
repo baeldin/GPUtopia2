@@ -9,6 +9,13 @@
 // #include <locale>
 // #include <codecvt>
 #include <cstdlib>
+#include <comdef.h>
+#include <sstream>
 
-void openFileDialog(std::string& fileName, bool& success);
+void openFileDialog(std::string& fileName,
+    bool& success,
+    const std::wstring& defaultExt = L"clf",
+    const std::wstring& filterDescription = L"GPUtopia Fractal (*.clf)");
+    
 void saveFileDialog(std::string& fileName, bool& success);
+
