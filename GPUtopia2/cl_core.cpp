@@ -26,9 +26,32 @@ void clCore::setContext()
 
 void clCore::setQueue()
 {
-    this->queue = cl::CommandQueue(this->context, this->device, 0, &this->queueError);
-    if (this->queueError != CL_SUCCESS) {
-        std::cout << "Failed to create command queue. Error code: " << this->queueError << std::endl;
+    // Query for the extension support first.
+    if (this->device.getInfo<CL_DEVICE_EXTENSIONS>().find("cl_khr_priority_hints") != std::string::npos)
+    {
+        cl_queue_properties props[] = {
+            CL_QUEUE_PRIORITY_KHR, CL_QUEUE_PRIORITY_LOW_KHR,
+            0
+        };
+        // Create the command queue using the C API.
+        cl_command_queue cq = clCreateCommandQueueWithProperties(context(), device(), props, &this->queueError);
+        if (this->queueError != CL_SUCCESS)
+        {
+            std::cerr << "clCreateCommandQueueWithProperties failed with error: " << this->queueError << "\n";
+            // Fall back to a default queue.
+            this->queue = cl::CommandQueue(context, device, 0, &this->queueError);
+        }
+
+        // Wrap the cl_command_queue in a cl::CommandQueue.
+        this->queue = cl::CommandQueue(cq);
+    }
+    else
+    {
+        // Extension not supported; create a default command queue.
+        this->queue = cl::CommandQueue(this->context, this->device, 0, &this->queueError);
+        if (this->queueError != CL_SUCCESS) {
+            std::cout << "Failed to create command queue. Error code: " << this->queueError << std::endl;
+        }
     }
 }
 
@@ -37,7 +60,7 @@ cl_int clCore::compileNewKernel(clKernelContainer& kc, const std::string& fullCL
 {
     std::vector<std::string> programStrings{ fullCLcode };
     kc.program = cl::Program(this->context, programStrings, &kc.errors.programError);
-    kc.errors.compileError = kc.program.build({ this->device }); // "-cl-std=CL2.0" could be added here if needed.
+    kc.errors.compileError = kc.program.build({ this->device }, "-cl-std=CL2.0");
     if (kc.errors.compileError != CL_SUCCESS) {
         kc.program.getBuildInfo(this->device, CL_PROGRAM_BUILD_LOG, &kc.buildLog);
         return kc.errors.compileError;
