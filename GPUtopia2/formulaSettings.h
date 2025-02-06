@@ -2,6 +2,8 @@
 
 #define CL_USE_DEPRECATED_OPENCL_2_2_APIS
 
+#include <filesystem>
+
 #include "GL/glew.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"

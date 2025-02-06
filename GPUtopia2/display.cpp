@@ -107,11 +107,23 @@ namespace mainView
 			{
 				// Disabling fullscreen would allow the window to be moved to the front of other windows,
 				// which we can't undo at the moment without finer window depth/z control.
+				if (ImGui::MenuItem("New"))
+				{
+					cf = clFractal();
+					cf.makeCLCode(NEW_FILES);
+					cf.image.size.x = 1280;
+					cf.image.size.y = 720;
+					cf.image.resetStatus();
+					cf.image.updateComplexSubplane();
+					core.resetCore();
+					core.compileFractalKernel(cf.fullCLcode);
+				}
 				if (ImGui::MenuItem("Open"))
 				{
 					std::string path;
 					bool success = false;
-					openFileDialog(path, success);
+
+					openFileDialog(path, success, L"clf", L"GPUtopia Fractals (*.clf)");
 					if (success)
 					{
 						std::ifstream inFile(path);
