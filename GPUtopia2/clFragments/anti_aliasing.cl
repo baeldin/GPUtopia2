@@ -1,10 +1,10 @@
 // constants and functions used for anti-aliasing and
 // calculating subpixel coordinates of samples
 
-const real phi = 1.618033988749f;
-const real phi2 = 1.324717957244f;
-const real inv_phi2A = 1.f / phi2;
-const real inv_phi2B = 1.f / (phi2 * phi2);
+__constant real phi = 1.618033988749f;
+__constant real phi2 = 1.324717957244f;
+__constant real inv_phi2A = 1.f / phi2;
+__constant real inv_phi2B = 1.f / (phi2 * phi2);
 
 real fracf(const real x) { return x - floor(x); }
 real absf(const real x) { return x * sign(x); }
@@ -59,11 +59,11 @@ ulong lowbias64(ulong x)
 
 // 32 bit offset using 64 bit ints
 #ifdef USE_DOUBLE
-const double R2scale = 1.0 / (1ul << 53);
-const int bit_offset = 11;
+__constant double R2scale = 1.0 / (1ul << 53);
+__constant int bit_offset = 11;
 #else
-const float R2scale = 1.0f / (1 << 24);
-const int bit_offset = 40;
+__constant float R2scale = 1.0f / (1 << 24);
+__constant int bit_offset = 40;
 #endif
 real2 R2_offset(const uint idx, const uint s)
 {

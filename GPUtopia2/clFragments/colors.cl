@@ -6,13 +6,13 @@ float clampZeroToOne(const float x)
 	return fmax(0.f, fmin(1.f, x));
 }
 
-const float a = 1.f / 12.92f;
-const float b = 1.f / 1.055f;
+__constant float a = 1.f / 12.92f;
+__constant float b = 1.f / 1.055f;
 float fsRGBtoLinear(const float x) {
 	return (clampZeroToOne(x) <= 0.04045f) ? clampZeroToOne(x) * a : pow((clampZeroToOne(x) + 0.055f) * b, 2.4f);
 }
 
-const float invGamma = 1.f / 2.4f;
+__constant float invGamma = 1.f / 2.4f;
 float flinearToSRGB(const float x) {
 	return (clampZeroToOne(x) <= 0.0031308f) ? clampZeroToOne(x) * 12.92f : 1.055f * pow(clampZeroToOne(x), invGamma) - 0.055f;
 }
@@ -52,7 +52,7 @@ int4 toIntColor(const float4 color)
 
 // get a color from a gradient via linear interpolation
 // TODO: figure out why the function fails at the rollover point
-int4 getColor(const float4* colors, const float idxIn, const int nColors)
+int4 getColor(const __global float4* colors, const float idxIn, const int nColors)
 {
 	const float fidx = idxIn - floor(idxIn);
 	const int colorIndex1 = (int)floor(fidx * nColors) % nColors;
@@ -65,7 +65,7 @@ int4 getColor(const float4* colors, const float idxIn, const int nColors)
 }
 
 #ifdef FLAME
-void setColor(atomic_uint* colorsRGBA, const int4 col, const int pixelIndex)
+void setColor(__global atomic_uint* colorsRGBA, const int4 col, const int pixelIndex)
 {
 	atomic_fetch_add_explicit(&colorsRGBA[4 * pixelIndex    ], col.x, memory_order_relaxed, memory_scope_device); // , memory_scope_device);
 	atomic_fetch_add_explicit(&colorsRGBA[4 * pixelIndex + 1], col.y, memory_order_relaxed, memory_scope_device);
@@ -73,7 +73,7 @@ void setColor(atomic_uint* colorsRGBA, const int4 col, const int pixelIndex)
 	atomic_fetch_add_explicit(&colorsRGBA[4 * pixelIndex + 3], col.w, memory_order_relaxed, memory_scope_device);
 }
 #else
-void setColor(uint* colorsRGBA, const int4 col, const int pixelIndex)
+void setColor(__global uint* colorsRGBA, const int4 col, const int pixelIndex)
 {
 	colorsRGBA[4 * pixelIndex    ] += col.x;
 	colorsRGBA[4 * pixelIndex + 1] += col.y;

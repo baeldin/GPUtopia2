@@ -69,6 +69,7 @@ __kernel void computeLoop(
     bool use_point = true;
     // check if point is to be used
     {
+        int4 outColor = { 0, 0, 0, 0 };
         for (int s = sampling.x; s < sampling.y; s++)
         {
             const real2 R2 = R2_offset(pixelIdx, s);
@@ -112,6 +113,7 @@ __kernel void computeLoop(
                 //@__coloringFinal
             }
         }
+        setColor(colorsRGBA, outColor, pixelIdx);
     }
 }
 

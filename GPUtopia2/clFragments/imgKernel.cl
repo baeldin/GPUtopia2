@@ -4,11 +4,11 @@ float clampZeroToOne(const float x)
 }
 
 
-const float a = 1.f / 12.92f;
-const float b = 1.f / 1.055f;
-const float inv256 = 1.f / 256.f;
+__constant float a = 1.f / 12.92f;
+__constant float b = 1.f / 1.055f;
+__constant float inv256 = 1.f / 256.f;
+__constant float invGamma = 1.f / 2.4f;
 
-const float invGamma = 1.f / 2.4f;
 float flinearToSRGB(const float x) {
     return (clampZeroToOne(x) <= 0.0031308f) ? clampZeroToOne(x) * 12.92f : 1.055f * pow(clampZeroToOne(x), invGamma) - 0.055f;
 }
@@ -43,7 +43,7 @@ __kernel void imgProcessing(
     if (mode == 0)
     {
         // do ET stuff
-        const float invFactor = 1.f / (float)(256 * sampling.y);
+        const float invFactor = 1.f / (float)(256 * sampling.x);
         outColors[i] = linearToSRGB(invFactor * convert_float4(inColorsRGBA[i]));
     }
     else if (mode == 1) // something something log
