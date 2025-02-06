@@ -3,6 +3,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <mutex>
 
 #include "json.hpp"
 using json = nlohmann::json;
@@ -180,6 +181,8 @@ struct clFractalMinimal
 		fractalCLFragmentFile, coloringCLFragmentFile);
 };
 
+inline std::mutex timingMutex;
+
 // Fractal class that holds parameters, names of the code fragmens, and the full
 // CL code of the fractal + coloring
 class clFractal
@@ -199,7 +202,7 @@ public:
 	std::string fullCLcode = "";
 	std::vector<int> imgIntRGBAData;
 	std::vector<color> imgData;
-	std::vector<double> timings = { 0 };
+	std::vector<float> timings;
 	bool stop = false;
 	bool useDouble = false;
 	bool vomit = false;
@@ -207,6 +210,7 @@ public:
 	bool buildKernel = false;
 	int maxIter = 100;
 	float bailout = 4.f;
+	int samples_per_kernel_run = 1;
 	// brightness, gamma, vibrancy
 	cl_float4 flameRenderSettings = { 4.f, 2.f, 1.f, 0.f };
 	cl_int flamePointSelection = 0;

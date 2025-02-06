@@ -129,7 +129,10 @@ void clCore::runFractalKernel(clFractal& cf) const
     this->queue.finish();
     auto t2 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
-    cf.timings.push_back(time_span.count());
+    {
+        std::lock_guard<std::mutex> guard(timingMutex);
+        cf.timings.push_back(static_cast<float>(time_span.count()));
+    }
 }
 
 void clCore::compileImgKernel()
@@ -148,7 +151,7 @@ void clCore::setImgKernelArguments(clFractal& cf)
     err = setKernelArg(this->imgKernel.kernel, 5, cf.flameRenderSettings.x, "flame render brightness", cf.verbosity);
     err = setKernelArg(this->imgKernel.kernel, 6, cf.flameRenderSettings.y, "flame render gamma", cf.verbosity);
     err = setKernelArg(this->imgKernel.kernel, 7, cf.flameRenderSettings.z, "flame render vibrancy", cf.verbosity);
-    this->imgKernel.argumentCount = 11;
+    this->imgKernel.argumentCount = 8;
 }
 
 void clCore::runImgKernel(clFractal& cf) const
@@ -192,12 +195,12 @@ void runFractalKernelAsync(clFractal& cf, clCore& cc)
         cl_int err = 0;
         cl_int3 sampling_info = {
             cf.image.current_sample_count,
-            cf.image.current_sample_count + 1,
+            std::min<int>(cf.image.current_sample_count + cf.samples_per_kernel_run, cf.image.target_sample_count),
             cf.image.target_sample_count
         };
         err = cc.setKernelArg(cc.fractalKernel.kernel, static_cast<int>(FractalKernelArg::SAMPLING_INFO), sampling_info, "sampling_info", cf.verbosity);
         cc.runFractalKernel(cf);
-        cf.image.current_sample_count += 1;
+        cf.image.current_sample_count = sampling_info.y;
     }
     cf.status.kernelRunning = false;
 }
@@ -207,7 +210,7 @@ void runImgKernelAsync(clFractal& cf, clCore& cc)
     cl_int err = 0;
     cl_int3 sampling_info = {
         cf.image.current_sample_count,
-        cf.image.current_sample_count,
+        std::min<int>(cf.image.current_sample_count + cf.samples_per_kernel_run, cf.image.target_sample_count),
         cf.image.target_sample_count
     };
     const uint32_t maxVal = sampling_info.y * cf.maxIter;

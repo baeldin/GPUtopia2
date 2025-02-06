@@ -122,9 +122,6 @@ namespace mainView
 						auto cfm = back_json.get<clFractalMinimal>();
 						cf = clFractal(cfm);
 						cf.makeCLCode(SAME_FILES);
-						cf.image.size.x = 800;
-						cf.image.size.y = 600;
-						// cf.buildKernel = true;
 						core.resetCore();
 						core.compileFractalKernel(cf.fullCLcode);
 					}
@@ -283,11 +280,12 @@ namespace mainView
 					core.resetCore();
 					core.compileFractalKernel(cf.fullCLcode);
 				}
-				cf.image.updateComplexSubplane();
 				core.setDefaultFractalArguments(cf);
 				core.setFractalParameterArgs(cf);
+				cf.image.updateComplexSubplane();
 				cf.image.resetStatus();
 				cf.status.runKernel = true;
+				cf.status.runImgKernel = false;
 				cf.timings.erase(cf.timings.begin(), cf.timings.end());
 				cf.status.done = false;
 				if (historyIndex < history.size() - 1)
@@ -318,10 +316,11 @@ namespace mainView
 		if (cf.status.runKernel and !cf.running() and cf.image.current_sample_count < cf.image.target_sample_count) {
 			if (cf.image.current_sample_count == 0) // if we are restarting
 			{
+				cf.image.resetStatus();
 				core.setDefaultFractalArguments(cf);
 				core.setFractalParameterArgs(cf);
 			}
-			cf.status.runKernel = false; 
+			cf.status.runKernel = false;
 			cf.status.kernelRunning = true;
 			jt = std::jthread(&runFractalKernelAsync, std::ref(cf), std::ref(core));
 			jt.detach();
@@ -336,11 +335,12 @@ namespace mainView
 		// check current image quality
 		if (!cf.running() and !cf.status.done and core.fractalKernel.errors.sum() == 0)
 		{
-			if (cf.image.current_sample_count == cf.image.next_update_sample_count)
+			if (cf.image.current_sample_count >= cf.image.next_update_sample_count)
 			{
-				cf.image.next_update_sample_count = 2* cf.image.next_update_sample_count;
-				cf.image.next_update_sample_count = cf.image.next_update_sample_count > cf.image.target_sample_count ? 
-					cf.image.target_sample_count : cf.image.next_update_sample_count;
+				while (cf.image.next_update_sample_count <= cf.image.current_sample_count)
+					cf.image.next_update_sample_count *= 2;
+				if (cf.image.next_update_sample_count > cf.image.target_sample_count)
+					cf.image.next_update_sample_count = cf.image.target_sample_count;
 				cf.status.runImgKernel = true;
 			}
 			else
