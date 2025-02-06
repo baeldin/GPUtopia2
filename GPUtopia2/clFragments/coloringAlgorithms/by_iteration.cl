@@ -9,7 +9,7 @@ __final:
 // 		// this part has to use setColors(), the components have
 // 		// to be in [0., 1.]
 //
-		int4 outColor = getColor(gradient, @colorDensity * 0.01 * iter, nColors);
-		setColor(colorsRGBA, outColor, pixelIdx);
+		outColor += getColor(gradient, @colorDensity * 0.01 * iter, nColors);
+		// setColor(colorsRGBA, outColor, pixelIdx);
 __functions:
 // void

@@ -14,7 +14,7 @@ __final:
 // 		// this part has to set colors[i], the components have
 // 		// to be in [0., 1.)
 //
-		int4 outColor = getColor(gradient, @colorDensity * d, nColors);
-		setColor(colorsRGBA, outColor, pixelIdx);
+		outColor += getColor(gradient, @colorDensity * d, nColors);
+		// setColor(colorsRGBA, outColor, pixelIdx);
 __functions:
 //=====| functions for use in the init, loop, and final parts
