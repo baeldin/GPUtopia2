@@ -69,7 +69,7 @@ inline const bool operator==(const paramCollector& lhs, const paramCollector& rh
 // settings for the image generated from the fractal, including default values
 struct clFractalImage
 {
-	cl_int2 size = { 1920, 1080 };
+	cl_int2 size = { 1280, 720 };
 	double aspectRatio = (double)size.x / (double)size.y;
 	Complex<double> center = Complex<double>(0., 0.);
 	Complex<double> span = Complex<double>(4., 4. / aspectRatio);
