@@ -1,10 +1,10 @@
 __parameters:
 __init:
 //=====| fractal formula init
-        float2 z = (float2)(0.f, 0.f);
+        real2 z = (real2)(0.f, 0.f);
 __loop:
 //=========| fractal formula loop
-            z = cexp((float2)(
+            z = cexp((real2)(
                 z.x * z.x - z.y * z.y + z0.x,
                 2.f * z.x * z.y + z0.y)) + z0;
 __bailout:
