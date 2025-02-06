@@ -12,4 +12,7 @@
 #include "display.h"
 #include "fractal_navigation.h"
 
+void ComputeStatistics(const std::vector<float> timings, float& average, float& median, float& stddev);
+std::vector<float> CreateBinnedHistogram(const std::vector<float> timings, int numBins, float& outMin, float& outMax);
+
 void infoWindow(clFractal& cf, fractalNavigationParameters& nav, ImFont* font_mono);
