@@ -103,48 +103,102 @@ void openFileDialog(std::string& fileName,
     CoUninitialize();
 }
 
-void saveFileDialog(std::string& fileName, bool& success)
+void saveFileDialog(std::string& fileName,
+    bool& success, const std::wstring& defaultExt,
+    const std::wstring& filterDescription)
+
 {
     success = false;
     HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
         COINIT_DISABLE_OLE1DDE);
     if (SUCCEEDED(hr))
     {
-        IFileSaveDialog* pFileSave;
-
+        IFileSaveDialog* pFileSave = nullptr;
         // Create the FileSaveDialog object.
         hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL,
             IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave));
+        if (FAILED(hr))
+        {
+            OutputDebugStringW(L"CoCreateInstance for FileSaveDialog failed.\n");
+            CoUninitialize();
+            return;
+        }
 
+        // Build a filter pattern from the default extension.
+        // E.g. if defaultExt is L"txt", then filterPattern becomes L"*.txt"
+        std::wstring filterPattern = L"*." + defaultExt;
+
+        // Setup file type filters.
+        COMDLG_FILTERSPEC rgSpec[] =
+        {
+            { filterDescription.c_str(), filterPattern.c_str() },
+            { L"All Files (*.*)", L"*.*" }
+        };
+
+        hr = pFileSave->SetFileTypes(ARRAYSIZE(rgSpec), rgSpec);
+        if (FAILED(hr))
+        {
+            std::wstringstream ws;
+            ws << L"SetFileTypes failed with hr = 0x" << std::hex << hr << L"\n";
+            OutputDebugStringW(ws.str().c_str());
+            pFileSave->Release();
+            CoUninitialize();
+            return;
+        }
+
+        hr = pFileSave->SetDefaultExtension(defaultExt.c_str());
+        if (FAILED(hr))
+        {
+            std::wstringstream ws;
+            ws << L"SetDefaultExtension failed with hr = 0x" << std::hex << hr << L"\n";
+            OutputDebugStringW(ws.str().c_str());
+            pFileSave->Release();
+            CoUninitialize();
+            return;
+        }
+
+        // Show the Save dialog box.
+        hr = pFileSave->Show(NULL);
+        if (FAILED(hr))
+        {
+            std::wstringstream ws;
+            ws << L"FileSaveDialog::Show failed with hr = 0x" << std::hex << hr << L"\n";
+            OutputDebugStringW(ws.str().c_str());
+            pFileSave->Release();
+            CoUninitialize();
+            return;
+        }
+
+        // Get the file name from the dialog box.
+        IShellItem* pItem = nullptr;
+        hr = pFileSave->GetResult(&pItem);
         if (SUCCEEDED(hr))
         {
-            // Show the Save dialog box.
-            hr = pFileSave->Show(NULL);
-
-            // Get the file name from the dialog box.
+            PWSTR pszFilePath = nullptr;
+            hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
             if (SUCCEEDED(hr))
             {
-                IShellItem* pItem;
-                hr = pFileSave->GetResult(&pItem);
-                if (SUCCEEDED(hr))
-                {
-                    PWSTR pszFilePath;
-                    hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-
-                    // Display the file name to the user.
-                    if (SUCCEEDED(hr))
-                    {
-                        std::wstring tmpFilePath(pszFilePath);
-                        size_t size;
-                        fileName.resize(tmpFilePath.length());
-                        wcstombs_s(&size, &fileName[0], fileName.size() + 1, tmpFilePath.c_str(), tmpFilePath.size());
-                        success = true;
-                    }
-                    pItem->Release();
-                }
+                std::wstring tmpFilePath(pszFilePath);
+                size_t sizeConverted = 0;
+                fileName.resize(tmpFilePath.length());
+                // Convert wide-character string to multibyte string.
+                wcstombs_s(&sizeConverted, &fileName[0], fileName.size() + 1,
+                    tmpFilePath.c_str(), tmpFilePath.size());
+                success = true;
             }
-            pFileSave->Release();
+            else
+            {
+                OutputDebugStringW(L"GetDisplayName failed.\n");
+            }
+            CoTaskMemFree(pszFilePath);
+            pItem->Release();
         }
+        else
+        {
+            OutputDebugStringW(L"GetResult failed.\n");
+        }
+
+        pFileSave->Release();
         CoUninitialize();
     }
     // return 0;

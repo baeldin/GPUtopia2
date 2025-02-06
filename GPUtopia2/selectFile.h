@@ -17,5 +17,7 @@ void openFileDialog(std::string& fileName,
     const std::wstring& defaultExt = L"clf",
     const std::wstring& filterDescription = L"GPUtopia Fractal (*.clf)");
     
-void saveFileDialog(std::string& fileName, bool& success);
+void saveFileDialog(std::string& fileName,
+    bool& success, const std::wstring& defaultExt = L"clf",
+    const std::wstring& filterDescription = L"GPUtopia Fractal (*.clf)");
 
