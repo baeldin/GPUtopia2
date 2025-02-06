@@ -105,108 +105,32 @@ namespace mainView
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				// Disabling fullscreen would allow the window to be moved to the front of other windows,
-				// which we can't undo at the moment without finer window depth/z control.
-				if (ImGui::MenuItem("New"))
-				{
-					cf = clFractal();
-					cf.makeCLCode(NEW_FILES);
-					cf.image.size.x = 1280;
-					cf.image.size.y = 720;
-					cf.image.resetStatus();
-					cf.image.updateComplexSubplane();
-					core.resetCore();
-					core.compileFractalKernel(cf.fullCLcode);
-				}
-				if (ImGui::MenuItem("Open"))
-				{
-					std::string path;
-					bool success = false;
-
-					openFileDialog(path, success, L"clf", L"GPUtopia Fractals (*.clf)");
-					if (success)
-					{
-						std::ifstream inFile(path);
-					    std:cout << path << "\n";
-						std::string jsonStr;
-						inFile >> jsonStr;
-						json back_json = json::parse(jsonStr);
-						auto cfm = back_json.get<clFractalMinimal>();
-						cf = clFractal(cfm);
-						cf.makeCLCode(SAME_FILES);
-						core.resetCore();
-						core.compileFractalKernel(cf.fullCLcode);
-					}
-				}
-				if (ImGui::MenuItem("Save As"))
-				{
-					bool success = false;
-					std::string path;
-					saveFileDialog(path, success);
-					if (success)
-					{
-						json json = cf.toExport();
-						std::ofstream outFile(path);
-						outFile << json.dump();
-						outFile.close();
-					}
-				}
-				if (ImGui::MenuItem("Export Image"))
-				{
-					bool success = false;
-					std::string fileName;
-					saveFileDialog(fileName, success);
-					if (success)
-						save_to_png(textureColors, cf.image.size.x, cf.image.size.y, (char*)fileName.c_str());
-				}
+				if (ImGui::MenuItem("New", "Ctrl+N"))
+					newCLF(cf, core);
+				if (ImGui::MenuItem("Open", "Ctrl+O"))
+					openCLF(cf, core);
+				if (ImGui::MenuItem("Save As", "Ctrl+Shift+S"))
+					saveCLF(cf);
+				if (ImGui::MenuItem("Export Image", "Ctrl+E"))
+					savePNG(textureColors, cf.image.size);
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Edit"))
 			{
-				if (ImGui::MenuItem("Undo"))
+				if (ImGui::MenuItem("Undo", "Ctrl+Z"))
 				{
 					if (historyIndex > 0)
 					{
-						historyIndex--;
-						cf = clFractal(history[historyIndex]);
-						if (cf.fractalCLFragmentFile != cf_old.fractalCLFragmentFile ||
-							cf.coloringCLFragmentFile != cf_old.coloringCLFragmentFile)
-						{
-							cf.makeCLCode();
-							// cf.buildKernel = true;
-							core.resetCore();
-							core.compileFractalKernel(cf.fullCLcode);
-						}
-						cf.image.resetStatus();
-						cf.status.runKernel = true;
-						cf.timings.erase(cf.timings.begin(), cf.timings.end());
-						cf.status.done = false;
-						cf_old = cf;
-						std::cout << "History index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
+						undo(cf, cf_old, core, history, &historyIndex);
 						redone = false;
 						undone = true;
 					}
 				}
-				if (ImGui::MenuItem("Redo"))
+				if (ImGui::MenuItem("Redo", "Ctrl+Y"))
 				{
 					if (historyIndex < history.size() - 1)
 					{
-						historyIndex++;
-						cf = clFractal(history[historyIndex]);
-						if (cf.fractalCLFragmentFile != cf_old.fractalCLFragmentFile ||
-							cf.coloringCLFragmentFile != cf_old.coloringCLFragmentFile)
-						{
-							cf.makeCLCode();
-							// cf.buildKernel = true;
-							core.resetCore();
-							core.compileFractalKernel(cf.fullCLcode);
-						}
-						cf.image.resetStatus();
-						cf.status.runKernel = true;
-						cf.timings.erase(cf.timings.begin(), cf.timings.end());
-						cf.status.done = false;
-						cf_old = cf;
-						std::cout << "History index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
+						redo(cf, cf_old, core, history, &historyIndex);
 						undone = false;
 						redone = true;
 					}
@@ -240,6 +164,25 @@ namespace mainView
 			}
 				ImGui::EndMainMenuBar();
 		}
+		// Check if Ctrl is held and the Z key was just pressed (without auto-repeat):
+		if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_N, false))
+			newCLF(cf, core);
+		if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_O, false))
+			openCLF(cf, core);
+		if (io.KeyCtrl && io.KeyShift && ImGui::IsKeyPressed(ImGuiKey_S, false))
+			saveCLF(cf);
+		if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_E, false))
+			savePNG(textureColors, cf.image.size);
+		if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Z, false))
+		{
+			// Call your function (e.g., undo)
+			undo(cf, cf_old, core, history, &historyIndex);
+		}
+		if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Y, false))
+		{
+			// Call your function (e.g., undo)
+			redo(cf, cf_old, core, history, &historyIndex);
+		}
 		ImGui::Begin("Main View", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 		static paramCollector params_old = cf.params;
 		static clFractalImage img_settings_old = cf.image;
@@ -253,17 +196,7 @@ namespace mainView
 		if (cf.flameRenderSettings != cf_old.flameRenderSettings and !cf.running()) {
 			cf.status.runImgKernel = true;
 			if (historyIndex < history.size() - 1)
-			{
-				std::cout << "We are not at the end of history, but the fractal was changed:\n";
-				const int historyEnd = history.size();
-				for (int ii = historyIndex; ii < historyEnd; ii++)
-				{
-					std::cout << "Popping history[" << ii << "]\n";
-					history.pop_back();
-				}
-				historyIndex--;
-				std::cout << "##################################\nHistory index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
-			}
+				popHistory(history, &historyIndex);
 			history.push_back(cf.toExport());
 			historyIndex++;
 			undone = false;
@@ -301,17 +234,7 @@ namespace mainView
 				cf.timings.erase(cf.timings.begin(), cf.timings.end());
 				cf.status.done = false;
 				if (historyIndex < history.size() - 1)
-				{
-					std::cout << "We are not at the end of history, but the fractal was changed:\n";
-					const int historyEnd = history.size();
-					for (int ii = historyIndex; ii < historyEnd; ii++)
-					{
-						std::cout << "Popping history[" << ii << "]\n";
-						history.pop_back();
-					}
-					historyIndex--;
-					std::cout << "##################################\nHistory index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
-				}
+					popHistory(history, &historyIndex);
 				history.push_back(cf.toExport());
 				historyIndex++;
 				undone = false;

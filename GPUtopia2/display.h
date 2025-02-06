@@ -25,6 +25,8 @@
 #include "fractal_navigation.h"
 #include "selectFile.h"
 #include "cl_error_window.h"
+#include "fileOperations.h"
+#include "history.h"
 
 using std::string;
 
