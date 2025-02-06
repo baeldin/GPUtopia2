@@ -115,7 +115,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -132,7 +132,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -154,11 +154,13 @@
     <ClInclude Include="complex_number.h" />
     <ClInclude Include="cubic_spline.h" />
     <ClInclude Include="display.h" />
+    <ClInclude Include="fileOperations.h" />
     <ClInclude Include="flameRenderSettings.h" />
     <ClInclude Include="formulaSettings.h" />
     <ClInclude Include="fractal_navigation.h" />
     <ClInclude Include="glewGuard.h" />
     <ClInclude Include="gradient.h" />
+    <ClInclude Include="history.h" />
     <ClInclude Include="imageSettings.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgExport.h" />
@@ -177,10 +179,12 @@
     <ClCompile Include="color.cpp" />
     <ClCompile Include="cubic_spline.cpp" />
     <ClCompile Include="display.cpp" />
+    <ClCompile Include="fileOperations.cpp" />
     <ClCompile Include="flameRenderSettings.cpp" />
     <ClCompile Include="formulaSettings.cpp" />
     <ClCompile Include="fractal_navigation.cpp" />
     <ClCompile Include="gradient.cpp" />
+    <ClCompile Include="hiostry.cpp" />
     <ClCompile Include="imageSettings.cpp" />
     <ClCompile Include="info.cpp" />
     <ClCompile Include="info.h" />
