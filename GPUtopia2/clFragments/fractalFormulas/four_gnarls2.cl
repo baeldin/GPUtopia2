@@ -3,8 +3,6 @@ __parameters:
     float parameter f1 = 5.f
     float parameter c2 = 0.01f;
     float parameter f2 = 10.f
-    float parameter c3 = 0.01f;
-    float parameter f3 = 15.f
     float parameter pentarlOffset = 0.2f;
     float parameter offsetReal = 0.f;
     float parameter offsetImag = 0.001f;
@@ -27,11 +25,9 @@ __loop:
             z += (real2)(
                 @c1 * stream_func_pentarls_X(@f1 * z.x, @f1 * z.y, a1, a2, a3, a4, b1, b2, b3, b4, os) + 
                 @c2 * stream_func_pentarls_X(@f2 * z.x, @f2 * z.y, a1, a2, a3, a4, b1, b2, b3, b4, os) +
-                @c3 * stream_func_pentarls_X(@f3 * z.x, @f3 * z.y, a1, a2, a3, a4, b1, b2, b3, b4, os) +
                 @offsetReal,
                 @c1 * stream_func_pentarls_Y(@f1 * z.x, @f1 * z.y, a1, a2, a3, a4, b1, b2, b3, b4, os) +
                 @c2 * stream_func_pentarls_Y(@f2 * z.x, @f2 * z.y, a1, a2, a3, a4, b1, b2, b3, b4, os) +
-                @c3 * stream_func_pentarls_Y(@f3 * z.x, @f3 * z.y, a1, a2, a3, a4, b1, b2, b3, b4, os) +
                 @offsetImag);
 __bailout:
 //=| factal bailout function
