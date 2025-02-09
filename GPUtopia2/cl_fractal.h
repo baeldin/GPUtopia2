@@ -313,7 +313,7 @@ inline const bool operator==(const clFractal& lhs, const clFractal& rhs)
 		lhs.maxIter == rhs.maxIter &&
 		lhs.bailout == rhs.bailout &&
 		lhs.useDouble == rhs.useDouble &&
-		//lhs.gradient == rhs.gradient &&
+		lhs.gradient == rhs.gradient &&
 		lhs.mode == rhs.mode &&
 		// lhs.flameRenderSettings == rhs.flameRenderSettings &&
 		lhs.flamePointSelection == rhs.flamePointSelection &&

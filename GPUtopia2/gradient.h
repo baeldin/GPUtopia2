@@ -99,3 +99,16 @@ public:
 	color get_color_cubic(float xidx) const;
 	std::vector<color> getGradientImg(const int width, const int height);
 };
+
+inline bool operator==(const Gradient& lhs, const Gradient& rhs)
+{
+	return (
+		lhs.nodeColors == rhs.nodeColors &&
+		lhs.nodeLocation == rhs.nodeLocation &&
+		lhs.fillOrder == rhs.fillOrder);
+}
+
+inline bool operator!=(const Gradient& lhs, const Gradient& rhs)
+{
+	return !(lhs == rhs);
+}
