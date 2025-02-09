@@ -137,6 +137,7 @@ struct clFractalStatus
 	bool runImgKernel = false;
 	bool updateImage = false;
 	bool done = false;
+	bool filesOK = false;
 };
 
 class clFractal;
@@ -219,7 +220,7 @@ public:
 	uint32_t verbosity = 0;
 	clFractal() : gradient() {}
 	clFractal(const clFractalMinimal& cfm);
-	void makeCLCode(const bool sameFiles = NEW_FILES);
+	bool makeCLCode(const bool sameFiles = NEW_FILES);
 	void setFractalCLFragmentFile(const char* fil) {
 		fractalCLFragmentFile = std::string(fil);
 	}
@@ -274,6 +275,25 @@ public:
 		this->coloringCLFragmentFileUi = newColoringCLFile;
 	}
 	bool newCLFragmentQueued() { return (newFractalCLFragmentQueued() || newColoringCLFragmentQueued()); }
+	bool clFragmentExists(const std::string& fileName) const
+	{
+		std::ifstream f(fileName.c_str());
+		return f.good();
+	}
+	bool pathOK(std::string& filePath, const std::string& fragmentFolder) 
+	{
+		std::filesystem::path p(filePath);
+		std::string defaultRelativePath = "clFragments\\" + fragmentFolder + "\\" + p.filename().string();
+		if (clFragmentExists(filePath))
+			return true;
+		else if (clFragmentExists(defaultRelativePath))
+		{
+			filePath = defaultRelativePath;
+			return true;
+		}
+		else
+			return false;
+	}
 	clFractalMinimal toExport() { return clFractalMinimal(this); }
 };
 

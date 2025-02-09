@@ -200,14 +200,15 @@ paramCollector parseParameters(std::string& fullStr, const std::string& fractalF
 	return pc;
 }
 
-void clFractal::makeCLCode(const bool newFiles)
+bool clFractal::makeCLCode(const bool newFiles)
 {
 	std::string full_template("clFragments/full_template.cl");
 	std::string fullTemplateStr = readCLFragmentFromFile(full_template);
-	//std::string fractalFile("clFragments/fractalFormulas/gnarl.cl");
-	std::string fractalFile(fractalCLFragmentFile);
-	//std::string coloringFile("clFragments/coloringAlgorithms/dist.cl");
-	std::string coloringFile(coloringCLFragmentFile);
+	std::string fractalFile = this->fractalCLFragmentFile;
+	if (!this->pathOK(this->fractalCLFragmentFile, std::string("fractalFormulas")))
+		return false;
+	if (!this->pathOK(this->coloringCLFragmentFile, std::string("coloringAlgorithms")))
+		return false;
 	std::string fractalFormulaStr = readCLFragmentFromFile(fractalCLFragmentFile) + eof;
 	std::string coloringAlgorithmStr = readCLFragmentFromFile(coloringCLFragmentFile) + eof;
 	std::string antiAliasing("clFragments/full_template.cl");
@@ -254,5 +255,5 @@ void clFractal::makeCLCode(const bool newFiles)
 	this->fullCLcode = fullTemplateStr;
 	if (newFiles)
 		this->params = pc;
-	
+	return true;
 }

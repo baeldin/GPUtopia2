@@ -205,7 +205,7 @@ namespace mainView
 			cf_old.flameRenderSettings = cf.flameRenderSettings;
 		}
 		// 
-		if (cf != cf_old) { //}&& waitCounter == 0) {
+		if (cf != cf_old) {
 			cf.stop = true;
 			if (!cf.running());
 			{
@@ -215,9 +215,17 @@ namespace mainView
 						cf.popFractalCLFragmentQueue();
 					if (cf.newColoringCLFragmentQueued())
 						cf.popColoringCLFragmentQueue();
-					cf.makeCLCode(NEW_FILES);
-					core.resetCore();
-					core.compileFractalKernel(cf.fullCLcode);
+					if (cf.makeCLCode(NEW_FILES))
+					{
+						core.resetCore();
+						core.compileFractalKernel(cf.fullCLcode);
+					}
+					else
+					{
+						cf.status.filesOK = false;
+						cf_old = cf;
+						ImGui::OpenPopup("Could not open fragments");
+					}
 				}
 				if (cf.useDouble != cf_old.useDouble)
 				{
