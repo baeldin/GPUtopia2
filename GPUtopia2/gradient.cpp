@@ -100,14 +100,14 @@ void Gradient::print() const
 		std::cout << nodeIndex[ii] << ", " << fillOrder[ii] << ", " << nodeLocation[ii] << ", " << nodeColors[ii] << "\n";
 		int idx = idxOfNodeOrd(ii);
 		int loc = locOfNodeOrd(ii);
-		std::cout << ii << ", " << idx << ", " << loc << ", " << nodeColors[idx] << "\n";
+		//std::cout << ii << ", " << idx << ", " << loc << ", " << nodeColors[idx] << "\n";
 	}
 	std::cout << "============== ordered ==============\n";
 	for (int ii = 0; ii < nodeCount; ii++)
 	{
 		int idx = idxOfNodeOrd(ii);
 		int loc = locOfNodeOrd(ii);
-		std::cout << idx << ", " << ii << ", " << loc << ", " << nodeColors[idx] << "\n";
+		// std::cout << idx << ", " << ii << ", " << loc << ", " << nodeColors[idx] << "\n";
 		std::cout << idx << "(" << fillOrder[ii] << ", " << nodeIndex[ii] << "): (" << nodeColors[ii].r << ", " << nodeColors[ii].g << ", " << nodeColors[ii].b << ")\n";
 	}
 	std::cout << "=====================================\n";
@@ -415,7 +415,7 @@ std::vector<color> Gradient::getGradientImg(const int width, const int height)
 		{
 			const int pixelIndex = width * y + x;
 			const float colorIndex = float(x) / float(width);
-			img[pixelIndex] = this->getColor(colorIndex);
+			img[pixelIndex] = this->get_color_cubic(colorIndex);
 		}
 	}
 	return img;
