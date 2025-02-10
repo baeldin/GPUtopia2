@@ -31,8 +31,8 @@ struct color
     }
     color(const uint32_t UFint) {
         const int ib = UFint / 65536;
-        const int ig = (UFint - b * 65536) / 256;
-        const int ir = (UFint - b * 65536 - g * 256) / 256;
+        const int ig = (UFint - ib * 65536) / 256;
+        const int ir = UFint - ib * 65536 - ig * 256;
         r = (float)ir * inv255;
         g = (float)ig * inv255;
         b = (float)ib * inv255;
