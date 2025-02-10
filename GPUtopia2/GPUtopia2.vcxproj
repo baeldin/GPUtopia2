@@ -160,6 +160,7 @@
     <ClInclude Include="fractal_navigation.h" />
     <ClInclude Include="glewGuard.h" />
     <ClInclude Include="gradient.h" />
+    <ClInclude Include="gradientWindow.h" />
     <ClInclude Include="history.h" />
     <ClInclude Include="imageSettings.h" />
     <ClInclude Include="imconfig.h" />
@@ -184,6 +185,7 @@
     <ClCompile Include="formulaSettings.cpp" />
     <ClCompile Include="fractal_navigation.cpp" />
     <ClCompile Include="gradient.cpp" />
+    <ClCompile Include="gradientWindow.cpp" />
     <ClCompile Include="hiostry.cpp" />
     <ClCompile Include="imageSettings.cpp" />
     <ClCompile Include="info.cpp" />
