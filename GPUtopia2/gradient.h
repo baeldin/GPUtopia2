@@ -50,22 +50,22 @@ public:
 	std::vector<int> getFillOrder(const std::vector<int>& nodeLocations);
 	void fill();
 	void print() const;
-	//const char* printUF() const
-	//{
-	//	std::string outStr = "";
-	//	outStr += "Printing UF Gradient Format\n";
-	//	outStr += "===========================\n";
-	//	outStr += name + " {\n";
-	//	outStr += "gradient:\n";
-	//	outStr += "title=" + name + " smooth=yes,\n";
-	//	for (int ii = 0; ii < nodeLocation.size(); ii++)
-	//	{
-	//		outStr += "index = " + std::to_string(nodeLocation[ii]) + " color = " + std::to_string(nodeColors[ii].toInt()) + "\n";
-	//	}
-	//	outStr += "}\n";
-	//	const char* outChar = outStr.c_str();
-	//	return outChar;
-	//}
+	const char* printUF() const
+	{
+		std::string outStr = "";
+		outStr += "Printing UF Gradient Format\n";
+		outStr += "===========================\n";
+		outStr += name + " {\n";
+		outStr += "gradient:\n";
+		outStr += "title=" + name + " smooth=yes,\n";
+		for (int ii = 0; ii < nodeLocation.size(); ii++)
+		{
+			outStr += "index = " + std::to_string(nodeLocation[ii]) + " color = " + std::to_string(nodeColors[ii].toUFint()) + "\n";
+		}
+		outStr += "}\n";
+		const char* outChar = outStr.c_str();
+		return outChar;
+	}
 	void print_fine() const;
 	// check the locations of the nodes and update fillOrder if necessary
 	void checkNodeOrder();

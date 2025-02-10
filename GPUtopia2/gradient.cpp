@@ -52,7 +52,6 @@ Gradient::Gradient(int length_, std::vector<color> colors_, std::vector<int> loc
 	{
 		nodeIndex[ii] = ii;
 	}
-	fillOrder = fillOrder_;
 	fill();
 }
 
@@ -78,8 +77,8 @@ std::vector<int> Gradient::getFillOrder(const std::vector<int>& nodeLocations)
 
 void Gradient::fill()
 {
-	//this->print();
-	fillOrder = this->getFillOrder(nodeLocation);
+	// this->print();
+	// fillOrder = this->getFillOrder(nodeLocation);
 	fine_indices.resize(fineLength);
 	fineColors.resize(fineLength);
 	for (int ii = 0; ii < fineLength; ii++)
