@@ -190,6 +190,7 @@ namespace mainView
 		imageSettingsWindow(cf);
 		flameRenderSettingsWindow(cf);
 		infoWindow(cf, nav, font_mono);
+		gradientWindow(cf);
 		static int waitCounter = 0;
 		static bool force_img_update = false;
 		// only order rerun of imgKernel if flameRenderSettings change

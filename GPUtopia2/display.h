@@ -27,6 +27,7 @@
 #include "cl_error_window.h"
 #include "fileOperations.h"
 #include "history.h"
+#include "gradientWindow.h"
 
 using std::string;
 
