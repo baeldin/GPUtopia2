@@ -71,7 +71,10 @@ clFractal::clFractal(const clFractalMinimal& cfm)
         nodeColors.push_back(c);
         nodeLocations.push_back(cfm.gradientColors[ii].first);
     }
-    this->gradient = Gradient(cfm.gradientColors.size(), nodeColors, nodeLocations, cfm.gradientFillOrder);
+    // this->gradient = Gradient(cfm.gradientColors.size(), nodeColors, nodeLocations, cfm.gradientFillOrder);
+    // TODO: solve this dynamically, maybe without breaking compat just yet?
+    // changed from cfm.gradientColors.size() to 400 to load a nice fractal without crash
+    this->gradient = Gradient(400, nodeColors, nodeLocations, cfm.gradientFillOrder);
     this->fractalCLFragmentFile = cfm.fractalCLFragmentFile;
     this->fractalCLFragmentFileUi = cfm.fractalCLFragmentFile;
     this->fractalCLFragmentFileHist= cfm.fractalCLFragmentFile;
