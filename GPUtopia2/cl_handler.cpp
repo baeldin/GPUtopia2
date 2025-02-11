@@ -72,6 +72,8 @@ std::string fillKernelParamBlock(std::istringstream& paramList, std::string& ful
 	{
 		std::string fractalParameterLine = "    const " + std::regex_replace(
 			parameterLine, std::regex("parameter "), parType);
+		fractalParameterLine = std::regex_replace(fractalParameterLine, std::regex("float"), std::string("real"));
+		fractalParameterLine = std::regex_replace(fractalParameterLine, std::regex("double"), std::string("real"));
 		std::string inParameterName = getFragmentPart(fractalParameterLine, parType, eq);
 		std::string inParameterValue = getFragmentPart(fractalParameterLine, eq, semiColon);
 		trimTrailingCharacters(inParameterName);
@@ -96,20 +98,30 @@ void addParam(parameterMaps& m,	const std::string name, const std::string type,
 {
 	if (type == "int")
 	{ 
-		// std::cout << "Storing " << name << " for pos " << index << " as " << type << " with value: " << value << std::endl;
 		int p;
 		sscanf_s(value.c_str(), "%d", &p);
 		m.integerParameters[name] = std::make_pair(p, index);
-		// m.integerParameters.insert({ name.c_str(), std::make_pair(p, index) });
 	}
-	else if (type == "float")
+	else if (type == "real" || type == "double" || type == "float")
+	{
+		double p = std::stod(value);
+		// sscanf_s(value.c_str(), "%f", &p);
+		std::pair val = std::make_pair(p, index);
+		m.realParameters[name] = val;
+	}
+	else if (type == "bool")
 	{
 		// std::cout << "Storing " << name << " for pos " << index << " as " << type << " with value: " << value << std::endl;
-		float p;
-		sscanf_s(value.c_str(), "%f", &p);
+		bool p = std::stoi(value.c_str());
 		std::pair val = std::make_pair(p, index);
-		m.floatParameters[name] = val;
-		// m.floatParameters.insert({ cname, std::make_pair(p, index) });
+		m.boolParameters[name] = val;
+	}
+	else if (type == "complex")
+	{
+		// std::cout << "Storing " << name << " for pos " << index << " as " << type << " with value: " << value << std::endl;
+		Complex<double> p;
+		sscanf_s(value.c_str(), "(%f, %f)", &p.x, &p.y);
+		m.complexParameters[name] = std::make_pair(p, index);
 	}
 }
 

@@ -127,9 +127,19 @@ void clCore::setDefaultFractalArguments(clFractal& cf)
 void clCore::setFractalParameterArgs(clFractal& cf)
 {
     setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.integerParameters, cf.verbosity);
-    setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.floatParameters, cf.verbosity);
     setMapOfArgs(this->fractalKernel.kernel, cf.params.coloringParameterMaps.integerParameters, cf.verbosity);
-    setMapOfArgs(this->fractalKernel.kernel, cf.params.coloringParameterMaps.floatParameters, cf.verbosity);
+    if (cf.useDouble)
+    {
+        setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.realParameters, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, cf.params.coloringParameterMaps.realParameters, cf.verbosity);
+    }
+    else
+    {
+        parameterMapFloat floatArgumentMapF = argumentMapFloatCast(cf.params.fractalParameterMaps.realParameters);
+        parameterMapFloat floatArgumentMapC = argumentMapFloatCast(cf.params.coloringParameterMaps.realParameters);
+        setMapOfArgs(this->fractalKernel.kernel, floatArgumentMapF, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, floatArgumentMapC, cf.verbosity);
+    }
 }
 
 void clCore::compileFractalKernel(const std::string fullCLcode)

@@ -20,10 +20,10 @@ clFractalMinimal::clFractalMinimal(const clFractal* cf)
     useDouble = cf->useDouble;
     pointSelection = cf->flamePointSelection;
     fractalIntParameters = cf->params.fractalParameterMaps.integerParameters;
-    fractalFloatParameters = cf->params.fractalParameterMaps.floatParameters;
+    fractalFloatParameters = cf->params.fractalParameterMaps.realParameters;
     fractalBoolParameters = cf->params.fractalParameterMaps.boolParameters;
     coloringIntParameters = cf->params.coloringParameterMaps.integerParameters;
-    coloringFloatParameters = cf->params.coloringParameterMaps.floatParameters;
+    coloringFloatParameters = cf->params.coloringParameterMaps.realParameters;
     coloringBoolParameters = cf->params.coloringParameterMaps.boolParameters;
     for (int ii = 0; ii < cf->gradient.nodeCount; ii++)
     {
@@ -56,10 +56,10 @@ clFractal::clFractal(const clFractalMinimal& cfm)
     this->useDouble = cfm.useDouble;
     this->flamePointSelection = cfm.pointSelection;
     this->params.fractalParameterMaps.integerParameters = cfm.fractalIntParameters;
-    this->params.fractalParameterMaps.floatParameters = cfm.fractalFloatParameters;
+    this->params.fractalParameterMaps.realParameters = cfm.fractalFloatParameters;
     this->params.fractalParameterMaps.boolParameters = cfm.fractalBoolParameters;
     this->params.coloringParameterMaps.integerParameters = cfm.coloringIntParameters;
-    this->params.coloringParameterMaps.floatParameters = cfm.coloringFloatParameters;
+    this->params.coloringParameterMaps.realParameters = cfm.coloringFloatParameters;
     this->params.coloringParameterMaps.boolParameters = cfm.coloringBoolParameters;
     std::vector<color> nodeColors;
     std::vector<int> nodeLocations;

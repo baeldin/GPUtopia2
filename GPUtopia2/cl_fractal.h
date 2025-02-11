@@ -15,6 +15,14 @@ using json = nlohmann::json;
 #define NEW_FILES true
 #define SAME_FILES false
 
+typedef std::map<std::string, std::pair<int, int>> parameterMapInt;
+typedef std::map<std::string, std::pair<bool, int>> parameterMapBool;
+typedef std::map<std::string, std::pair<double, int>> parameterMapReal;
+typedef std::map<std::string, std::pair<Complex<double>, int>> parameterMapComplex;
+
+typedef std::map<std::string, std::pair<float, int>> parameterMapFloat;
+typedef std::map<std::string, std::pair<Complex<float>, int>> parameterMapComplexFloat;
+
 inline const bool operator==(const cl_int2& lhs, const cl_int2& rhs)
 {
 	return
@@ -37,10 +45,10 @@ inline const bool operator==(const cl_float4& lhs, const cl_float4& rhs)
 // flexible struct that holds parameters in a way that they can be used to make UI elements too
 struct parameterMaps
 {
-	std::map<std::string, std::pair<int, int>> integerParameters;
-	std::map<std::string, std::pair<bool, int>> boolParameters;
-	std::map<std::string, std::pair<float, int>> floatParameters;
-	std::map<std::string, std::pair<cl_float2, int>> float2Parameters;
+	parameterMapInt integerParameters;
+	parameterMapBool boolParameters;
+	parameterMapReal realParameters;
+	parameterMapComplex complexParameters;	
 };
 
 
@@ -49,8 +57,8 @@ inline const bool operator==(const parameterMaps& lhs, const parameterMaps& rhs)
 	return (
 		lhs.integerParameters == rhs.integerParameters &&
 		lhs.boolParameters == rhs.boolParameters &&
-		lhs.floatParameters == rhs.floatParameters &&
-		lhs.float2Parameters == rhs.float2Parameters);
+		lhs.realParameters == rhs.realParameters &&
+		lhs.complexParameters == rhs.complexParameters);
 }
 
 struct paramCollector
@@ -161,12 +169,12 @@ struct clFractalMinimal
 	int mode;
 	int pointSelection;
 	bool useDouble;
-	std::map<std::string, std::pair<int, int>> fractalIntParameters;
-	std::map<std::string, std::pair<float, int>> fractalFloatParameters;
-	std::map<std::string, std::pair<bool, int>> fractalBoolParameters;
-	std::map<std::string, std::pair<int, int>> coloringIntParameters;
-	std::map<std::string, std::pair<float, int>> coloringFloatParameters;
-	std::map<std::string, std::pair<bool, int>> coloringBoolParameters;
+	parameterMapInt fractalIntParameters;
+	parameterMapReal fractalFloatParameters;
+	parameterMapBool fractalBoolParameters;
+	parameterMapInt coloringIntParameters;
+	parameterMapReal coloringFloatParameters;
+	parameterMapBool coloringBoolParameters;
 	std::vector<std::pair<int, int>> gradientColors;
 	std::vector<int> gradientFillOrder;
 	std::string fractalCLFragmentFile;
@@ -217,7 +225,7 @@ public:
 	cl_int flamePointSelection = 0;
 	cl_int flameWarmup = 0;
 	clFractalStatus status;
-	uint32_t verbosity = 0;
+	uint32_t verbosity = 2;
 	clFractal() : gradient() {}
 	clFractal(const clFractalMinimal& cfm);
 	bool makeCLCode(const bool sameFiles = NEW_FILES);

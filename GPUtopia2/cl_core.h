@@ -186,3 +186,21 @@ public:
 
 void runFractalKernelAsync(clFractal& cf, clCore& cc);
 void runImgKernelAsync(clFractal& cf, clCore& cc);
+
+// cast parameter map of double to float
+inline parameterMapFloat argumentMapFloatCast(parameterMapReal& realParameters)
+{
+    parameterMapFloat ret;
+    for (auto const& [key, val] : realParameters)
+        ret[key] = std::make_pair((float)val.first, val.second);
+    return ret;
+}
+
+// cast parameter map of Complex<double> to Complex<float>
+inline parameterMapComplexFloat argumentMapFloatCast(parameterMapComplex& complexParameters)
+{
+    parameterMapComplexFloat ret;
+    for (auto const& [key, val] : complexParameters)
+        ret[key] = std::make_pair(Complex<float>(val.first.x, val.first.y), val.second);
+    return ret;
+}

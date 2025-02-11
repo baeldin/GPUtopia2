@@ -61,18 +61,18 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 	{
 		ImGui::DragInt(key.c_str(), &(val.first), 1, 1, 10000);
 	}
-	for (auto& [key, val] : cf.params.fractalParameterMaps.floatParameters)
+	for (auto& [key, val] : cf.params.fractalParameterMaps.realParameters)
 	{
-		ImGui::DragFloat(key.c_str(), &(val.first), 0.01f, -100.f, 100.f);
+		ImGui::InputDouble(key.c_str(), &(val.first));
 	}
 	ImGui::Text("ColoringParameters");
 	for (auto& [key, val] : cf.params.coloringParameterMaps.integerParameters)
 	{
 		ImGui::DragInt(key.c_str(), &val.first, 1, 1, 10000);
 	}
-	for (auto& [key, val] : cf.params.coloringParameterMaps.floatParameters)
+	for (auto& [key, val] : cf.params.coloringParameterMaps.realParameters)
 	{
-		ImGui::DragFloat(key.c_str(), &val.first, 0.01f, -100.f, 100.f);
+		ImGui::InputDouble(key.c_str(), &val.first);
 	}
 
 	ImGui::Checkbox("Vomit pixel contents", &cf.vomit);
