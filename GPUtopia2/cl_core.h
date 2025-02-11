@@ -36,6 +36,14 @@ enum class FractalKernelArg : int {
     // Add any further indices here if needed.
 };
 
+template <typename T>
+struct real2
+{
+    T x = 0.;
+    T y = 0.;
+    real2(T x_, T y_) : x(x_), y(y_) {};
+};
+
 struct err
 {
     cl_int programError = CL_SUCCESS;
@@ -98,6 +106,7 @@ public:
     // image kernel
     void compileImgKernel();
 
+    
     // Error checking helper
     inline void checkError(cl_int err, const std::string& msg, int verbosity = 1) const {
         if (err != CL_SUCCESS)
@@ -151,6 +160,25 @@ public:
         else if (err != CL_SUCCESS)
             std::cerr << "Failed to set kernel argument " << name << " (" << typeid(arg).name() << ") at index " << arg_idx << " (error " << err << ")\n";
         return err;
+    }
+
+    template <typename T>
+    inline void setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::pair<Complex<T>, int>>& map, const int verbosity = 99)
+    {
+        cl_int err = CL_SUCCESS;
+        for (auto const& [key, val] : map)
+        {
+            if (verbosity >= 1)
+                std::cout << "Setting kernel argument " << key << " at position " << val.second << " with value " << val.first << std::endl;
+            // Use the kernel's existing argumentCount offset (if any)
+            const uint32_t currentArgumentIndex = val.second + this->fractalKernel.argumentCount;
+            const real2 value(val.first.x, val.first.y);
+            err = setKernelArg(currentKernel, currentArgumentIndex, value, key.c_str(), verbosity);
+            if (err != CL_SUCCESS)
+            {
+                std::cout << "Failed to add kernel argument " << key << " at position " << val.second << "!\n";
+            }
+        }
     }
 
     template <typename T>

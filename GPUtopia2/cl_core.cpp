@@ -131,14 +131,20 @@ void clCore::setFractalParameterArgs(clFractal& cf)
     if (cf.useDouble)
     {
         setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.realParameters, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.complexParameters, cf.verbosity);
         setMapOfArgs(this->fractalKernel.kernel, cf.params.coloringParameterMaps.realParameters, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, cf.params.coloringParameterMaps.complexParameters, cf.verbosity);
     }
     else
     {
         parameterMapFloat floatArgumentMapF = argumentMapFloatCast(cf.params.fractalParameterMaps.realParameters);
+        parameterMapComplexFloat complexFloatArgumentMapF = argumentMapFloatCast(cf.params.fractalParameterMaps.complexParameters);
         parameterMapFloat floatArgumentMapC = argumentMapFloatCast(cf.params.coloringParameterMaps.realParameters);
+        parameterMapComplexFloat complexFloatArgumentMapC = argumentMapFloatCast(cf.params.coloringParameterMaps.complexParameters);
         setMapOfArgs(this->fractalKernel.kernel, floatArgumentMapF, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, complexFloatArgumentMapF, cf.verbosity);
         setMapOfArgs(this->fractalKernel.kernel, floatArgumentMapC, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, complexFloatArgumentMapC, cf.verbosity);
     }
 }
 

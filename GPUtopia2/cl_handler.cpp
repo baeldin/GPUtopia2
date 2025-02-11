@@ -120,8 +120,12 @@ void addParam(parameterMaps& m,	const std::string name, const std::string type,
 	{
 		// std::cout << "Storing " << name << " for pos " << index << " as " << type << " with value: " << value << std::endl;
 		Complex<double> p;
-		sscanf_s(value.c_str(), "(%f, %f)", &p.x, &p.y);
-		m.complexParameters[name] = std::make_pair(p, index);
+		char comma;
+		std::istringstream iss(value);
+		if (iss >> p.x >> comma >> p.y)
+			m.complexParameters[name] = std::make_pair(p, index);
+		else
+			std::cout << "Error parsing complex argument.";
 	}
 }
 
@@ -139,6 +143,7 @@ paramCollector parseKernelParameterBlock(std::string& kpb)
 	int paramIndex = 0; // first non-default param
 	std::string paramName;
 	std::string paramValue;
+	Complex<double> z;
 	while (std::getline(kernelParamBlockStream, kernelParamLine))
 	{
 
@@ -158,17 +163,41 @@ paramCollector parseKernelParameterBlock(std::string& kpb)
 				paramAffiliaton = (word[0] == *"f") ? 0 : 1;
 				paramName = std::regex_replace(paramName, std::regex("[fc]Par_"), "");
 			}
-			if (word_counter == 4)
+			if (paramType != "complex")
 			{
-				paramValue = word;
-				trimTrailingCharacters(paramValue, ","); // remove comma behind value
-				if (paramAffiliaton == 0)
-					addParam(pc.fractalParameterMaps, paramName, paramType, paramValue, paramIndex);
-				else
-					addParam(pc.coloringParameterMaps, paramName, paramType, paramValue, paramIndex);
-				paramIndex++;
+				if (word_counter == 4)
+				{
+					paramValue = word;
+					trimTrailingCharacters(paramValue, ","); // remove comma behind value
+					if (paramAffiliaton == 0)
+						addParam(pc.fractalParameterMaps, paramName, paramType, paramValue, paramIndex);
+					else
+						addParam(pc.coloringParameterMaps, paramName, paramType, paramValue, paramIndex);
+					paramIndex++;
+				}
 			}
-			if (word == constStr) { 
+			else
+			{
+				if (word_counter == 4)
+				{
+					paramValue = word;
+					// trimTrailingCharacters(paramValue, ","); // remove comma behind value
+
+				}
+				if (word_counter == 5)
+				{
+					paramValue += word;
+					trimTrailingCharacters(paramValue, ","); // remove comma behind value
+					paramValue = std::regex_replace(paramValue, std::regex("\\("), "");
+					paramValue = std::regex_replace(paramValue, std::regex("\\)"), "");
+					if (paramAffiliaton == 0)
+						addParam(pc.fractalParameterMaps, paramName, paramType, paramValue, paramIndex);
+					else
+						addParam(pc.coloringParameterMaps, paramName, paramType, paramValue, paramIndex);
+					paramIndex++;
+				}
+			}
+			if (word == constStr) {
 				word_counter = 0; 
 				kpb_noValues += "    const ";
 			} // reset word counter

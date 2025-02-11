@@ -65,6 +65,13 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 	{
 		ImGui::InputDouble(key.c_str(), &(val.first));
 	}
+	for (auto& [key, val] : cf.params.fractalParameterMaps.complexParameters)
+	{
+		std::string labelR = key + ".R";
+		std::string labelI = key + ".I";
+		ImGui::InputDouble(labelR.c_str(), &(val.first.x));
+		ImGui::InputDouble(labelI.c_str(), &(val.first.y));
+	}
 	ImGui::Text("ColoringParameters");
 	for (auto& [key, val] : cf.params.coloringParameterMaps.integerParameters)
 	{
@@ -74,7 +81,13 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 	{
 		ImGui::InputDouble(key.c_str(), &val.first);
 	}
-
+	for (auto& [key, val] : cf.params.coloringParameterMaps.complexParameters)
+	{
+		std::string labelR = key + ".R";
+		std::string labelI = key + ".I";
+		ImGui::InputDouble(labelR.c_str(), &(val.first.x));
+		ImGui::InputDouble(labelI.c_str(), &(val.first.y));
+	}
 	ImGui::Checkbox("Vomit pixel contents", &cf.vomit);
 	ImGui::End();
 }
