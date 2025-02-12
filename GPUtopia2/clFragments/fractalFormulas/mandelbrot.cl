@@ -1,7 +1,7 @@
 __parameters:
 complex parameter exponent = (2., 0.);
 enum parameter test = 0;
-zero, one, two, three
+Two, Three, ExponentArgument
 __init:
 //=====| fractal formula init
         complex z = z0;
@@ -10,7 +10,13 @@ __init:
              //z = (complex)(
              //    z.x * z.x - z.y * z.y + z0.x,
              //    2.f * z.x * z.y + z0.y);
-             z = cpow(z, @exponent) + z0;
+             // z = cpow(z, @exponent) + z0;
+             if (@test == 0)
+                 z = cmul(z, z) + z0;
+             else if (@test == 1)
+                 z = cmul(cmul(z, z), z) + z0;
+             else if (@test == 2)
+                 z = cpow(z, @exponent) + z0;
 __bailout:
 //=| factal bailout function
     // must always define bool bailedout!!!
