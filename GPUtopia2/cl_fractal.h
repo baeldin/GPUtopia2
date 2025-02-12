@@ -73,7 +73,8 @@ inline const bool operator==(const parameterMaps& lhs, const parameterMaps& rhs)
 		lhs.integerParameters == rhs.integerParameters &&
 		lhs.boolParameters == rhs.boolParameters &&
 		lhs.realParameters == rhs.realParameters &&
-		lhs.complexParameters == rhs.complexParameters);
+		lhs.complexParameters == rhs.complexParameters &&
+		lhs.enumParameters == rhs.enumParameters);
 }
 
 struct paramCollector
