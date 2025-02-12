@@ -72,6 +72,14 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 		ImGui::InputDouble(labelR.c_str(), &(val.first.x));
 		ImGui::InputDouble(labelI.c_str(), &(val.first.y));
 	}
+	for (auto& [key, val] : cf.params.fractalParameterMaps.enumParameters)
+	{
+		std::vector<const char*> enumLabels;
+		for (const auto& label : val.first.labels) {
+			enumLabels.push_back(label.c_str());
+		}
+		ImGui::Combo(key.c_str(), &val.first.value, enumLabels.data(), static_cast<int>(enumLabels.size()));
+	}
 	ImGui::Text("ColoringParameters");
 	for (auto& [key, val] : cf.params.coloringParameterMaps.integerParameters)
 	{
