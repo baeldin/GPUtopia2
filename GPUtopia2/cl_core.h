@@ -181,6 +181,22 @@ public:
         }
     }
 
+    inline void setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::pair<enumParameter, int>>& map, const int verbosity = 99)
+    {
+        cl_int err = CL_SUCCESS;
+        for (auto const& [key, val] : map)
+        {
+            if (verbosity >= 1)
+                std::cout << "Setting kernel argument " << key << " at position " << val.second << " with value " << val.first.value << std::endl;
+            // Use the kernel's existing argumentCount offset (if any)
+            const uint32_t currentArgumentIndex = val.second + this->fractalKernel.argumentCount;
+            err = setKernelArg(currentKernel, currentArgumentIndex, val.first.value, key.c_str(), verbosity);
+            if (err != CL_SUCCESS)
+            {
+                std::cout << "Failed to add kernel argument " << key << " at position " << val.second << "!\n";
+            }
+        }
+    }
     template <typename T>
     inline void setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::pair<T, int>>& map, const int verbosity = 99)
     {

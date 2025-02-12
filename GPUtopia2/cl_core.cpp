@@ -128,6 +128,8 @@ void clCore::setFractalParameterArgs(clFractal& cf)
 {
     setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.integerParameters, cf.verbosity);
     setMapOfArgs(this->fractalKernel.kernel, cf.params.coloringParameterMaps.integerParameters, cf.verbosity);
+    setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.enumParameters, cf.verbosity);
+    setMapOfArgs(this->fractalKernel.kernel, cf.params.coloringParameterMaps.enumParameters, cf.verbosity);
     if (cf.useDouble)
     {
         setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.realParameters, cf.verbosity);
