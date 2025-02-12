@@ -129,92 +129,89 @@ void addParam(parameterMaps& m,	const std::string name, const std::string type,
 	}
 }
 
+// overload for enumParameter type
+void addParam(parameterMaps& m, const std::string name, const std::string type,
+	const enumParameter& ep, int index)
+{
+	m.enumParameters[name] = std::make_pair(ep, index);
+}
+
+std::vector<std::string> splitLines(const std::string& text) 
+{
+	std::vector<std::string> lines;
+	std::istringstream iss(text);
+	std::string line;
+	while (std::getline(iss, line)) {
+		if (!line.empty())
+			lines.push_back(line);
+	}
+	return lines;
+}
+
+std::vector<std::string> splitWords(const std::string& line)
+{
+    std::vector<std::string> words;
+    std::istringstream iss(line);
+    std::string word;
+    while (iss >> word)
+    {
+        trimTrailingCharacters(word, ",");
+        words.push_back(word);
+    }
+    return words;
+}
+
 paramCollector parseKernelParameterBlock(std::string& kpb)
 {
-	std::istringstream kernelParamBlockStream(kpb.c_str());
-	std::string kernelParamLine;
-	// std::cout << "========= KERNEL PARAM VOMIT ===========\n";
-	unsigned word_counter = 0;
 	std::string kpb_noValues;
 	paramCollector pc;
 	std::string paramType;
-	int paramAffiliaton = 0; // 0 for fractal, 1 for coloring
-	// TODO: somehow get this from the cl core or smth?
 	int paramIndex = 0; // first non-default param
 	std::string paramName;
-	std::string paramValue;
-	Complex<double> z;
-	while (std::getline(kernelParamBlockStream, kernelParamLine))
+	std::vector<std::string> kpbLines = splitLines(kpb);
+	int N = 0;
+	while (N < kpbLines.size()) 
 	{
-
-		std::istringstream iss(kernelParamLine);
-		do {
-			std::string word;
-			iss >> word;
-			if (word_counter == 1)
-			{
-				paramType = word;
-				kpb_noValues += word + " ";
-			}
-			if (word_counter == 2)
-			{
-				paramName = word;
-				kpb_noValues += word + ",\n";
-				paramAffiliaton = (word[0] == *"f") ? 0 : 1;
-				paramName = std::regex_replace(paramName, std::regex("[fc]Par_"), "");
-			}
-			if (paramType != "complex")
-			{
-				if (word_counter == 4)
-				{
-					paramValue = word;
-					trimTrailingCharacters(paramValue, ","); // remove comma behind value
-					if (paramAffiliaton == 0)
-						addParam(pc.fractalParameterMaps, paramName, paramType, paramValue, paramIndex);
-					else
-						addParam(pc.coloringParameterMaps, paramName, paramType, paramValue, paramIndex);
-					paramIndex++;
-				}
-			}
-			else
-			{
-				if (word_counter == 4)
-				{
-					paramValue = word;
-					// trimTrailingCharacters(paramValue, ","); // remove comma behind value
-
-				}
-				if (word_counter == 5)
-				{
-					paramValue += word;
-					trimTrailingCharacters(paramValue, ","); // remove comma behind value
-					paramValue = std::regex_replace(paramValue, std::regex("\\("), "");
-					paramValue = std::regex_replace(paramValue, std::regex("\\)"), "");
-					if (paramAffiliaton == 0)
-						addParam(pc.fractalParameterMaps, paramName, paramType, paramValue, paramIndex);
-					else
-						addParam(pc.coloringParameterMaps, paramName, paramType, paramValue, paramIndex);
-					paramIndex++;
-				}
-			}
-			if (word == constStr) {
-				word_counter = 0; 
-				kpb_noValues += "    const ";
-			} // reset word counter
-			//std::cout << word << std::endl;
-			word_counter++;
-		} while (iss);
-		//std::cout << paramName << " is of type " << paramType << " and has value " << paramValue << " and index " << paramIndex << std::endl;
+		std::vector<std::string> words = splitWords(kpbLines[N]);
+		parameterMaps* paramMaps = (words[2][0] == *"f") ? &pc.fractalParameterMaps : &pc.coloringParameterMaps;
+		paramName = std::regex_replace(words[2], std::regex("[fc]Par_"), "");
+		if (words[1] == "int")
+		{
+			int val = std::stoi(words[4]);
+			paramMaps->integerParameters[paramName] = std::make_pair(val, paramIndex);
+			kpb_noValues += std::string("    const int ") + words[2] + std::string(",\n");
+		}
+		if (words[1] == "float" || words[1] == "double" || words[1] == "real")
+		{
+			double val = std::stod(words[4]);
+			paramMaps->realParameters[paramName] = std::make_pair(val, paramIndex);
+			kpb_noValues += std::string("    const real ") + words[2] + std::string(",\n");
+		}
+		if (words[1] == "complex")
+		{
+			double x = std::stod(std::regex_replace(words[4], std::regex("\\("), ""));
+			double y = std::stod(std::regex_replace(words[5], std::regex("\\)"), ""));
+			Complex<double> val(x, y);
+			paramMaps->complexParameters[paramName] = std::make_pair(val, paramIndex);
+			kpb_noValues += std::string("    const complex ") + words[2] + std::string(",\n");
+		}
+		if (words[1] == "enum")
+		{
+			int val = std::stoi(words[4]);
+			enumParameter ep;
+			ep.value = val;
+			ep.labels = splitWords(kpbLines[N + 1]);
+			ep.labels.erase(ep.labels.begin());
+			paramMaps->enumParameters[paramName] = std::make_pair(ep, paramIndex);
+			kpb_noValues += std::string("    const int ") + words[2] + std::string(",\n");
+			N++;
+		}
+		N++;
+		paramIndex++;
 	}
-	// std::cout << "========= END KERNEL PARAM VOMIT =======\n";
+
 	trimTrailingCharacters(kpb_noValues, ",\n");
-	// kpb_noValues += ")";
 	kpb = kpb_noValues;
-	// std::cout << "========= DUMP MAP CONTENT =============\n";
-	// for (auto const& [key, val] : pc.coloringParameterMaps.floatParameters) {
-		// std::cout << key << ": " << val.first << ", " << val.second << std::endl;
-	// }
-	// std::cout << "Map has size " << pc.coloringParameterMaps.floatParameters.size() << std::endl;
 	return pc;
 }
 
@@ -222,20 +219,12 @@ paramCollector parseParameters(std::string& fullStr, const std::string& fractalF
 {
 	std::string formulaParamStr = getFragmentPart(fractalFormula, par, ini);
 	std::string coloringParamStr = getFragmentPart(coloringAlgorithm, par, ini);
-	// std::cout << coloringParamStr << std::endl;
 	std::istringstream sf(formulaParamStr.c_str());
 	std::istringstream sc(coloringParamStr.c_str());
-	// std::cout << "======================= RAW PARAMETER BLOCK ====================\n";
-	// std::cout << formulaParamStr << std::endl;
-	// std::cout << coloringParamStr << std::endl;
-	// std::cout << "======================= END RAW PARAMETER BLOCK ================\n";	
 	std::string parameterLine;
 	std::string kernelParameterBlock = fillKernelParamBlock(sf, fullStr, fPar);
 	kernelParameterBlock += fillKernelParamBlock(sc, fullStr, cPar);
 	trimTrailingCharacters(kernelParameterBlock, ",\n");
-	// std::cout << "======================= KERNEL PARAMETER BLOCK =================\n";
-	// std::cout << kernelParameterBlock << std::endl;
-	// std::cout << "======================= END KERNEL PARAMETER BLOCK =============\n";
 	paramCollector pc = parseKernelParameterBlock(kernelParameterBlock);
 	fullStr = std::regex_replace(fullStr, std::regex(kernelArgFlag), kernelParameterBlock);
 	return pc;
@@ -257,11 +246,6 @@ bool clFractal::makeCLCode(const bool newFiles)
 	std::string colorStr = readCLFragmentFromFile("clFragments/colors.cl");
 	std::string complexStr = readCLFragmentFromFile("clFragments/complex.cl");
 
-	// std::cout << fullTemplateStr << std::endl;
-	// std::cout << fractalFormulaStr << std::endl;
-	// std::cout << coloringAlgorithmStr << std::endl;
-	
-	// get init, loop, bailout, and final fragments
 	// UF-style separation
 	std::string fractalInit = getFragmentPart(fractalFormulaStr, ini, loo);
 	std::string fractalLoop = getFragmentPart(fractalFormulaStr, loo, bai);
@@ -290,9 +274,7 @@ bool clFractal::makeCLCode(const bool newFiles)
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(CFFlag), coloringFunctions);
 
 	paramCollector pc = parseParameters(fullTemplateStr, fractalFormulaStr, coloringAlgorithmStr);
-	// std::cout << "AFTER:\n" << fullTemplateStr << std::endl;
 
-	// clFractal cf;
 	this->fullCLcode = fullTemplateStr;
 	if (newFiles)
 		this->params = pc;

@@ -34,6 +34,7 @@ void trimTrailingCharacters(
 //	const std::string& type,
 //	const std::string& value);
 
+std::vector<std::string> splitLines(const std::string& text);
 paramCollector parseKernelParameterBlock(std::string& kpb);
 
 std::string fillKernelParamBlock(

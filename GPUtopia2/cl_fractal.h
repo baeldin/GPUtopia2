@@ -23,6 +23,20 @@ typedef std::map<std::string, std::pair<Complex<double>, int>> parameterMapCompl
 typedef std::map<std::string, std::pair<float, int>> parameterMapFloat;
 typedef std::map<std::string, std::pair<Complex<float>, int>> parameterMapComplexFloat;
 
+// support enum type parameter that is displayed as combo in the Ui
+struct enumParameter
+{
+	int value;
+	std::vector<std::string> labels;
+};
+
+inline const bool operator==(const enumParameter& lhs, const enumParameter& rhs)
+{
+	return (lhs.value == rhs.value);
+}
+
+typedef std::map<std::string, std::pair<enumParameter, int>> parameterMapEnum;
+
 inline const bool operator==(const cl_int2& lhs, const cl_int2& rhs)
 {
 	return
@@ -49,6 +63,7 @@ struct parameterMaps
 	parameterMapBool boolParameters;
 	parameterMapReal realParameters;
 	parameterMapComplex complexParameters;	
+	parameterMapEnum enumParameters;
 };
 
 
