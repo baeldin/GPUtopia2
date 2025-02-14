@@ -75,11 +75,11 @@ inline const Gradient volcano_under_a_glacier2(
 	{ 0, 33, 122, 152, 199, 286, 376 }
 );
 //jet:
-inline constexpr int jet_length = 63;
+inline constexpr int jet_length = 64;
 inline const std::vector<int> jet_indices{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,
 	35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53,
-	54, 55, 56, 57, 58, 59, 60, 61, 62 };
+	54, 55, 56, 57, 58, 59, 60, 61, 62, 63 };
 inline const std::vector<color> jet_colors{
 	color(0 * inv255,   0 * inv255, 143 * inv255),
 	color(0 * inv255,   0 * inv255, 159 * inv255),
