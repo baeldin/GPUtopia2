@@ -108,6 +108,9 @@
     <ClInclude Include="gradientWindow.h">
       <Filter>Header Files\Ui</Filter>
     </ClInclude>
+    <ClInclude Include="clipboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -184,6 +187,9 @@
     </ClCompile>
     <ClCompile Include="gradientWindow.cpp">
       <Filter>Source Files\Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="clipboard.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

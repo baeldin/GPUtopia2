@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="clipboard.h" />
     <ClInclude Include="cl_error_handling.h" />
     <ClInclude Include="cl_error_window.h" />
     <ClInclude Include="cl_fractal.h" />
@@ -171,6 +172,7 @@
     <ClInclude Include="parameterMaps.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="clipboard.cpp" />
     <ClCompile Include="cl_error_window.cpp" />
     <ClCompile Include="cl_erro_handling.cpp" />
     <ClCompile Include="cl_fractal.cpp" />
