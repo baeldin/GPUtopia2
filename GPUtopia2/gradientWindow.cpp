@@ -21,7 +21,7 @@ void gradientWindow(clFractal& cf)
     static GLuint textureGradientImgR, textureGradientImgG, textureGradientImgB;
     static bool windowChangedSize = false;
     static color nodeColorEdit = cf.gradient.nodeColors[0];
-    static int nodeLocationEdit = cf.gradient.nodeLocation[0];
+    static int nodeLocationEdit = cf.gradient.nodeLocations[0];
     static int lastActiveNode = 0;
     static bool needRGBlinePlots = true;
     static Gradient cfOld = cf.gradient;
@@ -88,7 +88,7 @@ void gradientWindow(clFractal& cf)
                 workGradient.nodeHighlight = nodeHovered;
                 lastActiveNode = nodeHovered;
                 needRGBlinePlots = true;
-                nodeStartingX = (float)workGradient.nodeLocation[nodeHovered];
+                nodeStartingX = (float)workGradient.nodeLocations[nodeHovered];
                 nodeStartingY = (float)workGradient.nodeColors[nodeHovered].r;
                 cout << "Setting nodeStartingY to " << nodeStartingY << " mouseImgY : " << mouseImgY << "\n";
             }
@@ -100,7 +100,7 @@ void gradientWindow(clFractal& cf)
                 //nodeStartingX = workGradient.nodeIndices[nodeHovered];
                 //nodeCurrentX = nodeStartingX + dragX / gradientImgSizeX * workGradient.length;
                 cout << "Dragging: " << dragX << ", " << dragY << " " << nodeHovered << "\n";
-                workGradient.nodeLocation[nodeHovered] = nodeStartingX + dragX * (float)workGradient.length / gradientImgSizeX;
+                workGradient.nodeLocations[nodeHovered] = nodeStartingX + dragX * (float)workGradient.length / gradientImgSizeX;
                 cout << "Setting r to " << nodeStartingY - (float)mouseImgY / gradientImgSizeY << "\n";
                 workGradient.nodeColors[nodeHovered].r = nodeStartingY - (float)dragY / gradientImgSizeY;
                 //workGradient.nodeColors[nodeHovered].r = nodeStartingY;// -((float)dragY) / gradientImgSizeY;
@@ -111,9 +111,9 @@ void gradientWindow(clFractal& cf)
             if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && draggingNode)
             {
                 draggingNode = false;
-                workGradient.nodeLocation[nodeHovered] = nodeStartingX + dragX * (float)workGradient.length / gradientImgSizeX;
+                workGradient.nodeLocations[nodeHovered] = nodeStartingX + dragX * (float)workGradient.length / gradientImgSizeX;
                 workGradient.nodeColors[nodeHovered].r = nodeStartingY - ((float)dragY) / gradientImgSizeY;
-                cout << "Stopped dragging, updating X to " << workGradient.nodeLocation[nodeHovered] << " and Y to " << workGradient.nodeColors[nodeHovered].r * gradientImgSizeY << "\n";
+                cout << "Stopped dragging, updating X to " << workGradient.nodeLocations[nodeHovered] << " and Y to " << workGradient.nodeColors[nodeHovered].r * gradientImgSizeY << "\n";
                 needRGBlinePlots = true;
                 workGradient.checkNodeOrder();
                 workGradient.fill();
@@ -144,7 +144,7 @@ void gradientWindow(clFractal& cf)
                 workGradient.nodeHighlight = nodeHovered;
                 lastActiveNode = nodeHovered;
                 needRGBlinePlots = true;
-                nodeStartingX = (float)workGradient.nodeLocation[nodeHovered];
+                nodeStartingX = (float)workGradient.nodeLocations[nodeHovered];
                 nodeStartingY = (float)workGradient.nodeColors[nodeHovered].g;
                 cout << "Setting nodeStartingY to " << nodeStartingY << " mouseImgY : " << mouseImgY << "\n";
             }
@@ -156,7 +156,7 @@ void gradientWindow(clFractal& cf)
                 //nodeStartingX = workGradient.nodeIndices[nodeHovered];
                 //nodeCurrentX = nodeStartingX + dragX / gradientImgSizeX * workGradient.length;
                 cout << "Dragging: " << dragX << ", " << dragY << " " << nodeHovered << "\n";
-                workGradient.nodeLocation[nodeHovered] = nodeStartingX + dragX * (float)workGradient.length / gradientImgSizeX;
+                workGradient.nodeLocations[nodeHovered] = nodeStartingX + dragX * (float)workGradient.length / gradientImgSizeX;
                 cout << "Setting r to " << nodeStartingY - (float)mouseImgY / gradientImgSizeY << "\n";
                 workGradient.nodeColors[nodeHovered].g = nodeStartingY - (float)dragY / gradientImgSizeY;
                 //workGradient.nodeColors[nodeHovered].g = nodeStartingY;// -((float)dragY) / gradientImgSizeY;
@@ -167,9 +167,9 @@ void gradientWindow(clFractal& cf)
             if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && draggingNode)
             {
                 draggingNode = false;
-                workGradient.nodeLocation[nodeHovered] = nodeStartingX + dragX * (float)workGradient.length / gradientImgSizeX;
+                workGradient.nodeLocations[nodeHovered] = nodeStartingX + dragX * (float)workGradient.length / gradientImgSizeX;
                 workGradient.nodeColors[nodeHovered].g = nodeStartingY - ((float)dragY) / gradientImgSizeY;
-                cout << "Stopped dragging, updating X to " << workGradient.nodeLocation[nodeHovered] << " and Y to " << workGradient.nodeColors[nodeHovered].g * gradientImgSizeY << "\n";
+                cout << "Stopped dragging, updating X to " << workGradient.nodeLocations[nodeHovered] << " and Y to " << workGradient.nodeColors[nodeHovered].g * gradientImgSizeY << "\n";
                 needRGBlinePlots = true;
                 workGradient.checkNodeOrder();
                 workGradient.fill();
@@ -200,7 +200,7 @@ void gradientWindow(clFractal& cf)
                 workGradient.nodeHighlight = nodeHovered;
                 lastActiveNode = nodeHovered;
                 needRGBlinePlots = true;
-                nodeStartingX = (float)workGradient.nodeLocation[nodeHovered];
+                nodeStartingX = (float)workGradient.nodeLocations[nodeHovered];
                 nodeStartingY = (float)workGradient.nodeColors[nodeHovered].b;
                 cout << "Setting nodeStartingY to " << nodeStartingY << " mouseImgY : " << mouseImgY << "\n";
             }
@@ -212,7 +212,7 @@ void gradientWindow(clFractal& cf)
                 //nodeStartingX = workGradient.nodeIndices[nodeHovered];
                 //nodeCurrentX = nodeStartingX + dragX / gradientImgSizeX * workGradient.length;
                 cout << "Dragging: " << dragX << ", " << dragY << " " << nodeHovered << "\n";
-                workGradient.nodeLocation[nodeHovered] = nodeStartingX + dragX * (float)workGradient.length / gradientImgSizeX;
+                workGradient.nodeLocations[nodeHovered] = nodeStartingX + dragX * (float)workGradient.length / gradientImgSizeX;
                 cout << "Setting r to " << nodeStartingY - (float)mouseImgY / gradientImgSizeY << "\n";
                 workGradient.nodeColors[nodeHovered].b = nodeStartingY - (float)dragY / gradientImgSizeY;
                 //workGradient.nodeColors[nodeHovered].b = nodeStartingY;// -((float)dragY) / gradientImgSizeY;
@@ -223,9 +223,9 @@ void gradientWindow(clFractal& cf)
             if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && draggingNode)
             {
                 draggingNode = false;
-                workGradient.nodeLocation[nodeHovered] = nodeStartingX + dragX * (float)workGradient.length / gradientImgSizeX;
+                workGradient.nodeLocations[nodeHovered] = nodeStartingX + dragX * (float)workGradient.length / gradientImgSizeX;
                 workGradient.nodeColors[nodeHovered].b = nodeStartingY - ((float)dragY) / gradientImgSizeY;
-                cout << "Stopped dragging, updating X to " << workGradient.nodeLocation[nodeHovered] << " and Y to " << workGradient.nodeColors[nodeHovered].b * gradientImgSizeY << "\n";
+                cout << "Stopped dragging, updating X to " << workGradient.nodeLocations[nodeHovered] << " and Y to " << workGradient.nodeColors[nodeHovered].b * gradientImgSizeY << "\n";
                 needRGBlinePlots = true;
                 workGradient.checkNodeOrder();
                 workGradient.fill();
@@ -235,7 +235,7 @@ void gradientWindow(clFractal& cf)
         ImGui::TreePop();
     }
     nodeColorEdit = workGradient.nodeColors[lastActiveNode];
-    nodeLocationEdit = workGradient.nodeLocation[lastActiveNode];
+    nodeLocationEdit = workGradient.nodeLocations[lastActiveNode];
     static color nodeColorEditOld = nodeColorEdit;
     static int nodeLocationEditOld = nodeLocationEdit;
     ImGui::SliderInt("Active Node Location", &nodeLocationEdit, 0, workGradient.length);
@@ -245,7 +245,7 @@ void gradientWindow(clFractal& cf)
     if (nodeColorEdit != nodeColorEditOld || nodeLocationEdit != nodeLocationEditOld)
     {
         workGradient.nodeColors[lastActiveNode] = nodeColorEdit;
-        workGradient.nodeLocation[lastActiveNode] = nodeLocationEdit;
+        workGradient.nodeLocations[lastActiveNode] = nodeLocationEdit;
         needRGBlinePlots = true;
         // gradientChanged = true;
         workGradient.checkNodeOrder();
