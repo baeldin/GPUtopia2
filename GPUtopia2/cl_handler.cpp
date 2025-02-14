@@ -131,7 +131,7 @@ void addParam(parameterMaps& m,	const std::string name, const std::string type,
 
 // overload for enumParameter type
 void addParam(parameterMaps& m, const std::string name, const std::string type,
-	const enumParameter& ep, int index)
+	enumParameter& ep, int index)
 {
 	m.enumParameters[name] = std::make_pair(ep, index);
 }
