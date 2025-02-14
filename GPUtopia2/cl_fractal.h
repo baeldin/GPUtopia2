@@ -28,6 +28,7 @@ struct enumParameter
 {
 	int value;
 	std::vector<std::string> labels;
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(enumParameter, value, labels);
 };
 
 inline const bool operator==(const enumParameter& lhs, const enumParameter& rhs)
@@ -188,9 +189,12 @@ struct clFractalMinimal
 	parameterMapInt fractalIntParameters;
 	parameterMapReal fractalFloatParameters;
 	parameterMapBool fractalBoolParameters;
+	parameterMapEnum fractalEnumParameters;
 	parameterMapInt coloringIntParameters;
 	parameterMapReal coloringFloatParameters;
 	parameterMapBool coloringBoolParameters;
+	parameterMapEnum coloringEnumParameters;
+	int gradientLength;
 	std::vector<std::pair<int, int>> gradientColors;
 	std::vector<int> gradientFillOrder;
 	std::string fractalCLFragmentFile;
@@ -200,9 +204,9 @@ struct clFractalMinimal
 	NLOHMANN_DEFINE_TYPE_INTRUSIVE(clFractalMinimal,
 		centerX, centerY, zoom, angle, sizeX, sizeY, quality,
 		brightness, gamma, vibrancy, maxIter, bailout, mode, pointSelection, useDouble,
-		fractalIntParameters, fractalFloatParameters, fractalBoolParameters,
-		coloringIntParameters, coloringFloatParameters, coloringBoolParameters,
-		gradientColors, gradientFillOrder,
+		fractalIntParameters, fractalFloatParameters, fractalBoolParameters, fractalEnumParameters,
+		coloringIntParameters, coloringFloatParameters, coloringBoolParameters, coloringEnumParameters,
+		gradientLength, gradientColors, gradientFillOrder,
 		fractalCLFragmentFile, coloringCLFragmentFile);
 };
 

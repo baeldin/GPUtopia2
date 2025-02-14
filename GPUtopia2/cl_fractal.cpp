@@ -22,13 +22,16 @@ clFractalMinimal::clFractalMinimal(const clFractal* cf)
     fractalIntParameters = cf->params.fractalParameterMaps.integerParameters;
     fractalFloatParameters = cf->params.fractalParameterMaps.realParameters;
     fractalBoolParameters = cf->params.fractalParameterMaps.boolParameters;
+    fractalEnumParameters = cf->params.fractalParameterMaps.enumParameters;
     coloringIntParameters = cf->params.coloringParameterMaps.integerParameters;
     coloringFloatParameters = cf->params.coloringParameterMaps.realParameters;
     coloringBoolParameters = cf->params.coloringParameterMaps.boolParameters;
+    coloringEnumParameters = cf->params.coloringParameterMaps.enumParameters;
+    this->gradientLength = cf->gradient.length;
     for (int ii = 0; ii < cf->gradient.nodeCount; ii++)
     {
         const int intColor = cf->gradient.nodeColors[ii].toUFint();
-        const int idx = cf->gradient.nodeLocation[ii];
+        const int idx = cf->gradient.nodeLocations[ii];
         this->gradientColors.push_back(std::pair<int, int>(idx, intColor));
         this->gradientFillOrder.push_back(cf->gradient.fillOrder[ii]);
     }
@@ -58,9 +61,11 @@ clFractal::clFractal(const clFractalMinimal& cfm)
     this->params.fractalParameterMaps.integerParameters = cfm.fractalIntParameters;
     this->params.fractalParameterMaps.realParameters = cfm.fractalFloatParameters;
     this->params.fractalParameterMaps.boolParameters = cfm.fractalBoolParameters;
+    this->params.fractalParameterMaps.enumParameters = cfm.fractalEnumParameters;
     this->params.coloringParameterMaps.integerParameters = cfm.coloringIntParameters;
     this->params.coloringParameterMaps.realParameters = cfm.coloringFloatParameters;
     this->params.coloringParameterMaps.boolParameters = cfm.coloringBoolParameters;
+    this->params.coloringParameterMaps.enumParameters = cfm.coloringEnumParameters;
     std::vector<color> nodeColors;
     std::vector<int> nodeLocations;
     std::vector<int> fillOrder;
@@ -74,7 +79,7 @@ clFractal::clFractal(const clFractalMinimal& cfm)
     // this->gradient = Gradient(cfm.gradientColors.size(), nodeColors, nodeLocations, cfm.gradientFillOrder);
     // TODO: solve this dynamically, maybe without breaking compat just yet?
     // changed from cfm.gradientColors.size() to 400 to load a nice fractal without crash
-    this->gradient = Gradient(400, nodeColors, nodeLocations, cfm.gradientFillOrder);
+    this->gradient = Gradient(cfm.gradientLength, nodeColors, nodeLocations, cfm.gradientFillOrder);
     this->fractalCLFragmentFile = cfm.fractalCLFragmentFile;
     this->fractalCLFragmentFileUi = cfm.fractalCLFragmentFile;
     this->fractalCLFragmentFileHist= cfm.fractalCLFragmentFile;
