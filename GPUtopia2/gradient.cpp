@@ -15,7 +15,7 @@ int Gradient::getIndex(const std::vector<int>& v, const int K) const
 Gradient::Gradient() {
 	length = 40;
 	nodeColors = { color(0,0,0), color(1, 0,0), color(1,1,1), color(0.5f,0.5f,0.9f) };
-	nodeLocation = { 0, 10, 20, 30 };
+	nodeLocations = { 0, 10, 20, 30 };
 	nodeLocationsOld = std::vector<int>(4);
 	nodeCount = 4;
 	nodeIndex = { 0,1,2,3 };
@@ -26,7 +26,7 @@ Gradient::Gradient() {
 Gradient::Gradient(int length_, std::vector<color> colors_, std::vector<int> locations_) {
 	length = length_;
 	nodeColors = colors_;
-	nodeLocation = locations_;
+	nodeLocations = locations_;
 	nodeCount = locations_.size();
 	nodeLocationsOld = std::vector<int>(nodeCount);
 	nodeIndex = std::vector<int>(nodeCount);
@@ -35,7 +35,7 @@ Gradient::Gradient(int length_, std::vector<color> colors_, std::vector<int> loc
 	{
 		nodeIndex[ii] = ii;
 	}
-	fillOrder = getFillOrder(nodeLocation);
+	fillOrder = getFillOrder(nodeLocations);
 	fill();
 }
 
@@ -43,7 +43,7 @@ Gradient::Gradient(int length_, std::vector<color> colors_, std::vector<int> loc
 	std::vector<int> fillOrder_) {
 	length = length_;
 	nodeColors = colors_;
-	nodeLocation = locations_;
+	nodeLocations = locations_;
 	nodeCount = locations_.size();
 	nodeLocationsOld = std::vector<int>(nodeCount);
 	nodeIndex = std::vector<int>(nodeCount);
@@ -96,7 +96,7 @@ void Gradient::print() const
 	std::cout << "Index, Pos in Sequence, Location, (r, g, b)\n";
 	for (int ii = 0; ii < nodeCount; ii++)
 	{
-		std::cout << nodeIndex[ii] << ", " << fillOrder[ii] << ", " << nodeLocation[ii] << ", " << nodeColors[ii] << "\n";
+		std::cout << nodeIndex[ii] << ", " << fillOrder[ii] << ", " << nodeLocations[ii] << ", " << nodeColors[ii] << "\n";
 		int idx = idxOfNodeOrd(ii);
 		int loc = locOfNodeOrd(ii);
 		//std::cout << ii << ", " << idx << ", " << loc << ", " << nodeColors[idx] << "\n";
@@ -148,7 +148,7 @@ void Gradient::checkNodeOrder()
 	bool locationsChanged = false;
 	for (int ii = 0; ii < nodeCount; ii++)
 	{
-		if (!nodeLocation[ii] == nodeLocationsOld[ii])
+		if (!nodeLocations[ii] == nodeLocationsOld[ii])
 		{
 			locationsChanged = true;
 			break;
@@ -156,17 +156,17 @@ void Gradient::checkNodeOrder()
 	}
 	if (locationsChanged)
 	{
-		fillOrder = this->getFillOrder(nodeLocation);
+		fillOrder = this->getFillOrder(nodeLocations);
 		for (int ii = 0; ii < nodeCount - 1; ii++)
 		{
-			if (nodeLocation[ii] > nodeLocation[ii + 1])
+			if (nodeLocations[ii] > nodeLocations[ii + 1])
 			{
-				std::swap(nodeLocation[ii], nodeLocation[ii + 1]);
+				std::swap(nodeLocations[ii], nodeLocations[ii + 1]);
 				std::swap(nodeColors[ii], nodeColors[ii + 1]);
 			}
 		}
-		fillOrder = this->getFillOrder(nodeLocation);
-		nodeLocationsOld = nodeLocation;
+		fillOrder = this->getFillOrder(nodeLocations);
+		nodeLocationsOld = nodeLocations;
 	}
 }
 
@@ -198,7 +198,7 @@ std::vector<std::vector<int>> Gradient::getClickDotCoordinates(const int sizeX, 
 			std::max<int>(0, (int)((1.f - nodeColors[jj].r) * (sizeY - 1))),
 			std::max<int>(0, (int)((1.f - nodeColors[jj].g) * (sizeY - 1))),
 			std::max<int>(0, (int)((1.f - nodeColors[jj].b) * (sizeY - 1))) };
-		int dotXValue = nodeLocation[jj] * scaleX;
+		int dotXValue = nodeLocations[jj] * scaleX;
 		int dotHalfSize = 3;
 		for (int x = -dotHalfSize; x <= dotHalfSize; x++)
 		{
@@ -244,7 +244,7 @@ std::vector<std::vector<color>> Gradient::drawWithRGBlines(const int sizeX, cons
 			std::max<int>(0, (int)((1.f - nodeColors[jj].r) * (sizeY - 1))),
 			std::max<int>(0, (int)((1.f - nodeColors[jj].g) * (sizeY - 1))),
 			std::max<int>(0, (int)((1.f - nodeColors[jj].b) * (sizeY - 1))) };
-		int dotXValue = (float)nodeLocation[jj] * scaleX;
+		int dotXValue = (float)nodeLocations[jj] * scaleX;
 		int dotHalfSize = (nodeHighlight == jj) ? 4 : 3;
 		for (int x = -dotHalfSize; x <= dotHalfSize; x++)
 		{
@@ -394,7 +394,7 @@ color Gradient::get_color_cubic(float xidx) const
 	{
 		int fetch_index = nextIndex - 2 + jj;
 		fetch_index = (fetch_index < 0) ? fetch_index + nodeCount : (fetch_index >= nodeCount) ? fetch_index - nodeCount : fetch_index;
-		spline_indices[jj] = (float)nodeLocation[this->getIndex(fillOrder, fetch_index % nodeCount)];
+		spline_indices[jj] = (float)nodeLocations[this->getIndex(fillOrder, fetch_index % nodeCount)];
 		spline_colors[jj] = nodeColors[this->getIndex(fillOrder, fetch_index % nodeCount)];
 		if (jj > 0) // make sure to cycle if the 4 indices contain the end and beginning
 			spline_indices[jj] = (spline_indices[jj - 1] > spline_indices[jj]) ? spline_indices[jj] + this->length : spline_indices[jj];

@@ -98,6 +98,7 @@ public:
 	// ONLY USED FOR INTIAL FILL
 	color get_color_cubic(float xidx) const;
 	std::vector<color> getGradientImg(const int width, const int height);
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(Gradient, length, nodeColors, nodeLocation;);
 };
 
 inline bool operator==(const Gradient& lhs, const Gradient& rhs)
