@@ -5,6 +5,9 @@
 #include <cmath>
 #include <CL/opencl.h>
 
+#include "json.hpp"
+using json = nlohmann::json;
+
 float clamp(const float x);
 
 float sRGBtoLinear(const float x);
@@ -55,6 +58,7 @@ struct color
     uint32_t toUFint() const {
         return 65536 * (int)(b * 255) + 256 * (int)(g * 255) + (int)(r * 255);
     }
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(color, r, g, b, a);
 };
 
 inline const bool operator==(const color& lhs, const color& rhs)
