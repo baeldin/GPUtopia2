@@ -53,7 +53,7 @@ __loop:
                 @c4 * stream_func_pentarls2_Y(@f4 * z.x, @f4 * z.y, a1, a2, a3, a4, b1, b2, b3, b4, os4) +
                 @offsetImag1 + @offsetImag2 + @offsetImag3 + @offsetImag4);
         }
-        else if (@mode == 1)
+        else if (@mode == )
         {
             z += (real2)(
                 @c1 * stream_func_pentarls2_X(@f1 * z.x, @f1 * z.y, a1, a2, a3, a4, b1, b2, b3, b4, os1) + @offsetReal1,

@@ -7,10 +7,6 @@ __init:
         complex z = z0;
     __loop:
 //=========| fractal formula loop
-             //z = (complex)(
-             //    z.x * z.x - z.y * z.y + z0.x,
-             //    2.f * z.x * z.y + z0.y);
-             // z = cpow(z, @exponent) + z0;
              if (@test == 0)
                  z = cmul(z, z) + z0;
              else if (@test == 1)
