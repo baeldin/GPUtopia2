@@ -33,6 +33,8 @@ void trimTrailingCharacters(
 //	const std::string& name, 
 //	const std::string& type,
 //	const std::string& value);
+void addParam(parameterMaps& m, const std::string name, const std::string type,
+	enumParameter& ep, int index);
 
 std::vector<std::string> splitLines(const std::string& text);
 paramCollector parseKernelParameterBlock(std::string& kpb);
