@@ -10,5 +10,6 @@
 #include "cl_fractal.h"
 #include "gradient.h"
 #include "display.h"
+#include "clipboard.h"
 
 void gradientWindow(clFractal& cf);

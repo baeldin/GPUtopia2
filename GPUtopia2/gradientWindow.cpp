@@ -4,6 +4,24 @@ void gradientWindow(clFractal& cf)
 {
     ImGui::Begin("Gradient", nullptr);
     ImGuiIO& io = ImGui::GetIO();
+    static Gradient workGradientOld = cf.gradient;
+    static Gradient workGradient = cf.gradient;
+    if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_V, false) && ImGui::IsWindowFocused())
+    {
+        // paste gradient
+        std::string jsonStr = ReadStringFromClipboard();
+        json back_json = json::parse(jsonStr);
+        auto grad = back_json.get<Gradient>();
+        workGradient = grad;
+    }
+    if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_C, false) && ImGui::IsWindowFocused())
+    {
+        // copy gradient
+        json json = cf.gradient;
+        std::cout << "Copying gradient to clipboard:\n";
+        std::cout << json.dump(4);
+        CopyStringToClipboard(json.dump());
+    }
     // Yellow is content region min/max
     static ImVec2 vMin = ImGui::GetWindowContentRegionMin();
     static ImVec2 vMax = ImGui::GetWindowContentRegionMax();
@@ -27,15 +45,6 @@ void gradientWindow(clFractal& cf)
     static Gradient cfOld = cf.gradient;
     static Gradient cfNew = cf.gradient;
     cfNew = cf.gradient;
-    static Gradient workGradientOld = cf.gradient;
-    static Gradient workGradient = cf.gradient;
-    // if outside changed cf.gradient, update work gradients
-    if (cfOld != cfNew)
-    {
-        workGradientOld = cf.gradient;
-        workGradient = cf.gradient;
-    }
-    // set to true at the start and whenver the gradient changes
     if (ImGui::TreeNode("RGB"))
     {
         static int windowX = ImGui::GetContentRegionAvail().x;
@@ -75,8 +84,9 @@ void gradientWindow(clFractal& cf)
             gradientImgRClickZones = workGradient.getClickDotCoordinates(gradientImgSizeX, gradientImgSizeY);
             int mouseImgX = io.MousePos.x - ImGui::GetCursorScreenPos().x - ImGui::GetScrollX();
             int mouseImgY = gradientImgSizeY + (io.MousePos.y - ImGui::GetCursorScreenPos().y - ImGui::GetScrollY()) + 4;
-            int clickedPixelIndex = gradientImgSizeX * (mouseImgY)+mouseImgX;
-            static int dragX = 0;
+            int clickedPixelIndex = 0;
+            if (mouseImgX > 0 && mouseImgY > 0 && mouseImgX < gradientImgSizeX && mouseImgY < gradientImgSizeY)
+                clickedPixelIndex = gradientImgSizeX * (mouseImgY)+mouseImgX;            static int dragX = 0;
             static int dragY = 0;
             static float nodeStartingX, nodeStartingY;
             static int nodeHovered, colorHovered;
@@ -131,8 +141,9 @@ void gradientWindow(clFractal& cf)
             gradientImgGClickZones = workGradient.getClickDotCoordinates(gradientImgSizeX, gradientImgSizeY);
             int mouseImgX = io.MousePos.x - ImGui::GetCursorScreenPos().x - ImGui::GetScrollX();
             int mouseImgY = gradientImgSizeY + (io.MousePos.y - ImGui::GetCursorScreenPos().y - ImGui::GetScrollY()) + 4;
-            int clickedPixelIndex = gradientImgSizeX * (mouseImgY)+mouseImgX;
-            static int dragX = 0;
+            int clickedPixelIndex = 0;
+            if (mouseImgX > 0 && mouseImgY > 0 && mouseImgX < gradientImgSizeX && mouseImgY < gradientImgSizeY)
+                clickedPixelIndex = gradientImgSizeX * (mouseImgY)+mouseImgX;            static int dragX = 0;
             static int dragY = 0;
             static float nodeStartingX, nodeStartingY;
             static int nodeHovered, colorHovered;
@@ -187,7 +198,9 @@ void gradientWindow(clFractal& cf)
             gradientImgBClickZones = workGradient.getClickDotCoordinates(gradientImgSizeX, gradientImgSizeY);
             int mouseImgX = io.MousePos.x - ImGui::GetCursorScreenPos().x - ImGui::GetScrollX();
             int mouseImgY = gradientImgSizeY + (io.MousePos.y - ImGui::GetCursorScreenPos().y - ImGui::GetScrollY()) + 4;
-            int clickedPixelIndex = gradientImgSizeX * (mouseImgY)+mouseImgX;
+            int clickedPixelIndex = 0;
+            if (mouseImgX > 0 && mouseImgY > 0 && mouseImgX < gradientImgSizeX && mouseImgY < gradientImgSizeY)
+                clickedPixelIndex = gradientImgSizeX * (mouseImgY)+mouseImgX;
             static int dragX = 0;
             static int dragY = 0;
             static float nodeStartingX, nodeStartingY;
