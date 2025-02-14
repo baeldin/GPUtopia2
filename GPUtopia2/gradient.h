@@ -6,6 +6,9 @@
 #include <algorithm>
 #include <string>
 
+#include "json.hpp"
+using json = nlohmann::json;
+
 #include "color.h"
 #include "cubic_spline.h"
 
@@ -15,18 +18,18 @@ bool pixelInImage(const int x, const int y, const int sizeX, const int sizeY);
 class Gradient
 {
 public:
-	int fineLength = 400;
+	int length = 400;
+	int nodeCount = 4;
+	std::vector<color> nodeColors = { color(0,0,0), color(1, 0,0), color(1,1,1), color(0.5f,0.5f,0.9f) };
+	std::vector<int> nodeIndex = { 1, 2, 3, 4 };
+	std::vector<int> nodeLocations = { 0, 10, 20, 30 };
+	int fineLength = 4096;
 	std::vector<color> fineColors;
 	std::vector<int> fine_indices;
-	std::vector<int> nodeIndex;
 	std::vector<int> nodeLocationsOld;
 	// very basic function, assumes that K will always be found
 	// only to be used from within the class
 	int getIndex(const std::vector<int>& v, const int K) const;
-	int length;
-	int nodeCount;
-	std::vector<color> nodeColors;
-	std::vector<int> nodeLocation;
 	std::vector<int> fillOrder;
 	int nodeHighlight = 1; // default no node highlighted
 	std::string name = "DefaultName";
@@ -40,7 +43,7 @@ public:
 	// pos in draw sequence from index
 	int ordOfNodeIdx(const int N) const { return fillOrder[N]; }
 	// location in gradient from index
-	int locOfNodeIdx(const int N) const { return nodeLocation[N]; }
+	int locOfNodeIdx(const int N) const { return nodeLocations[N]; }
 	// index from location in gradient
 	int idxOfNodeLoc(const int N) const { return getIndex(nodeIndex, N); }
 	// location in gradient from pos in draw sequence
@@ -58,9 +61,9 @@ public:
 		outStr += name + " {\n";
 		outStr += "gradient:\n";
 		outStr += "title=" + name + " smooth=yes,\n";
-		for (int ii = 0; ii < nodeLocation.size(); ii++)
+		for (int ii = 0; ii < nodeLocations.size(); ii++)
 		{
-			outStr += "index = " + std::to_string(nodeLocation[ii]) + " color = " + std::to_string(nodeColors[ii].toUFint()) + "\n";
+			outStr += "index = " + std::to_string(nodeLocations[ii]) + " color = " + std::to_string(nodeColors[ii].toUFint()) + "\n";
 		}
 		outStr += "}\n";
 		const char* outChar = outStr.c_str();
@@ -98,14 +101,15 @@ public:
 	// ONLY USED FOR INTIAL FILL
 	color get_color_cubic(float xidx) const;
 	std::vector<color> getGradientImg(const int width, const int height);
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(Gradient, length, nodeColors, nodeLocation;);
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(Gradient, 
+		length, nodeColors, nodeLocations);
 };
 
 inline bool operator==(const Gradient& lhs, const Gradient& rhs)
 {
 	return (
 		lhs.nodeColors == rhs.nodeColors &&
-		lhs.nodeLocation == rhs.nodeLocation &&
+		lhs.nodeLocations == rhs.nodeLocations &&
 		lhs.fillOrder == rhs.fillOrder);
 }
 

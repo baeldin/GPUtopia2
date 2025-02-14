@@ -13,13 +13,8 @@ int Gradient::getIndex(const std::vector<int>& v, const int K) const
 }
 
 Gradient::Gradient() {
-	length = 40;
-	nodeColors = { color(0,0,0), color(1, 0,0), color(1,1,1), color(0.5f,0.5f,0.9f) };
-	nodeLocations = { 0, 10, 20, 30 };
-	nodeLocationsOld = std::vector<int>(4);
-	nodeCount = 4;
-	nodeIndex = { 0,1,2,3 };
-	fillOrder = { 0,1,2,3 };
+	nodeLocationsOld = nodeLocations;
+	fillOrder = getFillOrder(nodeLocations);
 	fill();
 }
 
