@@ -6,7 +6,7 @@
 #include <CL/opencl.h>
 
 #include "json.hpp"
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 float clamp(const float x);
 
@@ -32,6 +32,7 @@ struct color
     {
         r = r_; g = g_; b = b_; a = a_;
     }
+    // using Ultra Fractal type integer
     color(const uint32_t UFint) {
         const int ib = UFint / 65536;
         const int ig = (UFint - ib * 65536) / 256;
@@ -65,7 +66,6 @@ inline const bool operator==(const color& lhs, const color& rhs)
 {
     return(lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && lhs.a == rhs.a);
 }
-
 
 std::ostream& operator<<(std::ostream& os, const color& c);
 
