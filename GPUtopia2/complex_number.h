@@ -3,6 +3,9 @@
 #include <cmath>
 #include <iostream>
 
+#include "json.hpp"
+using json = nlohmann::json;
+
 using std::ostream;
 using std::basic_ostream;
 using std::cout;
@@ -64,6 +67,7 @@ public:
 	constexpr Complex<double> ln() const {
 		return Complex<double>(std::log(this->cabs()), std::atan2(y, x));
 	}
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(Complex, x, y);
 };
 
 template <typename T>

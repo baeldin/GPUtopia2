@@ -65,6 +65,8 @@ struct parameterMaps
 	parameterMapReal realParameters;
 	parameterMapComplex complexParameters;	
 	parameterMapEnum enumParameters;
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(parameterMaps, integerParameters, boolParameters,
+		realParameters, complexParameters, enumParameters);
 };
 
 
@@ -82,6 +84,7 @@ struct paramCollector
 {
 	parameterMaps fractalParameterMaps;
 	parameterMaps coloringParameterMaps;
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(paramCollector, fractalParameterMaps, coloringParameterMaps);
 };
 
 inline const bool operator==(const paramCollector& lhs, const paramCollector& rhs)
@@ -91,10 +94,26 @@ inline const bool operator==(const paramCollector& lhs, const paramCollector& rh
 		lhs.coloringParameterMaps == rhs.coloringParameterMaps);
 }
 
+struct size
+{
+	int x;
+	int y;
+	size() : x(1280), y(720) {}
+	size(const float x_, const float y_) : x(x_), y(y_) {}
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(size, x, y);
+};
+
+inline const bool operator==(const size& lhs, const size& rhs)
+{
+	return (lhs.x == rhs.x && lhs.y == rhs.y);
+}
+
+inline const bool operator!=(const size& lhs, const size& rhs) { return !(lhs == rhs); }
+
 // settings for the image generated from the fractal, including default values
 struct clFractalImage
 {
-	cl_int2 size = { 1280, 720 };
+	size size = { 1280, 720 };
 	double aspectRatio = (double)size.x / (double)size.y;
 	Complex<double> center = Complex<double>(0., 0.);
 	Complex<double> span = Complex<double>(4., 4. / aspectRatio);
@@ -134,8 +153,8 @@ struct clFractalImage
 		const cl_double2 xy = { x, y };
 		return image2complex(xy);
 	}
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(clFractalImage, center, zoom, angle, size, targetQuality, span);
 };
-
 
 inline const bool operator==(const clFractalImage& lhs, const clFractalImage& rhs)
 {
@@ -167,50 +186,24 @@ struct clFractalStatus
 
 class clFractal;
 
-struct clFractalMinimal
+inline std::mutex timingMutex;
+
+struct flameRenderSettings
 {
-	double centerX;
-	double centerY;
-	double spanX;
-	double spanY;
-	double zoom;
-	double angle;
-	int sizeX;
-	int sizeY;
-	int quality;
-	float brightness;
-	float gamma;
-	float vibrancy;
-	int maxIter;
-	double bailout;
-	int mode;
-	int pointSelection;
-	bool useDouble;
-	parameterMapInt fractalIntParameters;
-	parameterMapReal fractalFloatParameters;
-	parameterMapBool fractalBoolParameters;
-	parameterMapEnum fractalEnumParameters;
-	parameterMapInt coloringIntParameters;
-	parameterMapReal coloringFloatParameters;
-	parameterMapBool coloringBoolParameters;
-	parameterMapEnum coloringEnumParameters;
-	int gradientLength;
-	std::vector<std::pair<int, int>> gradientColors;
-	std::vector<int> gradientFillOrder;
-	std::string fractalCLFragmentFile;
-	std::string coloringCLFragmentFile;
-	clFractalMinimal() {}
-	clFractalMinimal(const clFractal* cf);
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(clFractalMinimal,
-		centerX, centerY, zoom, angle, sizeX, sizeY, quality,
-		brightness, gamma, vibrancy, maxIter, bailout, mode, pointSelection, useDouble,
-		fractalIntParameters, fractalFloatParameters, fractalBoolParameters, fractalEnumParameters,
-		coloringIntParameters, coloringFloatParameters, coloringBoolParameters, coloringEnumParameters,
-		gradientLength, gradientColors, gradientFillOrder,
-		fractalCLFragmentFile, coloringCLFragmentFile);
+	float brightness = 4.f;
+	float gamma = 1.5f;
+	float vibrancy = 1.f;
+	flameRenderSettings() {}
+	flameRenderSettings(const float b_, const float g_, const float v_) : brightness(b_), gamma(g_), vibrancy(v_) {}
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(flameRenderSettings, brightness, gamma, vibrancy);
 };
 
-inline std::mutex timingMutex;
+inline const bool operator==(const flameRenderSettings& lhs, const flameRenderSettings& rhs)
+{
+	return (lhs.brightness == rhs.brightness &&
+		lhs.gamma == rhs.gamma &&
+		lhs.vibrancy == rhs.vibrancy);
+}
 
 // Fractal class that holds parameters, names of the code fragmens, and the full
 // CL code of the fractal + coloring
@@ -241,13 +234,12 @@ public:
 	float bailout = 4.f;
 	int samples_per_kernel_run = 1;
 	// brightness, gamma, vibrancy
-	cl_float4 flameRenderSettings = { 4.f, 2.f, 1.f, 0.f };
+	flameRenderSettings frs = { 4.f, 2.f, 1.f };
 	cl_int flamePointSelection = 0;
 	cl_int flameWarmup = 0;
 	clFractalStatus status;
-	uint32_t verbosity = 2;
+	uint32_t verbosity = 0;
 	clFractal() : gradient() {}
-	clFractal(const clFractalMinimal& cfm);
 	bool makeCLCode(const bool sameFiles = NEW_FILES);
 	void setFractalCLFragmentFile(const char* fil) {
 		fractalCLFragmentFile = std::string(fil);
@@ -322,7 +314,9 @@ public:
 		else
 			return false;
 	}
-	clFractalMinimal toExport() { return clFractalMinimal(this); }
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(clFractal,
+		image, frs, maxIter, bailout, mode, flamePointSelection, useDouble,
+		params, gradient, fractalCLFragmentFile, coloringCLFragmentFile); 
 };
 
 inline const bool operator==(const clFractal& lhs, const clFractal& rhs)

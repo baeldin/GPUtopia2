@@ -189,9 +189,9 @@ void clCore::setImgKernelArguments(clFractal& cf)
     setReusedBufferArgument(this->imgKernel.kernel, 0, this->imgIntRGBABuffer, "intImgBuffer", cf.verbosity);
     this->imgFloatBuffer = setBufferKernelArg(this->imgKernel.kernel, 2, cf.imgData.data(), sizeof(cl_float4) * this->currentRenderSize, CL_MEM_WRITE_ONLY, "imgFloatColorValues", &err, cf.verbosity);
     err = setKernelArg(this->imgKernel.kernel, 4, cf.mode, "image processing mode (escape time/flame)", cf.verbosity);
-    err = setKernelArg(this->imgKernel.kernel, 5, cf.flameRenderSettings.x, "flame render brightness", cf.verbosity);
-    err = setKernelArg(this->imgKernel.kernel, 6, cf.flameRenderSettings.y, "flame render gamma", cf.verbosity);
-    err = setKernelArg(this->imgKernel.kernel, 7, cf.flameRenderSettings.z, "flame render vibrancy", cf.verbosity);
+    err = setKernelArg(this->imgKernel.kernel, 5, cf.frs.brightness, "flame render brightness", cf.verbosity);
+    err = setKernelArg(this->imgKernel.kernel, 6, cf.frs.gamma, "flame render gamma", cf.verbosity);
+    err = setKernelArg(this->imgKernel.kernel, 7, cf.frs.vibrancy, "flame render vibrancy", cf.verbosity);
     this->imgKernel.argumentCount = 8;
 }
 
