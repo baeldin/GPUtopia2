@@ -25,8 +25,7 @@ void openCLF(clFractal& cf, clCore& cc)
 		std::string jsonStr;
 		inFile >> jsonStr;
 		json back_json = json::parse(jsonStr);
-		auto cfm = back_json.get<clFractalMinimal>();
-		cf = clFractal(cfm);
+		auto cf = back_json.get<clFractal>();
 		cf.makeCLCode(SAME_FILES);
 		cc.resetCore();
 		cc.compileFractalKernel(cf.fullCLcode);
@@ -40,9 +39,9 @@ void saveCLF(clFractal& cf)
 	saveFileDialog(path, success, L"clf", L"GPUtopia Fractals (*.clf)");
 	if (success)
 	{
-		json json = cf.toExport();
+		json json = cf;
 		std::ofstream outFile(path);
-		outFile << json.dump();
+		outFile << json.dump(4);
 		outFile.close();
 	}
 }
@@ -52,7 +51,7 @@ void saveCLF(clFractal& cf)
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
-void savePNG(const std::vector<color>& image_data, const cl_int2& size)
+void savePNG(const std::vector<color>& image_data, const size& size)
 {
 	bool success = false;
 	std::string fileName;
