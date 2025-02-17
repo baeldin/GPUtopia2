@@ -325,7 +325,7 @@ void gradientWindow(clFractal& cf)
     static GLuint gradientTextureID;
     static bool needGradientTexture;
     static int colorNodeCount = 4;
-    static int currentGradientIndex = 2;
+    static int currentGradientIndex = 3;
     static int previousGradientIndex = -1; // make sure that this is different initially
     const char* items[] = { "UF Default", "UF Default Muted", "Volcano Under a Glacier", "Volcano Under a Glacier2", "Jet", "CBR_coldhot", "nice_random", "Default" , "Test" };
     static std::vector<color> gradient_img_data(400 * 30, color(0.f));
