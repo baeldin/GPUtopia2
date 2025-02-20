@@ -47,7 +47,5 @@ std::string fillKernelParamBlock(
 // detect and name all parameters
 // add parameters as kernel arguments
 // figure out how to auto-hand the respective parameters to the kernel???
-paramCollector parseParameters(
-	std::string& fullStr,
-	const std::string& fractalFormula,
-	const std::string& coloringAlgorithm);
+paramCollector parseParameters(std::string& fullStr, const std::string& fractalFormula,
+	const std::string& coloringInsideAlgorithm, const std::string& coloringOutsideAlgorithm);

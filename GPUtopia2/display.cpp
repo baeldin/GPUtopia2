@@ -219,8 +219,10 @@ namespace mainView
 				{
 					if (cf.newFractalCLFragmentQueued())
 						cf.popFractalCLFragmentQueue();
-					if (cf.newColoringCLFragmentQueued())
-						cf.popColoringCLFragmentQueue();
+					if (cf.newOutsideColoringCLFragmentQueued())
+						cf.popOutsideColoringCLFragmentQueue();
+					if (cf.newInsideColoringCLFragmentQueued())
+						cf.popInsideColoringCLFragmentQueue();
 					if (cf.makeCLCode(NEW_FILES))
 					{
 						core.resetCore();

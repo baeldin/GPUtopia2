@@ -127,26 +127,34 @@ void clCore::setDefaultFractalArguments(clFractal& cf)
 void clCore::setFractalParameterArgs(clFractal& cf)
 {
     setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.integerParameters, cf.verbosity);
-    setMapOfArgs(this->fractalKernel.kernel, cf.params.coloringParameterMaps.integerParameters, cf.verbosity);
+    setMapOfArgs(this->fractalKernel.kernel, cf.params.insideColoringParameterMaps.integerParameters, cf.verbosity);
+    setMapOfArgs(this->fractalKernel.kernel, cf.params.outsideColoringParameterMaps.integerParameters, cf.verbosity);
     setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.enumParameters, cf.verbosity);
-    setMapOfArgs(this->fractalKernel.kernel, cf.params.coloringParameterMaps.enumParameters, cf.verbosity);
+    setMapOfArgs(this->fractalKernel.kernel, cf.params.insideColoringParameterMaps.enumParameters, cf.verbosity);
+    setMapOfArgs(this->fractalKernel.kernel, cf.params.outsideColoringParameterMaps.enumParameters, cf.verbosity);
     if (cf.useDouble)
     {
         setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.realParameters, cf.verbosity);
         setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.complexParameters, cf.verbosity);
-        setMapOfArgs(this->fractalKernel.kernel, cf.params.coloringParameterMaps.realParameters, cf.verbosity);
-        setMapOfArgs(this->fractalKernel.kernel, cf.params.coloringParameterMaps.complexParameters, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, cf.params.outsideColoringParameterMaps.realParameters, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, cf.params.insideColoringParameterMaps.complexParameters, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, cf.params.outsideColoringParameterMaps.realParameters, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, cf.params.insideColoringParameterMaps.complexParameters, cf.verbosity);
     }
     else
     {
         parameterMapFloat floatArgumentMapF = argumentMapFloatCast(cf.params.fractalParameterMaps.realParameters);
         parameterMapComplexFloat complexFloatArgumentMapF = argumentMapFloatCast(cf.params.fractalParameterMaps.complexParameters);
-        parameterMapFloat floatArgumentMapC = argumentMapFloatCast(cf.params.coloringParameterMaps.realParameters);
-        parameterMapComplexFloat complexFloatArgumentMapC = argumentMapFloatCast(cf.params.coloringParameterMaps.complexParameters);
+        parameterMapFloat floatArgumentMapCO = argumentMapFloatCast(cf.params.outsideColoringParameterMaps.realParameters);
+        parameterMapComplexFloat complexFloatArgumentMapCO = argumentMapFloatCast(cf.params.outsideColoringParameterMaps.complexParameters);
+        parameterMapFloat floatArgumentMapCI = argumentMapFloatCast(cf.params.insideColoringParameterMaps.realParameters);
+        parameterMapComplexFloat complexFloatArgumentMapCI = argumentMapFloatCast(cf.params.insideColoringParameterMaps.complexParameters);
         setMapOfArgs(this->fractalKernel.kernel, floatArgumentMapF, cf.verbosity);
         setMapOfArgs(this->fractalKernel.kernel, complexFloatArgumentMapF, cf.verbosity);
-        setMapOfArgs(this->fractalKernel.kernel, floatArgumentMapC, cf.verbosity);
-        setMapOfArgs(this->fractalKernel.kernel, complexFloatArgumentMapC, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, floatArgumentMapCO, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, complexFloatArgumentMapCO, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, floatArgumentMapCI, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, complexFloatArgumentMapCI, cf.verbosity);
     }
 }
 

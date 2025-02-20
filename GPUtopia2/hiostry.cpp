@@ -10,7 +10,8 @@ void undo(clFractal& cf, clFractal& cf_old, clCore& cc,
 		std::cout << "UNDO: -History index = " << *historyIndex << "\n";
 		cf = clFractal(history[*historyIndex]);
 		if (cf.fractalCLFragmentFile != cf_old.fractalCLFragmentFile ||
-			cf.coloringCLFragmentFile != cf_old.coloringCLFragmentFile)
+			cf.outsideColoringCLFragmentFile != cf_old.outsideColoringCLFragmentFile ||
+			cf.insideColoringCLFragmentFile != cf_old.insideColoringCLFragmentFile)
 		{
 			cf.makeCLCode();
 			cc.resetCore();
@@ -41,7 +42,8 @@ void redo(clFractal& cf, clFractal& cf_old, clCore& cc,
 		std::cout << "REDO: +History index = " << *historyIndex << "\n";
 		cf = clFractal(history[*historyIndex]);
 		if (cf.fractalCLFragmentFile != cf_old.fractalCLFragmentFile ||
-			cf.coloringCLFragmentFile != cf_old.coloringCLFragmentFile)
+			cf.outsideColoringCLFragmentFile != cf_old.outsideColoringCLFragmentFile ||
+			cf.insideColoringCLFragmentFile != cf_old.insideColoringCLFragmentFile)
 		{
 			cf.makeCLCode();
 			cc.resetCore();

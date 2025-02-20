@@ -83,15 +83,18 @@ inline const bool operator==(const parameterMaps& lhs, const parameterMaps& rhs)
 struct paramCollector
 {
 	parameterMaps fractalParameterMaps;
-	parameterMaps coloringParameterMaps;
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(paramCollector, fractalParameterMaps, coloringParameterMaps);
+	parameterMaps insideColoringParameterMaps;
+	parameterMaps outsideColoringParameterMaps;
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(paramCollector, fractalParameterMaps, 
+		outsideColoringParameterMaps, insideColoringParameterMaps);
 };
 
 inline const bool operator==(const paramCollector& lhs, const paramCollector& rhs)
 {
 	return (
 		lhs.fractalParameterMaps == rhs.fractalParameterMaps &&
-		lhs.coloringParameterMaps == rhs.coloringParameterMaps);
+		lhs.insideColoringParameterMaps == rhs.insideColoringParameterMaps &&
+		lhs.outsideColoringParameterMaps == rhs.outsideColoringParameterMaps);
 }
 
 struct size
@@ -218,9 +221,12 @@ public:
 	std::string fractalCLFragmentFile = "clFragments/fractalFormulas/mandelbrot.cl";
 	std::string fractalCLFragmentFileUi = "clFragments/fractalFormulas/mandelbrot.cl";
 	std::string fractalCLFragmentFileHist = "clFragments/fractalFormulas/mandelbrot.cl";
-	std::string coloringCLFragmentFile = "clFragments/coloringAlgorithms/by_iteration.cl";
-	std::string coloringCLFragmentFileUi = "clFragments/coloringAlgorithms/by_iteration.cl";
-	std::string coloringCLFragmentFileHist = "clFragments/coloringAlgorithms/by_iteration.cl";
+	std::string outsideColoringCLFragmentFile = "clFragments/coloringAlgorithms/by_iteration.cl";
+	std::string outsideColoringCLFragmentFileUi = "clFragments/coloringAlgorithms/by_iteration.cl";
+	std::string outsideColoringCLFragmentFileHist = "clFragments/coloringAlgorithms/by_iteration.cl";
+	std::string insideColoringCLFragmentFile = "clFragments/coloringAlgorithms/gaussian_integer.cl";
+	std::string insideColoringCLFragmentFileUi = "clFragments/coloringAlgorithms/gaussian_integer.cl";
+	std::string insideColoringCLFragmentFileHist = "clFragments/coloringAlgorithms/gaussian_integer.cl";
 	std::string fullCLcode = "";
 	std::vector<int> imgIntRGBAData;
 	std::vector<color> imgData;
@@ -241,12 +247,6 @@ public:
 	uint32_t verbosity = 0;
 	clFractal() : gradient() {}
 	bool makeCLCode(const bool sameFiles = NEW_FILES);
-	void setFractalCLFragmentFile(const char* fil) {
-		fractalCLFragmentFile = std::string(fil);
-	}
-	void setColoringCLFragmentFile(const char* fil) {
-		coloringCLFragmentFile = std::string(fil);
-	}
 	bool running() {
 		return this->status.kernelRunning or this->status.imgKernelRunning;
 	}
@@ -256,11 +256,17 @@ public:
 			this->fractalCLFragmentFile != this->fractalCLFragmentFileHist ||
 			this->fractalCLFragmentFile != this->fractalCLFragmentFileUi);
 	}
-	bool newColoringCLFragmentQueued() const
+	bool newInsideColoringCLFragmentQueued() const
 	{
 		return (
-			this->coloringCLFragmentFile != this->coloringCLFragmentFileHist ||
-			this->coloringCLFragmentFile != this->coloringCLFragmentFileUi);
+			this->insideColoringCLFragmentFile != this->insideColoringCLFragmentFileHist ||
+			this->insideColoringCLFragmentFile != this->insideColoringCLFragmentFileUi);
+	}
+	bool newOutsideColoringCLFragmentQueued() const
+	{
+		return (
+			this->outsideColoringCLFragmentFile != this->outsideColoringCLFragmentFileHist ||
+			this->outsideColoringCLFragmentFile != this->outsideColoringCLFragmentFileUi);
 	}
 	std::string getQueuedFractalCLFile() const
 	{
@@ -271,12 +277,21 @@ public:
 		else // this should never happen
 			return std::string("void");
 	}
-	std::string getQueuedColoringCLFile() const
+	std::string getQueuedOutsideColoringCLFile() const
 	{
-		if (coloringCLFragmentFile != coloringCLFragmentFileUi)
-			return coloringCLFragmentFileUi;
-		if (coloringCLFragmentFile != coloringCLFragmentFileHist)
-			return coloringCLFragmentFileHist;
+		if (outsideColoringCLFragmentFile != outsideColoringCLFragmentFileUi)
+			return outsideColoringCLFragmentFileUi;
+		if (outsideColoringCLFragmentFile != outsideColoringCLFragmentFileHist)
+			return outsideColoringCLFragmentFileHist;
+		else // this should never happen
+			return std::string("void");
+	}
+	std::string getQueuedInsideColoringCLFile() const
+	{
+		if (insideColoringCLFragmentFile != insideColoringCLFragmentFileUi)
+			return insideColoringCLFragmentFileUi;
+		if (insideColoringCLFragmentFile != insideColoringCLFragmentFileHist)
+			return insideColoringCLFragmentFileHist;
 		else // this should never happen
 			return std::string("void");
 	}
@@ -287,14 +302,24 @@ public:
 		this->fractalCLFragmentFileHist = newFractalCLFile;
 		this->fractalCLFragmentFileUi = newFractalCLFile;
 	}
-	void popColoringCLFragmentQueue()
+	void popOutsideColoringCLFragmentQueue()
 	{
-		const std::string newColoringCLFile = this->getQueuedColoringCLFile();
-		this->coloringCLFragmentFile = newColoringCLFile;
-		this->coloringCLFragmentFileHist = newColoringCLFile;
-		this->coloringCLFragmentFileUi = newColoringCLFile;
+		const std::string newOutsideColoringCLFile = this->getQueuedOutsideColoringCLFile();
+		this->outsideColoringCLFragmentFile = newOutsideColoringCLFile;
+		this->outsideColoringCLFragmentFileHist = newOutsideColoringCLFile;
+		this->outsideColoringCLFragmentFileUi = newOutsideColoringCLFile;
 	}
-	bool newCLFragmentQueued() { return (newFractalCLFragmentQueued() || newColoringCLFragmentQueued()); }
+	void popInsideColoringCLFragmentQueue()
+	{
+		const std::string newInsideColoringCLFile = this->getQueuedInsideColoringCLFile();
+		this->insideColoringCLFragmentFile = newInsideColoringCLFile;
+		this->insideColoringCLFragmentFileHist = newInsideColoringCLFile;
+		this->insideColoringCLFragmentFileUi = newInsideColoringCLFile;
+	}
+	bool newCLFragmentQueued() { return (
+		newFractalCLFragmentQueued() ||
+		newOutsideColoringCLFragmentQueued() ||
+		newInsideColoringCLFragmentQueued()); }
 	bool clFragmentExists(const std::string& fileName) const
 	{
 		std::ifstream f(fileName.c_str());
@@ -316,7 +341,7 @@ public:
 	}
 	NLOHMANN_DEFINE_TYPE_INTRUSIVE(clFractal,
 		image, frs, maxIter, bailout, mode, flamePointSelection, useDouble,
-		params, gradient, fractalCLFragmentFile, coloringCLFragmentFile); 
+		params, gradient, fractalCLFragmentFile, insideColoringCLFragmentFile, outsideColoringCLFragmentFile); 
 };
 
 inline const bool operator==(const clFractal& lhs, const clFractal& rhs)
@@ -343,9 +368,12 @@ inline const bool operator==(const clFractal& lhs, const clFractal& rhs)
 		lhs.fractalCLFragmentFile == rhs.fractalCLFragmentFile &&
 		lhs.fractalCLFragmentFileHist == rhs.fractalCLFragmentFileHist &&
 		lhs.fractalCLFragmentFileUi == rhs.fractalCLFragmentFileUi &&
-		lhs.coloringCLFragmentFile == rhs.coloringCLFragmentFile &&
-		lhs.coloringCLFragmentFileHist == rhs.coloringCLFragmentFileHist &&
-		lhs.coloringCLFragmentFileUi == rhs.coloringCLFragmentFileUi &&
+		lhs.outsideColoringCLFragmentFile == rhs.outsideColoringCLFragmentFile &&
+		lhs.outsideColoringCLFragmentFileHist == rhs.outsideColoringCLFragmentFileHist &&
+		lhs.outsideColoringCLFragmentFileUi == rhs.outsideColoringCLFragmentFileUi &&
+		lhs.insideColoringCLFragmentFile == rhs.insideColoringCLFragmentFile &&
+		lhs.insideColoringCLFragmentFileHist == rhs.insideColoringCLFragmentFileHist &&
+		lhs.insideColoringCLFragmentFileUi == rhs.insideColoringCLFragmentFileUi &&
 		// lhs.fullCLcode == rhs.fullCLcode &&
 		lhs.maxIter == rhs.maxIter &&
 		lhs.bailout == rhs.bailout &&

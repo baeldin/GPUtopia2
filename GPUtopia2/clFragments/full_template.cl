@@ -15,7 +15,8 @@ typedef float4 real4;
 //@__COMPLEX
 
 //@__formulaFunctions
-//@__coloringFunctions
+//@__coloringInsideFunctions
+//@__coloringOutsideFunctions
 
 complex get_complex_coordinates(const real2 xy, const int2 img_size, const real4 cz, const real2 rot)
 {
@@ -103,14 +104,24 @@ __kernel void computeLoop(
                     tent(R2.y));
                 const real2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane, rot);
                 //@__formulaInit
-                //@__coloringInit
+                //@__coloringInsideInit
+                //@__coloringOutsideInit
+
                 while (!bailed_out(z, bailout) && iter < maxIterations)
                 {
                     //@__formulaLoop
-                    //@__coloringLoop
+                    //@__coloringInsideLoop
+                    //@__coloringOutsideLoop
                     iter++;
                 }
-                //@__coloringFinal
+                if (bailed_out(z, bailout))
+                {
+                    //@__coloringOutsideFinal
+		        } 
+                else
+                {
+                    //@__coloringInsideFinal
+		        }
             }
         }
         setColor(colorsRGBA, outColor, pixelIdx);

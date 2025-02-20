@@ -20,20 +20,34 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 	}
 	ImGui::Text(formulaName.c_str());
 	// coloring CL fragment
-	static std::string coloringName = "by_iteration";
+	static std::string outsideColoringName = "by_iteration";
+	static std::string insideColoringName = "gaussian_integer";
+	if (ImGui::Button("Load Outisde Coloring"))
+	{
+		bool success = false;
+		std::string newOutsideColoringCLFragment;
+		openFileDialog(newOutsideColoringCLFragment, success, L"cl", L"GPUtopia CL Fragment (*.cl)");
+		if (success)
+		{
+			cf.outsideColoringCLFragmentFileUi = newOutsideColoringCLFragment;
+			std::filesystem::path p(newOutsideColoringCLFragment);
+			outsideColoringName = p.stem().string();
+		}
+	}
+	ImGui::Text(outsideColoringName.c_str());
 	if (ImGui::Button("Load Coloring"))
 	{
 		bool success = false;
-		std::string newColoringCLFragment;
-		openFileDialog(newColoringCLFragment, success, L"cl", L"GPUtopia CL Fragment (*.cl)");
+		std::string newInsideColoringCLFragment;
+		openFileDialog(newInsideColoringCLFragment, success, L"cl", L"GPUtopia CL Fragment (*.cl)");
 		if (success)
 		{
-			cf.coloringCLFragmentFileUi = newColoringCLFragment;
-			std::filesystem::path p(newColoringCLFragment);
-			coloringName = p.stem().string();
+			cf.insideColoringCLFragmentFileUi = newInsideColoringCLFragment;
+			std::filesystem::path p(newInsideColoringCLFragment);
+			insideColoringName = p.stem().string();
 		}
 	}
-	ImGui::Text(coloringName.c_str());
+	ImGui::Text(insideColoringName.c_str());
 	if (ImGui::Button("Reload CL Fragments"))
 	{
 		cf.makeCLCode(SAME_FILES);
@@ -44,7 +58,8 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 	if (ImGui::Button("Load AA diag"))
 	{
 		cf.fractalCLFragmentFileUi = "clFragments/diag_AA.cl";
-		cf.coloringCLFragmentFileUi = "clFragments/diag_AA_col.cl";
+		cf.insideColoringCLFragmentFileUi = "clFragments/diag_AA_col.cl";
+		cf.outsideColoringCLFragmentFileUi = "clFragments/diag_AA_col.cl";
 	}
 	static bool useDouble = cf.useDouble;
 	ImGui::Checkbox("Double Precision", &useDouble);
@@ -81,22 +96,45 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 		ImGui::Combo(key.c_str(), &val.first.value, enumLabels.data(), static_cast<int>(enumLabels.size()));
 	}
 	ImGui::Text("ColoringParameters");
-	for (auto& [key, val] : cf.params.coloringParameterMaps.integerParameters)
+	for (auto& [key, val] : cf.params.insideColoringParameterMaps.integerParameters)
 	{
 		ImGui::DragInt(key.c_str(), &val.first, 1, 1, 10000);
 	}
-	for (auto& [key, val] : cf.params.coloringParameterMaps.realParameters)
+	for (auto& [key, val] : cf.params.insideColoringParameterMaps.realParameters)
 	{
 		ImGui::InputDouble(key.c_str(), &val.first);
 	}
-	for (auto& [key, val] : cf.params.coloringParameterMaps.complexParameters)
+	for (auto& [key, val] : cf.params.insideColoringParameterMaps.complexParameters)
 	{
 		std::string labelR = key + ".R";
 		std::string labelI = key + ".I";
 		ImGui::InputDouble(labelR.c_str(), &(val.first.x));
 		ImGui::InputDouble(labelI.c_str(), &(val.first.y));
 	}
-	for (auto& [key, val] : cf.params.coloringParameterMaps.enumParameters)
+	for (auto& [key, val] : cf.params.insideColoringParameterMaps.enumParameters)
+	{
+		std::vector<const char*> enumLabels;
+		for (const auto& label : val.first.labels) {
+			enumLabels.push_back(label.c_str());
+		}
+		ImGui::Combo(key.c_str(), &val.first.value, enumLabels.data(), static_cast<int>(enumLabels.size()));
+	}
+	for (auto& [key, val] : cf.params.outsideColoringParameterMaps.integerParameters)
+	{
+		ImGui::DragInt(key.c_str(), &val.first, 1, 1, 10000);
+	}
+	for (auto& [key, val] : cf.params.outsideColoringParameterMaps.realParameters)
+	{
+		ImGui::InputDouble(key.c_str(), &val.first);
+	}
+	for (auto& [key, val] : cf.params.outsideColoringParameterMaps.complexParameters)
+	{
+		std::string labelR = key + ".R";
+		std::string labelI = key + ".I";
+		ImGui::InputDouble(labelR.c_str(), &(val.first.x));
+		ImGui::InputDouble(labelI.c_str(), &(val.first.y));
+	}
+	for (auto& [key, val] : cf.params.outsideColoringParameterMaps.enumParameters)
 	{
 		std::vector<const char*> enumLabels;
 		for (const auto& label : val.first.labels) {
