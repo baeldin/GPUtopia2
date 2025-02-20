@@ -14,16 +14,6 @@ int Gradient::getIndex(const std::vector<int>& v, const int K) const
 
 Gradient::Gradient() {
 	nodeLocationsOld = nodeLocations;
-	fillOrder = getFillOrder(nodeLocations);
-	fill();
-}
-
-Gradient::Gradient(int length_, std::vector<color> colors_, std::vector<int> locations_) {
-	length = length_;
-	nodeColors = colors_;
-	nodeLocations = locations_;
-	nodeCount = locations_.size();
-	nodeLocationsOld = std::vector<int>(nodeCount);
 	nodeIndex = std::vector<int>(nodeCount);
 	fillOrder = std::vector<int>(nodeCount);
 	for (int ii = 0; ii < nodeCount; ii++)
@@ -34,19 +24,19 @@ Gradient::Gradient(int length_, std::vector<color> colors_, std::vector<int> loc
 	fill();
 }
 
-Gradient::Gradient(int length_, std::vector<color> colors_, std::vector<int> locations_,
-	std::vector<int> fillOrder_) {
+Gradient::Gradient(int length_, std::vector<color> colors_, std::vector<int> locations_) {
 	length = length_;
 	nodeColors = colors_;
 	nodeLocations = locations_;
 	nodeCount = locations_.size();
-	nodeLocationsOld = std::vector<int>(nodeCount);
+	nodeLocationsOld = nodeLocations;
 	nodeIndex = std::vector<int>(nodeCount);
-	fillOrder = fillOrder_;
+	fillOrder = std::vector<int>(nodeCount);
 	for (int ii = 0; ii < nodeCount; ii++)
 	{
 		nodeIndex[ii] = ii;
 	}
+	fillOrder = getFillOrder(nodeLocations);
 	fill();
 }
 

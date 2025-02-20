@@ -7,7 +7,7 @@
 #include <string>
 
 #include "json.hpp"
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 #include "color.h"
 #include "cubic_spline.h"
@@ -107,10 +107,13 @@ public:
 
 inline bool operator==(const Gradient& lhs, const Gradient& rhs)
 {
+	//std::cout << "lhs.nodeColors == rhs.nodeColors " << (lhs.nodeColors == rhs.nodeColors) << "\n";
+	//std::cout << "lhs.nodeLocations == rhs.nodeLocations " << (lhs.nodeLocations == rhs.nodeLocations) << "\n";
+	// std::cout << "lhs.fillOrder == rhs.fillOrder " << (lhs.fillOrder == rhs.fillOrder) << "\n";
 	return (
 		lhs.nodeColors == rhs.nodeColors &&
-		lhs.nodeLocations == rhs.nodeLocations &&
-		lhs.fillOrder == rhs.fillOrder);
+		lhs.nodeLocations == rhs.nodeLocations); //&&
+		//lhs.fillOrder == rhs.fillOrder);
 }
 
 inline bool operator!=(const Gradient& lhs, const Gradient& rhs)
