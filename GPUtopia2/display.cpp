@@ -45,7 +45,7 @@ namespace mainView
 		static ImVec2 mainViewportSize = ImGui::GetContentRegionAvail();
 		static clFractal cf;
 		static clFractal cf_old;
-		static std::vector<clFractalMinimal> history; // = { cf.toExport() }; // history vector
+		static std::vector<json> history; // = { cf.toExport() }; // history vector
 		static int historyIndex = -1;
 		static bool undone = false;
 		static bool redone = false;
@@ -137,12 +137,15 @@ namespace mainView
 				}
 				if (ImGui::MenuItem("TODO: Copy"))
 				{
-					clFractalMinimal exp = cf.toExport();
-
+					json json = cf;
+					std::string json_out = json.dump(4);
+					CopyStringToClipboard(json.dump(4));
 				}
 				if (ImGui::MenuItem("TODO: Paste"))
 				{
-					// redo
+					std::string jsonStr = ReadStringFromClipboard();
+					json json = json::parse(jsonStr);
+					cf = json;
 				}
 				if (ImGui::MenuItem("TODO: Copy Image"))
 				{
@@ -194,16 +197,18 @@ namespace mainView
 		static int waitCounter = 0;
 		static bool force_img_update = false;
 		// only order rerun of imgKernel if flameRenderSettings change
-		if (cf.flameRenderSettings != cf_old.flameRenderSettings and !cf.running()) {
+		if (cf.frs != cf_old.frs and !cf.running())
+		{
+			std::cout << "Here?\n";
 			cf.status.runImgKernel = true;
 			if (historyIndex < history.size() - 1)
 				popHistory(history, &historyIndex);
-			history.push_back(cf.toExport());
+			history.push_back(json(cf));
 			historyIndex++;
 			undone = false;
 			redone = false;
-			std::cout << "History index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
-			cf_old.flameRenderSettings = cf.flameRenderSettings;
+			std::cout << "RENDER SETTINGS CHANGED: History index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
+			cf_old.frs = cf.frs;
 		}
 		// 
 		if (cf != cf_old) {
@@ -242,13 +247,14 @@ namespace mainView
 				cf.status.runImgKernel = false;
 				cf.timings.erase(cf.timings.begin(), cf.timings.end());
 				cf.status.done = false;
-				if (historyIndex < history.size() - 1)
+				std::cout << "Or here?\n";
+				if (historyIndex < history.size() - 1 and !undone and !redone)
 					popHistory(history, &historyIndex);
-				history.push_back(cf.toExport());
+				history.push_back(json(cf));
 				historyIndex++;
 				undone = false;
 				redone = false;
-				std::cout << "##################################\nHistory index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
+				std::cout << "FRACTAL CHANGED: \nHistory index = " << historyIndex << " and length of history vector is " << history.size() << "\n";
 				cf_old = cf;
 				cf.stop = false;
 			}

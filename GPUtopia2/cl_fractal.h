@@ -6,7 +6,7 @@
 #include <mutex>
 
 #include "json.hpp"
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 #include "gradient.h"
 #include "sampling.h"
@@ -321,6 +321,21 @@ public:
 
 inline const bool operator==(const clFractal& lhs, const clFractal& rhs)
 {
+	//std::cout << "lhs.params == rhs.params " << (lhs.params == rhs.params) << "\n";
+	//std::cout << "lhs.image == rhs.image " << (lhs.image == rhs.image) << "\n";
+	//std::cout << "lhs.fractalCLFragmentFile == rhs.fractalCLFragmentFile " << (lhs.fractalCLFragmentFile == rhs.fractalCLFragmentFile) << "\n";
+	//std::cout << "lhs.fractalCLFragmentFileHist == rhs.fractalCLFragmentFileHist " << (lhs.fractalCLFragmentFileHist == rhs.fractalCLFragmentFileHist) << "\n";
+	//std::cout << "lhs.fractalCLFragmentFileUi == rhs.fractalCLFragmentFileUi " << (lhs.fractalCLFragmentFileUi == rhs.fractalCLFragmentFileUi) << "\n";
+	//std::cout << "lhs.coloringCLFragmentFile == rhs.coloringCLFragmentFile " << (lhs.coloringCLFragmentFile == rhs.coloringCLFragmentFile) << "\n";
+	//std::cout << "lhs.coloringCLFragmentFileHist == rhs.coloringCLFragmentFileHist " << (lhs.coloringCLFragmentFileHist == rhs.coloringCLFragmentFileHist) << "\n";
+	//std::cout << "lhs.coloringCLFragmentFileUi == rhs.coloringCLFragmentFileUi " << (lhs.coloringCLFragmentFileUi == rhs.coloringCLFragmentFileUi) << "\n";
+	//std::cout << "lhs.maxIter == rhs.maxIter " << (lhs.maxIter == rhs.maxIter) << "\n";
+	//std::cout << "lhs.bailout == rhs.bailout " << (lhs.bailout == rhs.bailout) << "\n";
+	//std::cout << "lhs.useDouble == rhs.useDouble " << (lhs.useDouble == rhs.useDouble) << "\n";
+	//std::cout << "lhs.gradient == rhs.gradient " << (lhs.gradient == rhs.gradient) << "\n";
+	//std::cout << "lhs.mode == rhs.mode " << (lhs.mode == rhs.mode) << "\n";
+	//std::cout << "lhs.flamePointSelection == rhs.flamePointSelection " << (lhs.flamePointSelection == rhs.flamePointSelection) << "\n";
+	//std::cout << "lhs.vomit == rhs.vomit " << (lhs.vomit == rhs.vomit) << "\n";
 	return (
 		lhs.params == rhs.params &&
 		lhs.image == rhs.image &&

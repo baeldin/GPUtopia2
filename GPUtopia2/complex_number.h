@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "json.hpp"
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 using std::ostream;
 using std::basic_ostream;
