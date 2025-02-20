@@ -9,7 +9,7 @@ __final:
 // 		// this part has to use setColors(), the components have
 // 		// to be in [0., 1.]
 //
-		outColor += getColor(gradient, cPar_colorDensity * 0.01 * iter, nColors);
+		outColor += getColor(gradient, @colorDensity * 0.01f * iter, nColors);
 		// setColor(colorsRGBA, outColor, pixelIdx);
 __functions:
 // void
