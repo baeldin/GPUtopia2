@@ -13,6 +13,8 @@
 
 #include "cl_fractal.h"
 
+typedef std::vector<std::pair<std::string, std::string>> replacer;
+
 // read a text file into a string
 std::string readCLFragmentFromFile(
 	const std::string& clFileName);

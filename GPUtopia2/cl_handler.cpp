@@ -60,11 +60,40 @@ const std::string eq("=");
 const std::string fPar("fPar_");
 const std::string coPar("coPar_");
 const std::string ciPar("ciPar_");
-
+const std::string fVar("fVar_");
+const std::string coVar("coVar_");
+const std::string ciVar("ciVar_");
+const std::string fFunc("fFunc_");
+const std::string coFunc("coFunc_");
+const std::string ciFunc("ciFunc_");
+const std::vector<std::string> fPrefixes = { "fPar_", "fVar_", "fFunc_" };
+const std::vector<std::string> ciPrefixes = { "ciPar_", "ciVar_", "ciFunc_" };
+const std::vector<std::string> coPrefixes = { "coPar_", "coVar_", "coFunc_" };
 
 void trimTrailingCharacters(std::string& str, const char* trim = " ")
 {
 	str.erase(str.find_last_not_of(trim) + 1);
+}
+
+void trimLeadingCharacters(std::string& str, const char* trim = " ")
+{
+	str.erase(0, str.find_first_not_of(trim));
+}
+
+void splitAtPattern(const std::string& s, const std::string& pattern, std::string& A, std::string& B) {
+	size_t pos = s.find(pattern);
+	std::cout << "Found separator " << pattern << " at position " << pos << "\n";
+	if (pos == std::string::npos) {
+		A = s; 
+		B = "";
+	}
+	else
+	{
+		A = s.substr(0, pos);
+		B = s.substr(pos + pattern.length());
+	}
+	std::cout << A << "\n";
+	std::cout << B << "\n";
 }
 
 std::string fillKernelParamBlock(std::istringstream& paramList, std::string& fullStr, const std::string& parType)
@@ -72,23 +101,23 @@ std::string fillKernelParamBlock(std::istringstream& paramList, std::string& ful
 	std::string kernelParamList("");
 	std::string parameterLine;
 	std::string kernelParameterBlock("");
-
 	while (std::getline(paramList, parameterLine))
 	{
 		std::string fractalParameterLine = "    const " + std::regex_replace(
-			parameterLine, std::regex("parameter "), parType);
+			parameterLine, std::regex("parameter "), "");
+		// std::string fractalParameterLine = "    const " + parameterLine;
 		fractalParameterLine = std::regex_replace(fractalParameterLine, std::regex("float"), std::string("real"));
 		fractalParameterLine = std::regex_replace(fractalParameterLine, std::regex("double"), std::string("real"));
 		std::string inParameterName = getFragmentPart(fractalParameterLine, parType, eq);
-		std::string inParameterValue = getFragmentPart(fractalParameterLine, eq, semiColon);
+		// std::string inParameterValue = getFragmentPart(fractalParameterLine, eq, semiColon);
 		trimTrailingCharacters(inParameterName);
-		std::string oldParameterName = "@" + inParameterName;
-		std::string newParameterName = parType + inParameterName;
+		//std::string oldParameterName = "@" + inParameterName;
+		//std::string newParameterName = parType + inParameterName;
 		trimTrailingCharacters(fractalParameterLine, ";");
 		kernelParameterBlock += fractalParameterLine + ",\n";
 		// std::cout << fractalParameterLine << "\n";
 		// std::cout << "Replacing " << oldParameterName << " with " << newParameterName << std::endl;
-		fullStr = std::regex_replace(fullStr, std::regex(oldParameterName), newParameterName);
+		//fullStr = std::regex_replace(fullStr, std::regex(oldParameterName), newParameterName);
 
 	}
 	return kernelParameterBlock;
@@ -153,15 +182,16 @@ std::vector<std::string> splitLines(const std::string& text)
 	return lines;
 }
 
-std::vector<std::string> splitWords(const std::string& line)
+std::vector<std::string> splitWords(const std::string& line, const char delimiter = ' ', const char* trim = ",")
 {
     std::vector<std::string> words;
     std::istringstream iss(line);
     std::string word;
-    while (iss >> word)
+    while (std::getline(iss, word, delimiter))
     {
-        trimTrailingCharacters(word, ",");
-        words.push_back(word);
+        trimTrailingCharacters(word, trim);
+		if (!word.empty())
+			words.push_back(word);
     }
     return words;
 }
@@ -173,6 +203,7 @@ paramCollector parseKernelParameterBlock(std::string& kpb)
 	std::string paramType;
 	int paramIndex = 0; // first non-default param
 	std::string paramName;
+	std::cout << kpb << "\n";
 	std::vector<std::string> kpbLines = splitLines(kpb);
 	int N = 0;
 	while (N < kpbLines.size()) 
@@ -183,7 +214,7 @@ paramCollector parseKernelParameterBlock(std::string& kpb)
 			paramMaps = &pc.outsideColoringParameterMaps;
 		if (words[2][0] == *"ci")
 			paramMaps = &pc.insideColoringParameterMaps;
-		paramName = std::regex_replace(words[2], std::regex("[fc]Par_"), "");
+		paramName = std::regex_replace(words[2], std::regex("(?:fPar_|ciPar_|coPar_)"), "");
 		if (words[1] == "int")
 		{
 			int val = std::stoi(words[4]);
@@ -224,9 +255,110 @@ paramCollector parseKernelParameterBlock(std::string& kpb)
 	return pc;
 }
 
+bool isStringInVector(const std::vector<std::string>& vec, const std::string& str) {
+	// Use std::find to search for the string
+	return std::find(vec.begin(), vec.end(), str) != vec.end();
+}
+
+const std::vector<std::string> typeIndicators = { 
+	"^char\d{0,2}\s*", "^unsigned\s+$char\d{0,2}\s*", "^uchar\d{0,2}\s*", "^int\d{0,2}\s*", 
+	"^unsigned\s+$int\d{0,2}\s*", "^uint\d{0,2}\s*", "^long\d{0,2}\s*", "^unsigned\s+long\d{0,2}\s*",
+	"^ulong\d{0,2}\s*", "^float\d{0,2}\s*", "^double\d{0,2}\s*", "^half\d{0,2}\s*", "^size_t\s*", 
+	"^ptrdiff_t\s*", "^intptr_t\s*", "^uintptr_t\s*", "^void\s*", 
+	"^real\d{0,2}\s*", "^complex\s*", "^bool\s*", "^enum\s*"};
+const std::vector<std::string> qualifiers = {
+	"^__global\s*", "^global\s*", "^__local\s*", "^local\s*", "^__constant\s*", "^constant\s*", "^const\s*", "^__private\s*",
+	"^private\s*", "^__attribute__\s*$\\(\\(.*?\\)\\)\s*" };
+const std::vector<std::string> protectedNames = { "z", "bailedout", "outColor"}; // do not touch these!
+
+std::string getVariableAndParameterNames(const std::string& codeStr_,
+	const std::vector<std::string>& prefixes, const std::string& funcFlag)
+{
+	std::string codeStr, funcStr;
+	splitAtPattern(codeStr_, fun, codeStr, funcStr);
+	std::cout << codeStr << "\n";
+	std::cout << "======================\n";
+	std::cout << funcStr << "\n";
+	std::vector<std::string> codeLines = splitLines(codeStr);
+	replacer rawDeclarations;
+	replacer funcDeclarations;
+	int declarationType = 0; // Variable
+	int N = 0;
+	while (N < codeLines.size())
+	{
+		std::string line = codeLines[N];
+		if (line == "//@__functions:")
+			declarationType = 2;
+		trimTrailingCharacters(line, " ;\n");
+		std::cout << "LINE " << N << ": " << line << "\n";
+		trimLeadingCharacters(line, " \t");
+		bool isDeclaration = false;
+		int lineLength = line.length();
+		for (auto pattern : qualifiers)
+			line = std::regex_replace(line, std::regex(pattern), "");
+		trimLeadingCharacters(line, " ");
+		for (auto pattern : typeIndicators)
+			std::regex_replace(line, std::regex(pattern), "");
+		trimLeadingCharacters(line, " ");
+		for (auto pattern2 : typeIndicators)
+		{
+			line = std::regex_replace(line, std::regex(pattern2), "");
+		}
+		trimLeadingCharacters(line, " 01234567890*");
+		if (line.length() < lineLength)
+		{
+			std::cout << "FOUND declaration for \"" << line << "\"\n";
+			if (std::regex_search(line, std::regex("^parameter")))
+			{
+				line = std::regex_replace(line, std::regex("^parameter\s*"), "");
+				trimLeadingCharacters(line, " "); // why do I need this???
+				declarationType = 1; // parameter
+			}
+			line = std::regex_replace(line, std::regex("\\(.*?\\)"), "");
+			line = std::regex_replace(line, std::regex("\\{.*?\\}"), "");
+			std::vector<std::string> words = splitWords(line, ',', " ");
+			std::cout << words[0] << "\n";
+			for (auto word : words)
+			{
+				word = std::regex_replace(word, std::regex("\s*=\s*.*"), "");
+				trimTrailingCharacters(word, " "); // why do I need this???
+				std::cout << word << "\n";
+				std::cout << "FOUND declaration (" << declarationType << ") for \"" << word << "\"\n";
+				if (!isStringInVector(protectedNames, word))
+				{
+					
+					std::string prefix = prefixes[declarationType];
+					if (declarationType < 2)
+						rawDeclarations.push_back(std::make_pair("\\b" + word + "\\b", prefix + word));
+					else
+						funcDeclarations.push_back(std::make_pair("\\b" + word + "\\b", prefix + word));
+					std::cout << "Will replace " << word << " with " << prefixes[declarationType] + word << "\n";
+				}
+				else
+					std::cout << word << " is protected!\n";
+			}
+		}
+		N++;
+	}
+	std::cout << "============ before replace =================\n";
+	std::cout << codeStr << "\n";
+	for (auto repl : rawDeclarations)
+		codeStr = std::regex_replace(codeStr, std::regex(repl.first), repl.second);
+	codeStr = std::regex_replace(codeStr, std::regex("@"), "");
+	
+	for (auto repl : funcDeclarations)
+		funcStr = std::regex_replace(funcStr, std::regex(repl.first), repl.second);
+	std::cout << "============= after replace =================\n";
+	std::string ret = codeStr + fun + funcStr;
+	std::cout << ret << "\n";
+	return codeStr + fun + funcStr;
+}
+
+
 paramCollector parseParameters(std::string& fullStr, const std::string& fractalFormula, 
 	const std::string& coloringInsideAlgorithm, const std::string& coloringOutsideAlgorithm)
 {
+
 	std::string formulaParamStr = getFragmentPart(fractalFormula, par, ini);
 	std::string coloringInsideParamStr = getFragmentPart(coloringInsideAlgorithm, par, ini);
 	std::string coloringOutsideParamStr = getFragmentPart(coloringOutsideAlgorithm, par, ini);
@@ -261,6 +393,10 @@ bool clFractal::makeCLCode(const bool newFiles)
 	std::string antiAliasingStr = readCLFragmentFromFile("clFragments/anti_aliasing.cl");
 	std::string colorStr = readCLFragmentFromFile("clFragments/colors.cl");
 	std::string complexStr = readCLFragmentFromFile("clFragments/complex.cl");
+
+	fractalFormulaStr = getVariableAndParameterNames(fractalFormulaStr, fPrefixes, FFFlag);
+	insideColoringAlgorithmStr = getVariableAndParameterNames(insideColoringAlgorithmStr, ciPrefixes, FIFlag);
+	outsideColoringAlgorithmStr = getVariableAndParameterNames(outsideColoringAlgorithmStr, coPrefixes, FOFlag);
 
 	// UF-style separation
 	std::string fractalInit = getFragmentPart(fractalFormulaStr, ini, loo);
