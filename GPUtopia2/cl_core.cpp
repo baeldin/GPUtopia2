@@ -137,8 +137,8 @@ void clCore::setFractalParameterArgs(clFractal& cf)
         setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.realParameters, cf.verbosity);
         setMapOfArgs(this->fractalKernel.kernel, cf.params.fractalParameterMaps.complexParameters, cf.verbosity);
         setMapOfArgs(this->fractalKernel.kernel, cf.params.outsideColoringParameterMaps.realParameters, cf.verbosity);
-        setMapOfArgs(this->fractalKernel.kernel, cf.params.insideColoringParameterMaps.complexParameters, cf.verbosity);
-        setMapOfArgs(this->fractalKernel.kernel, cf.params.outsideColoringParameterMaps.realParameters, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, cf.params.outsideColoringParameterMaps.complexParameters, cf.verbosity);
+        setMapOfArgs(this->fractalKernel.kernel, cf.params.insideColoringParameterMaps.realParameters, cf.verbosity);
         setMapOfArgs(this->fractalKernel.kernel, cf.params.insideColoringParameterMaps.complexParameters, cf.verbosity);
     }
     else
