@@ -17,8 +17,9 @@ void showErrorLogWindow(clFractal& cf, const clCore& cc, ImFont* font_mono)
 	ImGui::Begin("Error Log");
 	ImGui::PushFont(font_mono);
 	ImVec4 colorErr = { 0.9f, 0.5f, 0.4f, 1.0f }; // red
-	ImVec4 colorOk = { 0.0f, 0.9f, 0.0f, 1.0 }; // green
+	ImVec4 colorOk = { 0.3f, 0.8f, 0.5f, 1.0 }; // green
 	static std::istringstream issImgKernelBuildLog;
+	ImGui::Text("Img Kernel:");
 	if (cc.imgKernel.errors.compileError != CL_SUCCESS)
 		issImgKernelBuildLog = std::istringstream(cc.imgKernel.buildLog);
 	else
@@ -69,6 +70,7 @@ void showErrorLogWindow(clFractal& cf, const clCore& cc, ImFont* font_mono)
 	if (cc.fractalKernel.errors.parseError != CL_SUCCESS)
 		ImGui::TextColored(colorErr, "Error parsing CL code, no build was attempted. Please see above.");
 	static std::istringstream issFractalKernelBuildLog;
+	ImGui::Text("Fractal Kernel:");
 	if (cc.fractalKernel.errors.compileError != CL_SUCCESS)
 	{
 		issFractalKernelBuildLog = std::istringstream(cc.fractalKernel.buildLog);
