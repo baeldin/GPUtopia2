@@ -166,8 +166,10 @@
     <ClInclude Include="imageSettings.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgExport.h" />
+    <ClInclude Include="insideSettings.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="load_shaders.h" />
+    <ClInclude Include="outsideSettings.h" />
     <ClInclude Include="selectFile.h" />
     <ClInclude Include="parameterMaps.h" />
   </ItemGroup>
@@ -192,8 +194,10 @@
     <ClCompile Include="imageSettings.cpp" />
     <ClCompile Include="info.cpp" />
     <ClCompile Include="info.h" />
+    <ClCompile Include="insideSettings.cpp" />
     <ClCompile Include="load_shaders.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="outsideSettings.cpp" />
     <ClCompile Include="selectFile.cpp" />
     <ClCompile Include="sampling.cpp" />
     <ClCompile Include="test_gradients.cpp" />
