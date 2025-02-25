@@ -232,6 +232,7 @@ public:
 
 void runFractalKernelAsync(clFractal& cf, clCore& cc);
 void runImgKernelAsync(clFractal& cf, clCore& cc);
+void compileFractalKernelAsync(clCore& cc, std::string& code, bool& compiling, bool& runKernel);
 
 // cast parameter map of double to float
 inline parameterMapFloat argumentMapFloatCast(parameterMapReal& realParameters)

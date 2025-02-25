@@ -163,6 +163,13 @@ void clCore::compileFractalKernel(const std::string fullCLcode)
     this->compileNewKernel(this->fractalKernel, fullCLcode, "computeLoop");
 }
 
+void compileFractalKernelAsync(clCore& cc, std::string& code, bool& compiling, bool& runKernel)
+{
+    cc.compileFractalKernel(code);
+    compiling = false;
+    runKernel = true;
+}
+
 void clCore::runFractalKernel(clFractal& cf) const
 {
     cl_int local_size = WG_SIZE;

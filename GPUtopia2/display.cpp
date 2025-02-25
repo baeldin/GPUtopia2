@@ -87,11 +87,34 @@ namespace mainView
 			cf_old.image = cf.image;
 		}
 		// check if a kernel rebuild is needed
+		static bool compilingFractalKernel = false;
+		static std::jthread ct;
+
 		if (cf.buildKernel and core.fractalKernel.errors.sum() == 0)
 		{
-			core.compileFractalKernel(cf.fullCLcode);
+			compilingFractalKernel = true;
+			//std::thread tComp(core.compileFractalKernel(cf.fullCLcode);
+			ct = std::jthread(&compileFractalKernelAsync, std::ref(core),
+				std::ref(cf.fullCLcode), std::ref(compilingFractalKernel),
+				std::ref(cf.status.runKernel));			
+			ct.detach();
 			cf.buildKernel = false;
-			cf.status.runKernel = true;
+		}
+		if (compilingFractalKernel)
+		{
+			ImGui::OpenPopup("Compiling");
+		}
+		// Begin the modal popup. This will block interaction with the rest of the UI.
+		if (ImGui::BeginPopupModal("Compiling", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::Text("Compiling kernel... please wait.");
+			ImGui::Text("This operation may take a few seconds.");
+			if (!compilingFractalKernel)
+			{
+				std::cout << "Demanding kernel run\n";
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
 		}
 		if (core.imgKernel.errors.sum() != 0 || cf.parseError() != 0 || core.fractalKernel.errors.sum() != 0)
 		{
@@ -229,7 +252,13 @@ namespace mainView
 					if (cf.makeCLCode(NEW_FILES))
 					{
 						core.resetCore();
-						core.compileFractalKernel(cf.fullCLcode);
+						compilingFractalKernel = true;
+						//std::thread tComp(core.compileFractalKernel(cf.fullCLcode);
+						ct = std::jthread(&compileFractalKernelAsync, std::ref(core),
+							std::ref(cf.fullCLcode), std::ref(compilingFractalKernel),
+							std::ref(cf.status.runKernel));
+						ct.detach();
+						cf.buildKernel = false;
 					}
 					else
 					{
@@ -242,13 +271,20 @@ namespace mainView
 				{
 					cf.makeCLCode(SAME_FILES);
 					core.resetCore();
-					core.compileFractalKernel(cf.fullCLcode);
+					compilingFractalKernel = true;
+					//std::thread tComp(core.compileFractalKernel(cf.fullCLcode);
+					ct = std::jthread(&compileFractalKernelAsync, std::ref(core), 
+						std::ref(cf.fullCLcode), std::ref(compilingFractalKernel),
+						std::ref(cf.status.runKernel));
+					ct.detach();
+					cf.buildKernel = false;
 				}
 				core.setDefaultFractalArguments(cf);
 				core.setFractalParameterArgs(cf);
 				cf.image.updateComplexSubplane();
 				cf.image.resetStatus();
-				cf.status.runKernel = true;
+				if (!compilingFractalKernel)
+					cf.status.runKernel = true;
 				cf.status.runImgKernel = false;
 				cf.timings.erase(cf.timings.begin(), cf.timings.end());
 				cf.status.done = false;
@@ -288,7 +324,7 @@ namespace mainView
 			cf.status.runImgKernel = false;
 		}
 		// check current image quality
-		if (!cf.running() and !cf.status.done and core.fractalKernel.errors.sum() == 0)
+		if (!cf.running() and !cf.status.done and core.fractalKernel.errors.sum() == 0 and !compilingFractalKernel)
 		{
 			if (cf.image.current_sample_count >= cf.image.next_update_sample_count)
 			{
