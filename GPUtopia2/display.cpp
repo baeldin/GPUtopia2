@@ -56,14 +56,17 @@ namespace mainView
 		static bool startup = true;
 		static bool showCoreError = false;
 		static clCore core;
+		static bool showErrorWindow = true;
 		if (core.imgKernel.need)
 			core.compileImgKernel();
 		// only run at startup, maybe move somewhere else?
 		while (startup)
 		{
 			// cf.verbosity = 2;
-			cf.makeCLCode(NEW_FILES);
-			cf.buildKernel = true;
+			if (cf.makeCLCode(NEW_FILES))
+				cf.buildKernel = true;
+			else
+				core.fractalKernel.errors.parseError = 1;
 			std::cout << "Doing the starting thing " << startup << "\n";
 			startup = false;
 			cf_old.image.zoom = -1.; // just ANY difference will do for startup
@@ -90,16 +93,14 @@ namespace mainView
 			cf.buildKernel = false;
 			cf.status.runKernel = true;
 		}
-		if (core.imgKernel.errors.sum() != 0)
+		if (core.imgKernel.errors.sum() != 0 || cf.parseError() != 0 || core.fractalKernel.errors.sum() != 0)
 		{
 			core.stop = true;
-			show_cl_error_window(cf, core, font_mono);
+			cf.stop = true;
+			showErrorWindow = true;
 		}
-		else if (core.fractalKernel.errors.sum() != 0)
-		{
-			core.stop = true;
-			show_cl_error_window(cf, core, font_mono);
-		}
+		if (showErrorLogWindow)
+			showErrorLogWindow(cf, core, font_mono);
 		ImGuiIO& io = ImGui::GetIO();
 		if (ImGui::BeginMainMenuBar())
 		{
@@ -190,6 +191,8 @@ namespace mainView
 		static paramCollector params_old = cf.params;
 		static clFractalImage img_settings_old = cf.image;
 		formulaSettingsWindow(cf, core);
+		outsideSettingsWindow(cf, core);
+		insideSettingsWindow(cf, core);
 		imageSettingsWindow(cf);
 		flameRenderSettingsWindow(cf);
 		infoWindow(cf, nav, font_mono);
