@@ -233,11 +233,11 @@ paramCollector parseKernelParameterBlock(std::string& kpb)
 	{
 		std::vector<std::string> words = splitWords(kpbLines[N]);
 		parameterMaps* paramMaps = &pc.fractalParameterMaps;
-		if (words[2][0] == *"co")
+		if (std::regex_search(words[2], std::regex("^co")))
 			paramMaps = &pc.outsideColoringParameterMaps;
-		if (words[2][0] == *"ci")
+		if (std::regex_search(words[2], std::regex("^ci")))
 			paramMaps = &pc.insideColoringParameterMaps;
-		paramName = std::regex_replace(words[2], std::regex("(?:fPar_|ciPar_|coPar_)"), "");
+		paramName = std::regex_replace(words[2], std::regex("(?:f[PV]ar_|ci[PV]ar_|co[PV]ar_)"), "");
 		if (words[1] == "int")
 		{
 			int val = std::stoi(words[4]);
@@ -283,7 +283,9 @@ bool isStringInVector(const std::vector<std::string>& vec, const std::string& st
 	return std::find(vec.begin(), vec.end(), str) != vec.end();
 }
 
-int parenthesesScanner(std::string& s)
+// scan a string and remove everything within {...} or (...) by default
+// optional arguments to turn off clearing of one kind of brackets
+int parenthesesScanner(std::string& s, const bool clearRound = true, const bool clearCurly = true)
 {
 	std::vector<std::pair<int, int>> p;
 	std::vector<int> counter = { 0, 0, 0 };
@@ -292,35 +294,40 @@ int parenthesesScanner(std::string& s)
 	int curlyCount = 0;
 	for (auto c : s)
 	{
-		if (c == '(')
+		if (clearRound)
 		{
-			if (counter[0] == 0)
-				roundCount = N;
-			counter[0]++;
+			if (c == '(')
+			{
+				if (counter[0] == 0)
+					roundCount = N;
+				counter[0]++;
+			}
+			if (c == ')')
+			{
+				if (counter[0] == 1)
+					p.push_back(std::make_pair(roundCount, N));
+				counter[0]--;
+			}
 		}
-		if (c == '{')
+		if (clearCurly)
 		{
-			if (counter[1] == 0)
-				curlyCount = N;
-			counter[1]++;
-		}
-		if (c == ')')
-		{
-			if (counter[0] == 1)
-				p.push_back(std::make_pair(roundCount, N));
-			counter[0]--;
-		}
-		if (c == '}')
-		{
-			if (counter[0] == 1)
-				p.push_back(std::make_pair(curlyCount, N));
-			counter[1]--;
+			if (c == '{')
+			{
+				if (counter[1] == 0)
+					curlyCount = N;
+				counter[1]++;
+			}
+			if (c == '}')
+			{
+				if (counter[1] == 1)
+					p.push_back(std::make_pair(curlyCount, N));
+				counter[1]--;
+			}
 		}
 		N++;
 	}
 	if (!counter[0] == 0 || !counter[1] == 0)
 		return 7; // unbalanced parentheses in declaration
-	// for (auto it = p.rbegin(); it != p.rend(); ++it)
 	for (auto del : p | std::views::reverse)
 		s.erase(del.first, del.second - del.first + 1);
 	return 0;
@@ -337,16 +344,20 @@ const std::vector<std::string> qualifiers = {
 	"^private\s*", "^__attribute__\s*$\\(\\(.*?\\)\\)\s*" };
 const std::vector<std::string> protectedNames = { "z", "bailedout", "outColor"}; // do not touch these!
 
-std::string getVariableAndParameterNames(const std::string& codeStr_,
-	const std::vector<std::string>& prefixes, const std::string& funcFlag, int* err = 0)
+std::string removeFunctionBodies(std::string& funcStr, int* err)
 {
-	std::string codeStr, funcStr;
-	splitAtPattern(codeStr_, fun, codeStr, funcStr);
+	*err = parenthesesScanner(funcStr, false, true);
+	return funcStr;
+}
+
+replacer scanString(std::string codeStr, const std::vector<std::string>& prefixes, const bool functionBlock, int* err)
+{
+	codeStr = functionBlock ? removeFunctionBodies(codeStr, err) : codeStr;
 	std::vector<std::string> codeLines = splitLines(codeStr);
-	replacer rawDeclarations;
-	replacer funcDeclarations;
+	replacer declarations;
 	int declarationType = 0; // Variable
 	int N = 0;
+	std::string prefix;
 	while (N < codeLines.size())
 	{
 		std::string line = codeLines[N];
@@ -372,14 +383,18 @@ std::string getVariableAndParameterNames(const std::string& codeStr_,
 			*err = parenthesesScanner(line);
 			if (*err > 0)
 			{
-				return "";
+				return declarations;
 			}
 			if (std::regex_search(line, std::regex("^parameter")))
 			{
 				line = std::regex_replace(line, std::regex("^parameter\s*"), "");
 				trimLeadingCharacters(line, " "); // why do I need this???
-				declarationType = 1; // parameter
+				prefix = prefixes[0];
 			}
+			else if (functionBlock)
+				prefix = prefixes[2];
+			else
+				prefix = prefixes[1];
 			std::vector<std::string> words = splitWords(line, ',', " ");
 			for (auto word : words)
 			{
@@ -387,22 +402,35 @@ std::string getVariableAndParameterNames(const std::string& codeStr_,
 				trimTrailingCharacters(word, " "); // why do I need this???
 				if (!isStringInVector(protectedNames, word))
 				{
-					
-					std::string prefix = prefixes[declarationType];
+
+					//std::string prefix = prefixes[declarationType];
 					if (declarationType < 2)
-						rawDeclarations.push_back(std::make_pair("\\b" + word + "\\b", prefix + word));
-					else
-						funcDeclarations.push_back(std::make_pair("\\b" + word + "\\b", prefix + word));
+						declarations.push_back(std::make_pair("\\b" + word + "\\b", prefix + word));
 				}
 			}
 		}
 		N++;
 	}
+	return declarations;
+}
+std::string getVariableAndParameterNames(const std::string& codeStr_,
+	const std::vector<std::string>& prefixes, const std::string& funcFlag, int* err = 0)
+{
+	std::string codeStr, funcStr;
+	splitAtPattern(codeStr_, fun, codeStr, funcStr);
+	std::vector<std::string> codeLines = splitLines(codeStr);
+	replacer rawDeclarations = scanString(codeStr, prefixes, false, err);
+	replacer funcDeclarations = scanString(funcStr, prefixes, true, err);
+	if (!*err == 0)
+		return "";
 	for (auto repl : rawDeclarations)
 		codeStr = std::regex_replace(codeStr, std::regex(repl.first), repl.second);
 	codeStr = std::regex_replace(codeStr, std::regex("@"), "");
 	for (auto repl : funcDeclarations)
+	{
 		funcStr = std::regex_replace(funcStr, std::regex(repl.first), repl.second);
+		codeStr = std::regex_replace(codeStr, std::regex(repl.first), repl.second);
+	}
 	std::string ret = codeStr + fun + funcStr;
 	return codeStr + fun + funcStr;
 }
