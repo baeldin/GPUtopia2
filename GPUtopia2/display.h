@@ -14,6 +14,8 @@
 #include "load_shaders.h"
 #include "cl_core.h"
 #include "formulaSettings.h"
+#include "outsideSettings.h"
+#include "insideSettings.h"
 #include "imageSettings.h"
 #include "flameRenderSettings.h"
 #include "cl_handler.h"
