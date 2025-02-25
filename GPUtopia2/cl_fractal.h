@@ -11,6 +11,7 @@ using json = nlohmann::ordered_json;
 #include "gradient.h"
 #include "sampling.h"
 #include "complex_number.h"
+#include "test_gradients.h"
 
 #define NEW_FILES true
 #define SAME_FILES false
@@ -218,7 +219,7 @@ class clFractal
 public:
 	paramCollector params;
 	clFractalImage image;
-	Gradient gradient;
+	Gradient gradient = volcano_under_a_glacier2;
 	// TODO: think of a better solution to avoid collisions from the two places that can set
 	// a new file: load function vs. undo/redo :-(
 	std::string fractalCLFragmentFile = "clFragments/fractalFormulas/mandelbrot.cl";
