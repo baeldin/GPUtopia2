@@ -8,4 +8,4 @@
 
 class clCore;
 
-void showErrorLogWindow(clFractal& cf, const clCore& cc, ImFont* font_mono);
+void showErrorLogWindow(clFractal& cf, const clCore& cc, ImFont* font_mono, bool hasError);

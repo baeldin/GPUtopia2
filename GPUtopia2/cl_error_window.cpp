@@ -1,4 +1,4 @@
-#include "cl_error_window.h"
+﻿#include "cl_error_window.h"
 
 const std::vector<std::string> parseErrorMessages =
 {
@@ -12,12 +12,28 @@ const std::vector<std::string> parseErrorMessages =
 	"Unbalanced parentheses in declaration or multi-line declaration, which is currenly not supported by the fragment parser."
 };
 
-void showErrorLogWindow(clFractal& cf, const clCore& cc, ImFont* font_mono)
+ImVec4 operator*(const float lhs, const ImVec4 rhs)
 {
-	ImGui::Begin("Error Log");
-	ImGui::PushFont(font_mono);
+	return ImVec4(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z, lhs * rhs.w);
+}
+
+void showErrorLogWindow(clFractal& cf, const clCore& cc, ImFont* font_mono, bool hasError)
+{
+	static bool undoStyleChange = false;
 	ImVec4 colorErr = { 0.9f, 0.5f, 0.4f, 1.0f }; // red
 	ImVec4 colorOk = { 0.3f, 0.8f, 0.5f, 1.0 }; // green
+	ImVec4 colorTab;
+	if (hasError)
+		colorTab = colorErr;
+	else
+		colorTab = colorOk;
+		// Push title text color for active and collapsed states.
+	ImGui::PushStyleColor(ImGuiCol_Tab, 0.8f * colorTab); // Normal state
+	ImGui::PushStyleColor(ImGuiCol_TabActive, 0.9f * colorTab); // Active window
+	ImGui::PushStyleColor(ImGuiCol_TabUnfocused, 0.7f * colorTab); // Collapsed window
+	ImGui::PushStyleColor(ImGuiCol_TabHovered, colorTab);
+	ImGui::Begin("Error Log");
+	ImGui::PushFont(font_mono);
 	static std::istringstream issImgKernelBuildLog;
 	ImGui::Text("Img Kernel:");
 	if (cc.imgKernel.errors.compileError != CL_SUCCESS)
@@ -84,4 +100,5 @@ void showErrorLogWindow(clFractal& cf, const clCore& cc, ImFont* font_mono)
 	}
 	ImGui::PopFont();
 	ImGui::End();
+	ImGui::PopStyleColor(4);
 }

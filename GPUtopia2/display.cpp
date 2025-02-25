@@ -123,7 +123,10 @@ namespace mainView
 			showErrorWindow = true;
 		}
 		if (showErrorLogWindow)
-			showErrorLogWindow(cf, core, font_mono);
+		{
+			bool hasError = (core.imgKernel.errors.sum() != 0 || cf.parseError() != 0 || core.fractalKernel.errors.sum() != 0);
+			showErrorLogWindow(cf, core, font_mono, hasError);
+		}
 		ImGuiIO& io = ImGui::GetIO();
 		if (ImGui::BeginMainMenuBar())
 		{
