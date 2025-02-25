@@ -329,7 +329,8 @@ int parenthesesScanner(std::string& s, const bool clearRound = true, const bool 
 	if (!counter[0] == 0 || !counter[1] == 0)
 		return 7; // unbalanced parentheses in declaration
 	for (auto del : p | std::views::reverse)
-		s.erase(del.first, del.second - del.first + 1);
+		if (del.second < s.length())
+			s.erase(del.first, del.second - del.first + 1);
 	return 0;
 }
 
@@ -346,7 +347,7 @@ const std::vector<std::string> protectedNames = { "z", "bailedout", "outColor"};
 
 std::string removeFunctionBodies(std::string& funcStr, int* err)
 {
-	*err = parenthesesScanner(funcStr, false, true);
+	*err = parenthesesScanner(funcStr, true, true);
 	return funcStr;
 }
 
