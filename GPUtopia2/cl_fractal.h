@@ -185,6 +185,9 @@ struct clFractalStatus
 	bool updateImage = false;
 	bool done = false;
 	bool filesOK = false;
+	int fractalFragmentStatus = 0;
+	int insideColoringFragmentStatus = 0;
+	int outsideColoringFragment_status = 0;
 };
 
 class clFractal;
@@ -338,6 +341,15 @@ public:
 		}
 		else
 			return false;
+	}
+	bool parseError()
+	{
+		return (this->status.fractalFragmentStatus + this->status.insideColoringFragmentStatus + this->status.outsideColoringFragment_status > 0);
+	}
+	void resetParseStatus() {
+		this->status.fractalFragmentStatus = 0;
+		this->status.outsideColoringFragment_status = 0;
+		this->status.insideColoringFragmentStatus = 0;
 	}
 	NLOHMANN_DEFINE_TYPE_INTRUSIVE(clFractal,
 		image, frs, maxIter, bailout, mode, flamePointSelection, useDouble,

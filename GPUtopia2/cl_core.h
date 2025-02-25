@@ -49,11 +49,13 @@ struct err
     cl_int programError = CL_SUCCESS;
     cl_int compileError = CL_SUCCESS;
     cl_int kernelError = CL_SUCCESS;
-    cl_int sum() const { return programError + compileError + kernelError; }
+    cl_int parseError = CL_SUCCESS; // set by the fragment parser
+    cl_int sum() const { return programError + compileError + kernelError + parseError; }
     void reset() {
         programError = CL_SUCCESS;
         compileError = CL_SUCCESS;
         kernelError = CL_SUCCESS;
+        parseError = CL_SUCCESS;
     }
 };
 

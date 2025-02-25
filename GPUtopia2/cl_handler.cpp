@@ -96,6 +96,29 @@ void splitAtPattern(const std::string& s, const std::string& pattern, std::strin
 	std::cout << B << "\n";
 }
 
+// do some basic checks to see if it COULD be a legit CL fragment
+// fragmentType = 0, 1, 2 for fractal, inside coloring, outside coloring
+int clFragmentSanityCheck(std::string& fragmentStr, int fragmentType)
+{
+	if (!std::regex_search(fragmentStr, std::regex(par))) // check for __parameters:
+		return 1;
+	if (!std::regex_search(fragmentStr, std::regex(ini))) // check for __init:
+		return 2;
+	if (!std::regex_search(fragmentStr, std::regex(loo))) // check for __loop:
+		return 3;
+	// TODO: make this one optional if no functions are being used
+	if (!std::regex_search(fragmentStr, std::regex(fun))) // check for __functions:
+		return 4;
+	if (fragmentType == 0)
+		if (!std::regex_search(fragmentStr, std::regex(bai))) // check for __bailout, if fractal formula:
+			return 5;
+	if (fragmentType > 0)
+		if (!std::regex_search(fragmentStr, std::regex(fin))) // check for __final, if coloring algorithm:
+			return 6;
+	return 0;
+}
+
+
 std::string fillKernelParamBlock(std::istringstream& paramList, std::string& fullStr, const std::string& parType)
 {
 	std::string kernelParamList("");
@@ -260,6 +283,49 @@ bool isStringInVector(const std::vector<std::string>& vec, const std::string& st
 	return std::find(vec.begin(), vec.end(), str) != vec.end();
 }
 
+int parenthesesScanner(std::string& s)
+{
+	std::vector<std::pair<int, int>> p;
+	std::vector<int> counter = { 0, 0, 0 };
+	unsigned N = 0;
+	int roundCount = 0;
+	int curlyCount = 0;
+	for (auto c : s)
+	{
+		if (c == '(')
+		{
+			if (counter[0] == 0)
+				roundCount = N;
+			counter[0]++;
+		}
+		if (c == '{')
+		{
+			if (counter[1] == 0)
+				curlyCount = N;
+			counter[1]++;
+		}
+		if (c == ')')
+		{
+			if (counter[0] == 1)
+				p.push_back(std::make_pair(roundCount, N));
+			counter[0]--;
+		}
+		if (c == '}')
+		{
+			if (counter[0] == 1)
+				p.push_back(std::make_pair(curlyCount, N));
+			counter[1]--;
+		}
+		N++;
+	}
+	if (!counter[0] == 0 || !counter[1] == 0)
+		return 7; // unbalanced parentheses in declaration
+	// for (auto it = p.rbegin(); it != p.rend(); ++it)
+	for (auto del : p | std::views::reverse)
+		s.erase(del.first, del.second - del.first + 1);
+	return 0;
+}
+
 const std::vector<std::string> typeIndicators = { 
 	"^char\d{0,2}\s*", "^unsigned\s+$char\d{0,2}\s*", "^uchar\d{0,2}\s*", "^int\d{0,2}\s*", 
 	"^unsigned\s+$int\d{0,2}\s*", "^uint\d{0,2}\s*", "^long\d{0,2}\s*", "^unsigned\s+long\d{0,2}\s*",
@@ -272,13 +338,10 @@ const std::vector<std::string> qualifiers = {
 const std::vector<std::string> protectedNames = { "z", "bailedout", "outColor"}; // do not touch these!
 
 std::string getVariableAndParameterNames(const std::string& codeStr_,
-	const std::vector<std::string>& prefixes, const std::string& funcFlag)
+	const std::vector<std::string>& prefixes, const std::string& funcFlag, int* err = 0)
 {
 	std::string codeStr, funcStr;
 	splitAtPattern(codeStr_, fun, codeStr, funcStr);
-	std::cout << codeStr << "\n";
-	std::cout << "======================\n";
-	std::cout << funcStr << "\n";
 	std::vector<std::string> codeLines = splitLines(codeStr);
 	replacer rawDeclarations;
 	replacer funcDeclarations;
@@ -290,7 +353,6 @@ std::string getVariableAndParameterNames(const std::string& codeStr_,
 		if (line == "//@__functions:")
 			declarationType = 2;
 		trimTrailingCharacters(line, " ;\n");
-		std::cout << "LINE " << N << ": " << line << "\n";
 		trimLeadingCharacters(line, " \t");
 		bool isDeclaration = false;
 		int lineLength = line.length();
@@ -307,23 +369,22 @@ std::string getVariableAndParameterNames(const std::string& codeStr_,
 		trimLeadingCharacters(line, " 01234567890*");
 		if (line.length() < lineLength)
 		{
-			std::cout << "FOUND declaration for \"" << line << "\"\n";
+			*err = parenthesesScanner(line);
+			if (*err > 0)
+			{
+				return "";
+			}
 			if (std::regex_search(line, std::regex("^parameter")))
 			{
 				line = std::regex_replace(line, std::regex("^parameter\s*"), "");
 				trimLeadingCharacters(line, " "); // why do I need this???
 				declarationType = 1; // parameter
 			}
-			line = std::regex_replace(line, std::regex("\\(.*?\\)"), "");
-			line = std::regex_replace(line, std::regex("\\{.*?\\}"), "");
 			std::vector<std::string> words = splitWords(line, ',', " ");
-			std::cout << words[0] << "\n";
 			for (auto word : words)
 			{
 				word = std::regex_replace(word, std::regex("\s*=\s*.*"), "");
 				trimTrailingCharacters(word, " "); // why do I need this???
-				std::cout << word << "\n";
-				std::cout << "FOUND declaration (" << declarationType << ") for \"" << word << "\"\n";
 				if (!isStringInVector(protectedNames, word))
 				{
 					
@@ -332,25 +393,17 @@ std::string getVariableAndParameterNames(const std::string& codeStr_,
 						rawDeclarations.push_back(std::make_pair("\\b" + word + "\\b", prefix + word));
 					else
 						funcDeclarations.push_back(std::make_pair("\\b" + word + "\\b", prefix + word));
-					std::cout << "Will replace " << word << " with " << prefixes[declarationType] + word << "\n";
 				}
-				else
-					std::cout << word << " is protected!\n";
 			}
 		}
 		N++;
 	}
-	std::cout << "============ before replace =================\n";
-	std::cout << codeStr << "\n";
 	for (auto repl : rawDeclarations)
 		codeStr = std::regex_replace(codeStr, std::regex(repl.first), repl.second);
 	codeStr = std::regex_replace(codeStr, std::regex("@"), "");
-	
 	for (auto repl : funcDeclarations)
 		funcStr = std::regex_replace(funcStr, std::regex(repl.first), repl.second);
-	std::cout << "============= after replace =================\n";
 	std::string ret = codeStr + fun + funcStr;
-	std::cout << ret << "\n";
 	return codeStr + fun + funcStr;
 }
 
@@ -377,6 +430,7 @@ paramCollector parseParameters(std::string& fullStr, const std::string& fractalF
 
 bool clFractal::makeCLCode(const bool newFiles)
 {
+	this->resetParseStatus();
 	std::string full_template("clFragments/full_template.cl");
 	std::string fullTemplateStr = readCLFragmentFromFile(full_template);
 	std::string fractalFile = this->fractalCLFragmentFile;
@@ -389,15 +443,36 @@ bool clFractal::makeCLCode(const bool newFiles)
 	std::string fractalFormulaStr = readCLFragmentFromFile(fractalCLFragmentFile) + eof;
 	std::string insideColoringAlgorithmStr = readCLFragmentFromFile(insideColoringCLFragmentFile) + eof;
 	std::string outsideColoringAlgorithmStr = readCLFragmentFromFile(outsideColoringCLFragmentFile) + eof;
+	this->status.fractalFragmentStatus = clFragmentSanityCheck(fractalFormulaStr, 0);
+	this->status.insideColoringFragmentStatus = clFragmentSanityCheck(insideColoringAlgorithmStr, 1);
+	this->status.outsideColoringFragment_status = clFragmentSanityCheck(outsideColoringAlgorithmStr, 2);
+	if (this->status.fractalFragmentStatus + this->status.insideColoringFragmentStatus +
+		this->status.outsideColoringFragment_status > 0) 
+		return false;
 	std::string antiAliasing("clFragments/full_template.cl");
 	std::string antiAliasingStr = readCLFragmentFromFile("clFragments/anti_aliasing.cl");
 	std::string colorStr = readCLFragmentFromFile("clFragments/colors.cl");
 	std::string complexStr = readCLFragmentFromFile("clFragments/complex.cl");
 
-	fractalFormulaStr = getVariableAndParameterNames(fractalFormulaStr, fPrefixes, FFFlag);
-	insideColoringAlgorithmStr = getVariableAndParameterNames(insideColoringAlgorithmStr, ciPrefixes, FIFlag);
-	outsideColoringAlgorithmStr = getVariableAndParameterNames(outsideColoringAlgorithmStr, coPrefixes, FOFlag);
-
+	int parseError = 0;
+	fractalFormulaStr = getVariableAndParameterNames(fractalFormulaStr, fPrefixes, FFFlag, &parseError);
+	if (parseError > 0)
+	{
+		this->status.fractalFragmentStatus = parseError;
+		return false;
+	}
+	insideColoringAlgorithmStr = getVariableAndParameterNames(insideColoringAlgorithmStr, ciPrefixes, FIFlag, &parseError);
+	if (parseError > 0)
+	{
+		this->status.insideColoringFragmentStatus = parseError;
+		return false;
+	}
+	outsideColoringAlgorithmStr = getVariableAndParameterNames(outsideColoringAlgorithmStr, coPrefixes, FOFlag, &parseError);
+	if (parseError > 0)
+	{
+		this->status.outsideColoringFragment_status = parseError;
+		return false;
+	}
 	// UF-style separation
 	std::string fractalInit = getFragmentPart(fractalFormulaStr, ini, loo);
 	std::string fractalLoop = getFragmentPart(fractalFormulaStr, loo, bai);
