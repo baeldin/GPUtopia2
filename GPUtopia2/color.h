@@ -22,7 +22,7 @@ struct color
     float b;
     float a = 1.f;
     color() : r(0.f), g(0.f), b(0.f), a(1.f) {}
-    color(const float x) : r(x), g(x), b(x), a(1.f) {}
+    // color(const float x) : r(x), g(x), b(x), a(1.f) {}
     color(const float c, const float a_) : r(c), g(c), b(c), a(a_) {}
     color(const float r_, const float g_, const float b_)
     {
