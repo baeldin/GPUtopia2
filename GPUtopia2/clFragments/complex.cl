@@ -14,6 +14,7 @@ inline complex flip(const complex z) { return (complex)(z.y, z.x); }
 inline complex conj(const complex z) { return (complex)(z.x, -z.y); }
 inline complex abs_squared(const complex z) { return (complex)(z.x * z.x, z.y * z.y); }
 inline complex cabs(const complex z) { return (complex)(absf(z.x), absf(z.y)); }
+inline complex rabs(const complex z) { return (complex)(absf(z.x), z.y); }
 
 // operations with two complex arguments
 inline complex cmul(const complex z1, const complex z2) 
