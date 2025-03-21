@@ -15,13 +15,6 @@ __final:
 // 		// to be in [0., 1.)
 //
 		float c = 0.01f * ((float)iter + il * lp - il * log(0.5f * log(dot(z, z))));
-
-		// c = sqrt(c);
-		//colors[i].xyzw += getColor(gradient, @colorDensity * c, nColors);
-		int4 outColor = getColor(gradient, @colorDensity * c, nColors);
-		atomic_fetch_add(&colorsR[i], outColor.x); // , memory_order_relaxed, memory_scope_device);
-		atomic_fetch_add(&colorsG[i], outColor.y); //, memory_order_relaxed);
-		atomic_fetch_add(&colorsB[i], outColor.z); // , memory_order_relaxed);
-		atomic_fetch_add(&colorsA[i], outColor.w); // , memory_order_relaxed);
+		int4 outColor = getColor(gradient, @colorDensity * 0.01f * c, nColors);
 __functions:
 //void

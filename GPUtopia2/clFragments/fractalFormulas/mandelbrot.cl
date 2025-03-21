@@ -19,3 +19,8 @@ __bailout:
     bool bailedout = (dot(z, z) > bailout);
 __functions:
 //=| functions which are usable in the init, loop, and bailout parts
+float t(int i,
+    float b)
+{
+    return 2.f*(float)i+b;
+}
