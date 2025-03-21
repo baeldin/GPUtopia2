@@ -190,7 +190,7 @@
     <ClCompile Include="fractal_navigation.cpp" />
     <ClCompile Include="gradient.cpp" />
     <ClCompile Include="gradientWindow.cpp" />
-    <ClCompile Include="hiostry.cpp" />
+    <ClCompile Include="history.cpp" />
     <ClCompile Include="imageSettings.cpp" />
     <ClCompile Include="info.cpp" />
     <ClCompile Include="info.h" />

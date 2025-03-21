@@ -188,7 +188,7 @@
     <ClCompile Include="fileOperations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="hiostry.cpp">
+    <ClCompile Include="history.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gradientWindow.cpp">
