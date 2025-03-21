@@ -253,7 +253,9 @@ paramCollector parseKernelParameterBlock(std::string& kpb)
 		if (words[1] == "complex")
 		{
 			double x = std::stod(std::regex_replace(words[4], std::regex("\\("), ""));
-			double y = std::stod(std::regex_replace(words[5], std::regex("\\)"), ""));
+			double y = 0.;
+			if (words.size() == 6)
+				y = std::stod(std::regex_replace(words[5], std::regex("\\)"), ""));
 			Complex<double> val(x, y);
 			paramMaps->complexParameters[paramName] = std::make_pair(val, paramIndex);
 			kpb_noValues += std::string("    const complex ") + words[2] + std::string(",\n");
