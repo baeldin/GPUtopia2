@@ -12,17 +12,6 @@ int Gradient::getIndex(const std::vector<int>& v, const int K) const
 	return it - v.begin();
 }
 
-Gradient::Gradient() {
-	nodeLocationsOld = nodeLocations;
-	nodeIndex = std::vector<int>(nodeCount);
-	fillOrder = std::vector<int>(nodeCount);
-	for (int ii = 0; ii < nodeCount; ii++)
-	{
-		nodeIndex[ii] = ii;
-	}
-	fillOrder = getFillOrder(nodeLocations);
-	fill();
-}
 
 Gradient::Gradient(int length_, std::vector<color> colors_, std::vector<int> locations_) {
 	length = length_;
@@ -38,6 +27,18 @@ Gradient::Gradient(int length_, std::vector<color> colors_, std::vector<int> loc
 	}
 	fillOrder = getFillOrder(nodeLocations);
 	fill();
+}
+
+Gradient::Gradient(const gradientContainer& gc)
+{
+	this->name = gc.name;
+	this->length = gc.length;
+	for (int ii = 0; ii < gc.colors.size(); ii++)
+	{
+		this->nodeColors.push_back(color(gc.colors[ii]));
+		this->nodeLocations.push_back(gc.indices[ii]);
+	}
+	this->fill();
 }
 
 std::vector<int> Gradient::getFillOrder(const std::vector<int>& nodeLocations)
@@ -405,6 +406,18 @@ std::vector<color> Gradient::getGradientImg(const int width, const int height)
 	return img;
 }
 
+gradientContainer Gradient::toExport() const
+{
+	gradientContainer gc;
+	gc.name = this->name;
+	gc.length = this->length;
+	for (int ii = 0; ii < this->nodeColors.size(); ii++)
+	{
+		gc.colors.push_back(this->nodeColors[ii].toUFint());
+		gc.indices.push_back(this->nodeLocations[ii]);
+	}
+	return gc;
+}
 
 
 // OLD FILE CONTENS !!!! //

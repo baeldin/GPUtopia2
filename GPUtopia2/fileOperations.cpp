@@ -25,10 +25,13 @@ void openCLF(clFractal& cf, clCore& cc)
 		std::string jsonStr;
 		inFile >> jsonStr;
 		json back_json = json::parse(jsonStr);
-		auto cf = back_json.get<clFractal>();
-		cf.makeCLCode(SAME_FILES);
+		auto cf_inC = back_json.get<clFractalContainer>();
+		clFractal cf_in(cf_inC);
+		cf_in.resetCLFragmentQueue();
+		cf_in.makeCLCode(SAME_FILES);
 		cc.resetCore();
-		cc.compileFractalKernel(cf.fullCLcode);
+		cc.compileFractalKernel(cf_in.fullCLcode);
+		cf = cf_in;
 	}
 }
 
@@ -39,7 +42,7 @@ void saveCLF(clFractal& cf)
 	saveFileDialog(path, success, L"clf", L"GPUtopia Fractals (*.clf)");
 	if (success)
 	{
-		json json = cf;
+		json json = cf.toExport();
 		std::ofstream outFile(path);
 		outFile << json.dump(4);
 		outFile.close();

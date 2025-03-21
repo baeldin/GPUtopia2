@@ -1,7 +1,7 @@
 #include "history.h"
 
 void undo(clFractal& cf, clFractal& cf_old, clCore& cc,
-	std::vector<json>& history, int* historyIndex)
+	std::vector<clFractalContainer>& history, int* historyIndex)
 {
 	if (*historyIndex > 0)
 	{
@@ -23,6 +23,7 @@ void undo(clFractal& cf, clFractal& cf_old, clCore& cc,
 			std::lock_guard guard(timingMutex);
 			cf.timings.erase(cf.timings.begin(), cf.timings.end());
 		}	
+		cf.resetCLFragmentQueue();
 		cf.status.done = false;
 		cf_old = cf;
 		std::cout << (cf_old == cf) << "\n";
@@ -33,7 +34,7 @@ void undo(clFractal& cf, clFractal& cf_old, clCore& cc,
 }
 
 void redo(clFractal& cf, clFractal& cf_old, clCore& cc,
-	std::vector<json>& history, int* historyIndex)
+	std::vector<clFractalContainer>& history, int* historyIndex)
 {
 	if (*historyIndex < history.size() - 1)
 	{
@@ -55,6 +56,7 @@ void redo(clFractal& cf, clFractal& cf_old, clCore& cc,
 			std::lock_guard guard(timingMutex);
 			cf.timings.erase(cf.timings.begin(), cf.timings.end());
 		}
+		cf.resetCLFragmentQueue();
 		cf.status.done = false;
 		cf_old = cf;
 		std::cout << "REDO: History index = " << *historyIndex << " and length of history vector is " << history.size() << "\n";
@@ -63,7 +65,7 @@ void redo(clFractal& cf, clFractal& cf_old, clCore& cc,
 		std::cout << "REDO: History index is already at " << *historyIndex << " and length of history vector is only " << history.size() << ", nothing to be redone.\n";
 }
 
-void popHistory(std::vector<json>& history, int* historyIndex)
+void popHistory(std::vector<clFractalContainer>& history, int* historyIndex)
 {
 	std::cout << "We are not at the end of history, but the fractal was changed:\n";
 	const int historyEnd = history.size();
@@ -75,3 +77,6 @@ void popHistory(std::vector<json>& history, int* historyIndex)
 	historyIndex--;
 	std::cout << "POP: History index = " << *historyIndex << " and length of history vector is " << history.size() << "\n";
 }
+
+
+

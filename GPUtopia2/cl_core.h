@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-     #include <map>
+#include <map>
 #include <typeinfo>
 #include <chrono>
 #include <CL/cl2.hpp>

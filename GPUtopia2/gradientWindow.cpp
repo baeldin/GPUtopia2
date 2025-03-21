@@ -10,14 +10,15 @@ void gradientWindow(clFractal& cf)
     {
         // paste gradient
         std::string jsonStr = ReadStringFromClipboard();
+        std::cout << jsonStr << "\n";
         json back_json = json::parse(jsonStr);
-        auto grad = back_json.get<Gradient>();
-        workGradient = grad;
+        auto grad = back_json.get<gradientContainer>();
+        workGradient = Gradient(grad);
     }
     if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_C, false) && ImGui::IsWindowFocused())
     {
         // copy gradient
-        json json = cf.gradient;
+        json json = cf.gradient.toExport();
         std::cout << "Copying gradient to clipboard:\n";
         std::cout << json.dump(4);
         CopyStringToClipboard(json.dump());
@@ -327,9 +328,9 @@ void gradientWindow(clFractal& cf)
     static int colorNodeCount = 4;
     static int currentGradientIndex = 3;
     static int previousGradientIndex = -1; // make sure that this is different initially
-    const char* items[] = { "UF Default", "UF Default Muted", "Volcano Under a Glacier", "Volcano Under a Glacier2", "Jet", "CBR_coldhot", "nice_random", "Default" , "Test" };
+    const char* items[] = { "UF Default", "UF Default Muted", "Volcano Under a Glacier", "Volcano Under a Glacier2", "Jet", "CBR_coldhot", "nice_random", "Test" };
     static std::vector<color> gradient_img_data(400 * 30, color(0.f));
-    static std::vector<Gradient> gradients = { uf_default, standard_muted, volcano_under_a_glacier, volcano_under_a_glacier2, jet, CBR_coldhot, nice_random, Gradient(), test };
+    static std::vector<Gradient> gradients = { uf_default, standard_muted, volcano_under_a_glacier, volcano_under_a_glacier2, jet, CBR_coldhot, nice_random, test };
     if (previousGradientIndex != currentGradientIndex)
     {
         workGradient = gradients[currentGradientIndex];

@@ -212,6 +212,32 @@ inline const bool operator==(const flameRenderSettings& lhs, const flameRenderSe
 		lhs.vibrancy == rhs.vibrancy);
 }
 
+class gradientContainer;
+
+class clFractalContainer
+{
+public:
+	paramCollector params;
+	clFractalImage image;
+	std::string fractalCLfragmentFile;
+	std::string outsideColoringCLfragmentFile;
+	std::string insideColoringCLfragmentFile;
+	bool useDouble;
+	int mode;
+	int maxIter;
+	float bailout;
+	flameRenderSettings frs;
+	int flamePointSelection;
+	int flameWarmup;
+	gradientContainer gradCont;
+	clFractalContainer() {};
+
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(clFractalContainer,
+		params, image, fractalCLfragmentFile, outsideColoringCLfragmentFile,
+		insideColoringCLfragmentFile, useDouble, mode, maxIter, bailout, frs,
+		flamePointSelection, flameWarmup, gradCont)
+};
+
 // Fractal class that holds parameters, names of the code fragmens, and the full
 // CL code of the fractal + coloring
 class clFractal
@@ -249,7 +275,8 @@ public:
 	cl_int flameWarmup = 0;
 	clFractalStatus status;
 	uint32_t verbosity = 0;
-	clFractal() : gradient() {}
+	clFractal() {}
+	clFractal(const clFractalContainer& cfc);
 	bool makeCLCode(const bool sameFiles = NEW_FILES);
 	bool running() {
 		return this->status.kernelRunning or this->status.imgKernelRunning;
@@ -320,6 +347,15 @@ public:
 		this->insideColoringCLFragmentFileHist = newInsideColoringCLFile;
 		this->insideColoringCLFragmentFileUi = newInsideColoringCLFile;
 	}
+	void resetCLFragmentQueue()
+	{
+		this->fractalCLFragmentFileHist = this->fractalCLFragmentFile;
+		this->fractalCLFragmentFileUi = this->fractalCLFragmentFile;
+		this->insideColoringCLFragmentFileHist = this->insideColoringCLFragmentFile;
+		this->insideColoringCLFragmentFileUi = this->insideColoringCLFragmentFile;
+		this->outsideColoringCLFragmentFileHist = this->outsideColoringCLFragmentFile;
+		this->outsideColoringCLFragmentFileUi = this->outsideColoringCLFragmentFile;
+	}
 	bool newCLFragmentQueued() { return (
 		newFractalCLFragmentQueued() ||
 		newOutsideColoringCLFragmentQueued() ||
@@ -352,9 +388,27 @@ public:
 		this->status.outsideColoringFragment_status = 0;
 		this->status.insideColoringFragmentStatus = 0;
 	}
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(clFractal,
-		image, frs, maxIter, bailout, mode, flamePointSelection, useDouble,
-		params, gradient, fractalCLFragmentFile, insideColoringCLFragmentFile, outsideColoringCLFragmentFile); 
+	clFractalContainer toExport()
+	{
+		clFractalContainer cfc;
+		cfc.params = this->params;
+		cfc.image = this->image;
+		cfc.fractalCLfragmentFile = this->fractalCLFragmentFile;
+		cfc.outsideColoringCLfragmentFile = this->outsideColoringCLFragmentFile;
+		cfc.insideColoringCLfragmentFile = this->insideColoringCLFragmentFile;
+		cfc.useDouble = this->useDouble;
+		cfc.mode = this->mode;
+		cfc.maxIter = this->maxIter;
+		cfc.bailout = this->bailout;
+		cfc.frs = this->frs;
+		cfc.flamePointSelection = this->flamePointSelection;
+		cfc.flameWarmup = this->flameWarmup;
+		cfc.gradCont = this->gradient.toExport();
+		return cfc;
+	}
+	//NLOHMANN_DEFINE_TYPE_INTRUSIVE(clFractal,
+	//	image, frs, maxIter, bailout, mode, flamePointSelection, useDouble,
+	//	params, gradient, fractalCLFragmentFile, insideColoringCLFragmentFile, outsideColoringCLFragmentFile); 
 };
 
 inline const bool operator==(const clFractal& lhs, const clFractal& rhs)

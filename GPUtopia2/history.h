@@ -6,12 +6,12 @@
 #include "json.hpp"
 using json = nlohmann::ordered_json;
 
-class clCore;
+// class clCore;
 
-void undo(clFractal& cf, clFractal& cf_old, clCore& cc, 
-	std::vector<json>& history, int* historyIndex);
+void undo(clFractal& cf, clFractal& cf_old, clCore& cc,
+	std::vector<clFractalContainer>& history, int* historyIndex);
 
 void redo(clFractal& cf, clFractal& cf_old, clCore& cc,
-	std::vector<json>& history, int* historyIndex);
+	std::vector<clFractalContainer>& history, int* historyIndex);
 
-void popHistory(std::vector<json>& history, int* historyIndex);
+void popHistory(std::vector<clFractalContainer>& history, int* historyIndex);

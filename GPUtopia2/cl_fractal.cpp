@@ -14,3 +14,20 @@ Complex<double> clFractalImage::image2complex(const cl_double2 xy) const
         ((this->size.y - xy.y) / (double)this->size.y - 0.5) * this->span.y);
     return relativeImgCoord * this->rotation() + this->center;
 }
+
+clFractal::clFractal(const clFractalContainer& cfc)
+{
+	this->params = cfc.params;
+	this->image = cfc.image;
+	this->fractalCLFragmentFile = cfc.fractalCLfragmentFile;
+	this->outsideColoringCLFragmentFile = cfc.outsideColoringCLfragmentFile;
+	this->insideColoringCLFragmentFile = cfc.insideColoringCLfragmentFile;
+	this->useDouble = cfc.useDouble;
+	this->mode = cfc.mode;
+	this->maxIter = cfc.maxIter;
+	this->bailout = cfc.bailout;
+	this->frs = cfc.frs;
+	this->flamePointSelection = cfc.flamePointSelection;
+	this->flameWarmup = cfc.flameWarmup;
+	this->gradient = Gradient(cfc.gradCont);
+}

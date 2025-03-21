@@ -45,7 +45,7 @@ namespace mainView
 		static ImVec2 mainViewportSize = ImGui::GetContentRegionAvail();
 		static clFractal cf;
 		static clFractal cf_old;
-		static std::vector<json> history; // = { cf.toExport() }; // history vector
+		static std::vector<clFractalContainer> history; // = { cf.toExport() }; // history vector
 		static int historyIndex = -1;
 		static bool undone = false;
 		static bool redone = false;
@@ -164,7 +164,7 @@ namespace mainView
 				}
 				if (ImGui::MenuItem("TODO: Copy"))
 				{
-					json json = cf;
+					json json = cf.toExport();
 					std::string json_out = json.dump(4);
 					CopyStringToClipboard(json.dump(4));
 				}
@@ -172,7 +172,7 @@ namespace mainView
 				{
 					std::string jsonStr = ReadStringFromClipboard();
 					json json = json::parse(jsonStr);
-					cf = json;
+					cf = clFractalContainer(json);
 				}
 				if (ImGui::MenuItem("TODO: Copy Image"))
 				{
@@ -232,7 +232,7 @@ namespace mainView
 			cf.status.runImgKernel = true;
 			if (historyIndex < history.size() - 1)
 				popHistory(history, &historyIndex);
-			history.push_back(json(cf));
+			history.push_back(json(cf.toExport()));
 			historyIndex++;
 			undone = false;
 			redone = false;
@@ -294,7 +294,7 @@ namespace mainView
 				std::cout << "Or here?\n";
 				if (historyIndex < history.size() - 1 and !undone and !redone)
 					popHistory(history, &historyIndex);
-				history.push_back(json(cf));
+				history.push_back(json(cf.toExport()));
 				historyIndex++;
 				undone = false;
 				redone = false;

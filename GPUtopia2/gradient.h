@@ -12,18 +12,29 @@ using json = nlohmann::ordered_json;
 #include "color.h"
 #include "cubic_spline.h"
 
-
 bool pixelInImage(const int x, const int y, const int sizeX, const int sizeY); 
+
+class gradientContainer
+{
+public:
+	std::string name = "Unnamed Gradient";
+	int length = 400;
+	std::vector<int> colors;
+	std::vector<int> indices;
+	gradientContainer() {}
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(gradientContainer,
+		name, length, colors, indices);
+};
 
 class Gradient
 {
 public:
 	int length = 400;
 	int nodeCount = 4;
-	std::vector<color> nodeColors = { color(0,0,0), color(1, 0,0), color(1,1,1), color(0.5f,0.5f,0.9f) };
-	std::vector<int> nodeIndex = { 1, 2, 3, 4 };
-	std::vector<int> nodeLocations = { 0, 10, 20, 30 };
-	int fineLength = 4096;
+	std::vector<color> nodeColors; // = { color(0,0,0), color(1, 0,0), color(1,1,1), color(0.5f,0.5f,0.9f) };
+	std::vector<int> nodeIndex; // = { 1, 2, 3, 4 };
+	std::vector<int> nodeLocations; // = { 0, 10, 20, 30 };
+	int fineLength = 400;
 	std::vector<color> fineColors;
 	std::vector<int> fine_indices;
 	std::vector<int> nodeLocationsOld;
@@ -32,10 +43,10 @@ public:
 	int getIndex(const std::vector<int>& v, const int K) const;
 	std::vector<int> fillOrder;
 	int nodeHighlight = 1; // default no node highlighted
-	std::string name = "DefaultName";
-	Gradient();
+	std::string name = "Unnamed Gradient";
+	Gradient() {}
+	Gradient(const gradientContainer& gc);
 	Gradient(int length_, std::vector<color> colors_, std::vector<int> locations_);
-	Gradient(int length_, std::vector<color> colors_, std::vector<int> locations_, std::vector<int> fillOrder_);
 	color get_color(float xidx, const float density, const float offset, const bool repeat) const;
 	color getColor(const int N) const { return nodeColors[N]; }
 	// index from pos in draw sequence
@@ -101,8 +112,9 @@ public:
 	// ONLY USED FOR INTIAL FILL
 	color get_color_cubic(float xidx) const;
 	std::vector<color> getGradientImg(const int width, const int height);
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(Gradient, 
-		length, nodeColors, nodeLocations);
+	gradientContainer toExport() const;
+	// NLOHMANN_DEFINE_TYPE_INTRUSIVE(Gradient, 
+	// 	name, length, nodeColors, nodeLocations);
 };
 
 inline bool operator==(const Gradient& lhs, const Gradient& rhs)
