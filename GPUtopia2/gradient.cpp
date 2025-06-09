@@ -33,11 +33,15 @@ Gradient::Gradient(const gradientContainer& gc)
 {
 	this->name = gc.name;
 	this->length = gc.length;
+	this->nodeIndex = std::vector<int>(gc.colors.size());
 	for (int ii = 0; ii < gc.colors.size(); ii++)
 	{
 		this->nodeColors.push_back(color(gc.colors[ii]));
 		this->nodeLocations.push_back(gc.indices[ii]);
+		nodeIndex[ii] = ii;
 	}
+	this->nodeLocationsOld = this->nodeLocations;
+	fillOrder = getFillOrder(nodeLocations);
 	this->fill();
 }
 

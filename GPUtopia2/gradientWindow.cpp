@@ -23,6 +23,18 @@ void gradientWindow(clFractal& cf)
         std::cout << json.dump(4);
         CopyStringToClipboard(json.dump());
     }
+    static std::vector<color> gradientImg;
+    static GLuint gradientTextureID;
+    static bool needGradientTexture;
+    if (cf.gradient != workGradient)
+    {
+        cf.gradient = workGradient;
+        // cf.status.runImgKernel = true;
+        glDeleteTextures(1, &gradientTextureID);
+        gradientImg = cf.gradient.getGradientImg(400, 20); // cf.gradient.getGradientImg(400, 20);
+        makeTexture(gradientTextureID, 400, 20, gradientImg);
+        needGradientTexture = false;
+    }
     // Yellow is content region min/max
     static ImVec2 vMin = ImGui::GetWindowContentRegionMin();
     static ImVec2 vMax = ImGui::GetWindowContentRegionMax();
@@ -322,9 +334,6 @@ void gradientWindow(clFractal& cf)
     //    }
     //}
     //ImGui::Text(gradientUFchar);
-    static std::vector<color> gradientImg;
-    static GLuint gradientTextureID;
-    static bool needGradientTexture;
     static int colorNodeCount = 4;
     static int currentGradientIndex = 3;
     static int previousGradientIndex = -1; // make sure that this is different initially
@@ -346,15 +355,7 @@ void gradientWindow(clFractal& cf)
         // grad.printNodes();
         // grad.printFine();
     }
-    if (cf.gradient != workGradient)
-    {
-        cf.gradient = workGradient;
-        cf.status.runImgKernel = true;
-        glDeleteTextures(1, &gradientTextureID);
-        gradientImg = cf.gradient.getGradientImg(400, 20); // cf.gradient.getGradientImg(400, 20);
-        makeTexture(gradientTextureID, 400, 20, gradientImg);
-        needGradientTexture = false;
-    }
+
     ImGui::Image((void*)(intptr_t)gradientTextureID, ImVec2(400, 20));
     ImGui::End(); // Gradient
 }
