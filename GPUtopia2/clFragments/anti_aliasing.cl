@@ -5,13 +5,28 @@ real fracf(const real x) { return x - floor(x); }
 real absf(const real x) { return x * sign(x); }
 real2 absf2(const real2 x) { return x * sign(x); }
 
-real tent(real x) {
+real __attribute__((overloadable)) tent(real x) {
     x = 2.f * x - 1.f;
     if (x == 0) { return 0.f; }
     return x / sqrt(absf(x)) - sign(x);
 }
 
-// Hash function for 64 bit uint
+real2 __attribute__((overloadable)) tent(const real2 v) {
+    return (real2)(tent(v.x), tent(v.y));
+}
+
+real half_tent(const real x) {
+    return x == 0. ? 0. : 1. - x / sqrt(x);
+}
+
+real2 disc(const real2 v) {
+    const real r = sqrt(half_tent(v.x));
+    const real PI2 =  2. * 3.1415926535897932384626433;
+    const real phi = PI2 * v.y;
+    return (real2)(r * cos(phi), r * sin(phi));
+}
+
+// Hash function for 64 bit uint    
 // Found here: https://gist.github.com/degski/6e2069d6035ae04d5d6f64981c995ec2
 ulong lowbias64(ulong x)
 {

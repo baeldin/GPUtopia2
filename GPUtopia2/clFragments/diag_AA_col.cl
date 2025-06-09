@@ -1,6 +1,7 @@
 __parameters:
 int parameter diag_sample_count = 55;
-int parameter pattern = 0;
+enum parameter pattern = 0;
+Lattice Tent Disc
 float parameter dot_size = 0.04f;
 __init:
 
@@ -16,8 +17,13 @@ __final:
 int4 outColor = 255;
 for (int sample = 0; sample <= @diag_sample_count; sample++)
 {
-	real2 sample_position = 0.f;
-	sample_position = R2_offset(1, sample) - 0.5f;
+	real2 sample_position = 0.;
+	if (@pattern == 0)
+		sample_position = R2_offset(1, sample) - 0.5f;
+	else if (@pattern == 1)
+		sample_position = tent(R2_offset(1, sample));
+	else if (@pattern == 2)
+		sample_position = disc(R2_offset(1, sample));
 	if (dot(z - sample_position, z - sample_position) < dot_dist)
 	{
 		outColor = (int4)(150, 0, 0, 255);
