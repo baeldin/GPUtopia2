@@ -22,8 +22,9 @@ void openCLF(clFractal& cf, clCore& cc)
 	{
 		std::ifstream inFile(path);
 		std:cout << path << "\n";
-		std::string jsonStr;
-		inFile >> jsonStr;
+		std::stringstream strStream;
+		strStream << inFile.rdbuf();
+		std::string jsonStr = strStream.str();
 		json back_json = json::parse(jsonStr);
 		auto cf_inC = back_json.get<clFractalContainer>();
 		clFractal cf_in(cf_inC);
