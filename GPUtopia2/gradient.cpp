@@ -240,8 +240,8 @@ std::vector<std::vector<color>> Gradient::drawWithRGBlines(const int sizeX, cons
 		{
 			for (int y = -dotHalfSize; y <= dotHalfSize; y++)
 			{
-				color frameColor = (nodeHighlight == jj) ? ((x + y) % 2 == 0) ? color(1.f) : color(0.f) : color(0.f);
-				color dotColor = (std::max<int>(std::abs(x), std::abs(y)) >= 3) ? frameColor : color(0.5f);
+				color frameColor = (nodeHighlight == jj) ? ((x + y) % 2 == 0) ? color(1.f, 1.f) : color(0.f, 1.f) : color(0.f, 1.f);
+				color dotColor = (std::max<int>(std::abs(x), std::abs(y)) >= 3) ? frameColor : color(0.5f, 1.f);
 				for (int kk = 0; kk < 3; kk++)
 				{
 					if (pixelInImage(dotXValue + x, dotYValues[kk] + y, sizeX, sizeY))
