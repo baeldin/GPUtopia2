@@ -70,6 +70,8 @@ const std::vector<std::string> fPrefixes = { "fPar_", "fVar_", "fFunc_" };
 const std::vector<std::string> ciPrefixes = { "ciPar_", "ciVar_", "ciFunc_" };
 const std::vector<std::string> coPrefixes = { "coPar_", "coVar_", "coFunc_" };
 
+const std::vector<std::string> protectedStrings = { "f" };
+
 void trimTrailingCharacters(std::string& str, const char* trim = " ")
 {
 	str.erase(str.find_last_not_of(trim) + 1);
@@ -82,7 +84,6 @@ void trimLeadingCharacters(std::string& str, const char* trim = " ")
 
 void splitAtPattern(const std::string& s, const std::string& pattern, std::string& A, std::string& B) {
 	size_t pos = s.find(pattern);
-	std::cout << "Found separator " << pattern << " at position " << pos << "\n";
 	if (pos == std::string::npos) {
 		A = s; 
 		B = "";
@@ -92,8 +93,11 @@ void splitAtPattern(const std::string& s, const std::string& pattern, std::strin
 		A = s.substr(0, pos);
 		B = s.substr(pos + pattern.length());
 	}
-	std::cout << A << "\n";
-	std::cout << B << "\n";
+}
+
+bool isProtected(std::string& s)
+{
+	return std::find(protectedStrings.begin(), protectedStrings.end(), s) != protectedStrings.end();
 }
 
 // do some basic checks to see if it COULD be a legit CL fragment
@@ -226,7 +230,7 @@ paramCollector parseKernelParameterBlock(std::string& kpb)
 	std::string paramType;
 	int paramIndex = 0; // first non-default param
 	std::string paramName;
-	std::cout << kpb << "\n";
+	// std::cout << kpb << "\n";
 	std::vector<std::string> kpbLines = splitLines(kpb);
 	int N = 0;
 	while (N < kpbLines.size()) 
@@ -294,6 +298,7 @@ int parenthesesScanner(std::string& s, const bool clearRound = true, const bool 
 	unsigned N = 0;
 	int roundCount = 0;
 	int curlyCount = 0;
+	int globalCount = 0;
 	for (auto c : s)
 	{
 		if (clearRound)
@@ -303,6 +308,7 @@ int parenthesesScanner(std::string& s, const bool clearRound = true, const bool 
 				if (counter[0] == 0)
 					roundCount = N;
 				counter[0]++;
+				globalCount++;
 			}
 			if (c == ')')
 			{
@@ -318,6 +324,7 @@ int parenthesesScanner(std::string& s, const bool clearRound = true, const bool 
 				if (counter[1] == 0)
 					curlyCount = N;
 				counter[1]++;
+				globalCount++;
 			}
 			if (c == '}')
 			{
@@ -329,11 +336,11 @@ int parenthesesScanner(std::string& s, const bool clearRound = true, const bool 
 		N++;
 	}
 	if (!counter[0] == 0 || !counter[1] == 0)
-		return 7; // unbalanced parentheses in declaration
+		return -1; // unbalanced parentheses in declaration
 	for (auto del : p | std::views::reverse)
 		if (del.second < s.length())
 			s.erase(del.first, del.second - del.first + 1);
-	return 0;
+	return globalCount; // return the total number of parentheses pairs found
 }
 
 const std::vector<std::string> typeIndicators = { 
@@ -364,8 +371,15 @@ replacer scanString(std::string codeStr, const std::vector<std::string>& prefixe
 	while (N < codeLines.size())
 	{
 		std::string line = codeLines[N];
+		std::cout << "parsing: " << line << "\n";
 		if (line == "//@__functions:")
 			declarationType = 2;
+		if (declarationType == 2 && line.find("=") == std::string::npos)
+		{
+			std::cout << "  this is not a function definition, use variable\n";
+			N++;
+			continue;
+		}
 		trimTrailingCharacters(line, " ;\n");
 		trimLeadingCharacters(line, " \t");
 		bool isDeclaration = false;
@@ -383,8 +397,15 @@ replacer scanString(std::string codeStr, const std::vector<std::string>& prefixe
 		trimLeadingCharacters(line, " 01234567890*");
 		if (line.length() < lineLength)
 		{
+			std::cout << "  found: " << line << "\n";
+			if (isProtected(line))
+			{
+				std::cout << "  WARNING: string \"" << line << "\" is protected, it will not be renamed. This could cause problems.\n";
+				N++;
+				continue;
+			}
 			*err = parenthesesScanner(line);
-			if (*err > 0)
+			if (*err < 0)
 			{
 				return declarations;
 			}
@@ -394,7 +415,7 @@ replacer scanString(std::string codeStr, const std::vector<std::string>& prefixe
 				trimLeadingCharacters(line, " "); // why do I need this???
 				prefix = prefixes[0];
 			}
-			else if (functionBlock)
+			else if (functionBlock && line.find('=') != std::string::npos)
 				prefix = prefixes[2];
 			else
 				prefix = prefixes[1];
@@ -541,7 +562,7 @@ bool clFractal::makeCLCode(const bool newFiles)
 
 	paramCollector pc = parseParameters(fullTemplateStr, fractalFormulaStr, insideColoringAlgorithmStr, outsideColoringAlgorithmStr);
 
-	std::cout << fullTemplateStr << "\n";
+	// std::cout << fullTemplateStr << "\n";
 	this->fullCLcode = fullTemplateStr;
 	if (newFiles)
 		this->params = pc;
