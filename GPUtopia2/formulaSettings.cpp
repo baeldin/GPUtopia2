@@ -1,4 +1,4 @@
-#include "formulaSettings.h"
+﻿#include "formulaSettings.h"
 
 
 

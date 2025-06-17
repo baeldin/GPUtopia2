@@ -1,4 +1,4 @@
-#include "insideSettings.h"
+﻿#include "insideSettings.h"
 
 
 
@@ -6,7 +6,7 @@ void insideSettingsWindow(clFractal& cf, clCore& cc)
 {
 	ImGui::Begin("Inside");
 	static std::string insideColoringName = "gaussian_integer";
-	if (ImGui::Button("Load"))
+	if (ImGui::Button("Load Coloring Algorithm"))
 	{
 		bool success = false;
 		std::string newInsideColoringCLFragment;

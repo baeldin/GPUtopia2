@@ -1,4 +1,4 @@
-#include "outsideSettings.h"
+﻿#include "outsideSettings.h"
 
 
 
@@ -6,7 +6,7 @@ void outsideSettingsWindow(clFractal& cf, clCore& cc)
 {
 	ImGui::Begin("Outside");
 	static std::string outsideColoringName = "by_iteration";
-	if (ImGui::Button("Load Outisde Coloring"))
+	if (ImGui::Button("Load Coloring Algorithm"))
 	{
 		bool success = false;
 		std::string newOutsideColoringCLFragment;
