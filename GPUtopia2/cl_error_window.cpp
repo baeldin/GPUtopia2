@@ -20,17 +20,30 @@ ImVec4 operator*(const float lhs, const ImVec4 rhs)
 void showErrorLogWindow(clFractal& cf, const clCore& cc, ImFont* font_mono, bool hasError)
 {
 	static bool undoStyleChange = false;
+	// Base colors
 	ImVec4 colorErr = { 0.9f, 0.5f, 0.4f, 1.0f }; // red
-	ImVec4 colorOk = { 0.3f, 0.8f, 0.5f, 1.0 }; // green
+	ImVec4 colorOk = { 0.3f, 0.8f, 0.5f, 1.0f }; // green
 	ImVec4 colorTab;
-	if (hasError)
-		colorTab = colorErr;
-	else
+
+	// Flash intensity, oscillates between 0 and 1
+	float time = ImGui::GetTime();
+	float flashIntensity = 0.5f * (std::sin(time * 5.0f) + 1.0f); // speed = 5.0, tweak as needed
+
+	if (hasError) {
+		// Interpolate between colorOk and colorErr
+		colorTab.x = colorOk.x * (1.0f - flashIntensity) + colorErr.x * flashIntensity;
+		colorTab.y = colorOk.y * (1.0f - flashIntensity) + colorErr.y * flashIntensity;
+		colorTab.z = colorOk.z * (1.0f - flashIntensity) + colorErr.z * flashIntensity;
+		colorTab.w = 1.0f;
+	}
+	else {
 		colorTab = colorOk;
-		// Push title text color for active and collapsed states.
-	ImGui::PushStyleColor(ImGuiCol_Tab, 0.8f * colorTab); // Normal state
-	ImGui::PushStyleColor(ImGuiCol_TabActive, 0.9f * colorTab); // Active window
-	ImGui::PushStyleColor(ImGuiCol_TabUnfocused, 0.7f * colorTab); // Collapsed window
+	}
+
+	// Apply flashing color to tab states
+	ImGui::PushStyleColor(ImGuiCol_Tab, 0.8f * colorTab);
+	ImGui::PushStyleColor(ImGuiCol_TabActive, 0.9f * colorTab);
+	ImGui::PushStyleColor(ImGuiCol_TabUnfocused, 0.7f * colorTab);
 	ImGui::PushStyleColor(ImGuiCol_TabHovered, colorTab);
 	ImGui::Begin("Error Log");
 	ImGui::PushFont(font_mono);
