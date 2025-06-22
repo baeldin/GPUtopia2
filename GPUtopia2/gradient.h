@@ -44,6 +44,7 @@ public:
 	std::vector<int> fillOrder;
 	int nodeHighlight = 1; // default no node highlighted
 	std::string name = "Unnamed Gradient";
+	bool isNew = false;
 	Gradient() {}
 	Gradient(const gradientContainer& gc);
 	Gradient(int length_, std::vector<color> colors_, std::vector<int> locations_);

@@ -33,6 +33,7 @@ void openCLF(clFractal& cf, clCore& cc)
 		cc.resetCore();
 		cc.compileFractalKernel(cf_in.fullCLcode);
 		cf = cf_in;
+		cf.gradient.isNew = true;
 	}
 }
 

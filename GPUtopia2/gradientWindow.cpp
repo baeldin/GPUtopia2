@@ -6,6 +6,12 @@ void gradientWindow(clFractal& cf)
     ImGuiIO& io = ImGui::GetIO();
     static Gradient workGradientOld = cf.gradient;
     static Gradient workGradient = cf.gradient;
+    if (cf.gradient.isNew)
+    {
+        workGradient = cf.gradient;
+        workGradientOld = cf.gradient;
+        cf.gradient.isNew = false;
+    }
     if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_V, false) && ImGui::IsWindowFocused())
     {
         // paste gradient
