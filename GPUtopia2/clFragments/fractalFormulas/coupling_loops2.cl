@@ -30,7 +30,7 @@ __init:
             }
 __bailout:
 //=| factal bailout function
-    // must always define bool bailedout!!!
-    bool bailedout = (dot(z, z) > bailout);
+    // must always define bailedOut!!!
+    bailedOut = (dot(z, z) > bailout);
 __functions:
 //=| functions which are usable in the init, loop, and bailout parts

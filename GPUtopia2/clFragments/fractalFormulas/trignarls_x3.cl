@@ -19,8 +19,8 @@ __loop:
         @c3 * stream_func_gradient_Y(@f3 * z.x, @f3 * z.y));
 __bailout:
 //=| factal bailout function
-    // must always define bool bailedout!!!
-    bool bailedout = (dot(z, z) > bailout*bailout);
+    // must always define bailedOut!!!
+    bailedOut = (dot(z, z) > bailout*bailout);
 __functions:
 real stream_func_gradient_X(const real xold, const real yold)
 {

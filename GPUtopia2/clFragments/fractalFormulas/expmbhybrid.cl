@@ -9,7 +9,7 @@ __loop:
                 2.f * z.x * z.y + z0.y)) + z0;
 __bailout:
 //=| factal bailout function
-    // must always define bool bailedout!!!
-    bool bailedout = (dot(z, z) > bailout);
+    // must always define bailedOut!!!
+    bailedOut = (dot(z, z) > bailout);
 __functions:
 //=| functions which are usable in the init, loop, and bailout parts

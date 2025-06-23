@@ -10,7 +10,7 @@ __loop:
             zold = z;
 __bailout:
 //=| factal bailout function
-    // must always define bool bailedout!!!
-    bool bailedout = (dot(z, z) > bailout || dot(z, zold) < 0.00005);
+    // must always define bailedOut!!!
+    bailedOut = (dot(z, z) > bailout || dot(z, zold) < 0.00005);
 __functions:
 //=| functions which are usable in the init, loop, and bailout parts

@@ -8,8 +8,8 @@ __loop:
         z += @c1 * midpoint_mb(z, z0, @c1);
 __blout:
 //=| factal bailout function
-    // must always define bool bailedout!!!
-    bool bailedout = (dot(z, z) > bailout*bailout);
+    // must always define bailedOut!!!
+    bailedOut = (dot(z, z) > bailout*bailout);
 __functions:
 //=| functions which are usable in the init, loop, and bailout parts
 // MB step

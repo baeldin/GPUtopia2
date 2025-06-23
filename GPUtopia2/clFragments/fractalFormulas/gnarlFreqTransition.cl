@@ -18,8 +18,8 @@ __loop:
             z += v1 + v2;
 __bailout:
 //=| factal bailout function
-    // must always define bool bailedout!!!
-    bool bailedout = (dot(z, z) > bailout*bailout);
+    // must always define bailedOut!!!
+    bailedOut = (dot(z, z) > bailout*bailout);
 __functions:
 //=| functions which are usable in the init, loop, and bailout parts
 complex stream_func_gradient_X(const complex x, const complex y)

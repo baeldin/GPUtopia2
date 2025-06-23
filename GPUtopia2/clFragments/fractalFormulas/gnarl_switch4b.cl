@@ -36,8 +36,8 @@ __loop:
             z += @c3 * RK4_pent(@f3 * z, @c3);
 __bailout:
 //=| factal bailout function
-    // must always define bool bailedout!!!
-    bool bailedout = (dot(z, z) > bailout*bailout);
+    // must always define bailedOut!!!
+    bailedOut = (dot(z, z) > bailout*bailout);
 __functions:
 //=| functions which are usable in the init, loop, and bailout parts
 __constant real i6f = 1. / 6.;

@@ -36,11 +36,6 @@ int2 revert_complex_coordinates(const real2 z, const int2 img_size, const real4 
         floor((z_tmp.y / cz.w + 0.5f) * (img_size.y - 1)));
 }
 
-bool bailed_out(const real2 z, const real bailout)
-{
-//@__bailout
-    return bailedout;
-}
 __kernel void computeLoop(
     const int2 image_size,             // 0:  image sizeX, image sizeY
     const real4 complex_subplane,      // 1:  {centerX, centerY, width, width / aspectRatio}
@@ -82,12 +77,14 @@ __kernel void computeLoop(
                     tent(R2.y));
                 const real2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane, rot);
                 //@__formulaInit
-                while (!bailed_out(z, bailout) && iter < maxIterations)
+                bool bailedOut = false;
+                while (!bailedOut && iter < maxIterations)
                 {
                     //@__formulaLoop
+                    //@__bailout
                     iter++;
                 }
-                if (bailed_out(z, bailout))
+                if (bailedOut)
                 {
                     use_point = flamePointSelection == 1 ? true : false;
                 }
@@ -107,14 +104,16 @@ __kernel void computeLoop(
                 //@__coloringInsideInit
                 //@__coloringOutsideInit
 
-                while (!bailed_out(z, bailout) && iter < maxIterations)
+                bool bailedOut = false;
+                while (!bailedOut && iter < maxIterations)
                 {
                     //@__formulaLoop
                     //@__coloringInsideLoop
                     //@__coloringOutsideLoop
+                    //@__bailout
                     iter++;
                 }
-                if (bailed_out(z, bailout))
+                if (bailedOut)
                 {
                     //@__coloringOutsideFinal
 		        } 
