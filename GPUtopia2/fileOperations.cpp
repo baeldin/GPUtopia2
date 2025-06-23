@@ -1,5 +1,14 @@
 #include "fileOperations.h"
 
+
+
+std::string getFileFromPath(std::string& fullPath) {
+	std::filesystem::path p(fullPath);
+	if (p.extension() == ".clf")
+		return p.stem().string(); // filename without extension
+	return p.filename().string(); // return full filename if not .clf}
+}
+
 void newCLF(clFractal& cf, clCore& cc)
 {
 	cf = clFractal();
@@ -30,6 +39,7 @@ void openCLF(clFractal& cf, clCore& cc)
 		clFractal cf_in(cf_inC);
 		cf_in.resetCLFragmentQueue();
 		cf_in.makeCLCode(SAME_FILES);
+		cf_in.name = getFileFromPath(path);
 		cc.resetCore();
 		cc.compileFractalKernel(cf_in.fullCLcode);
 		cf = cf_in;
@@ -48,6 +58,7 @@ void saveCLF(clFractal& cf)
 		std::ofstream outFile(path);
 		outFile << json.dump(4);
 		outFile.close();
+		cf.name = getFileFromPath(path);
 	}
 }
 

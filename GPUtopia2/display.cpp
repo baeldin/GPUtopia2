@@ -213,7 +213,7 @@ namespace mainView
 			// Call your function (e.g., undo)
 			redo(cf, cf_old, core, history, &historyIndex);
 		}
-		ImGui::Begin("Main View", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
+		ImGui::Begin((cf.name + "###Main View").c_str(), nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 		static paramCollector params_old = cf.params;
 		static clFractalImage img_settings_old = cf.image;
 		formulaSettingsWindow(cf, core);
@@ -425,8 +425,7 @@ namespace mainView
 			imgBlocked = false;
 		}
 		ImGui::End();
-		static char mainViewStr[] = "Main View";
-		ImGui::Begin(mainViewStr, nullptr, ImGuiWindowFlags_HorizontalScrollbar);
+		ImGui::Begin((cf.name + "###Main View").c_str(), nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 		ImGui::Image((void*)(intptr_t)textureID, ImVec2(
 		cf.image.size.x, cf.image.size.y)); 
 		ImGui::End();

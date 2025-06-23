@@ -9,6 +9,8 @@
 // forward declaration needed to avoid syntax error!?
 class clCore; 
 
+std::string getFileFromPath(std::string& fullPath);
+
 void newCLF(clFractal& cf, clCore& cc);
 void openCLF(clFractal& cf, clCore& cc);
 void saveCLF(clFractal& cf);

@@ -243,6 +243,7 @@ public:
 class clFractal
 {
 public:
+	std::string name = "Untitled";
 	paramCollector params;
 	clFractalImage image;
 	Gradient gradient = volcano_under_a_glacier2;
