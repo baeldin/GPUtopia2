@@ -17,6 +17,9 @@
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 #include "display.h"
 
+// #define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
 // Your own project should not be affected, as you are likely to link with a newer binary of GLFW that is adequate for your version of Visual Studio.
@@ -78,10 +81,24 @@ int main(int, char**)
 #endif
 
     // Create window with graphics context
+    const std::string mainTitle = "Lincantëa";
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Under Construction", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, reinterpret_cast<const char*>(u8"Lincantëa"), NULL, NULL);
     if (window == NULL)
         return 1;
+
+    // Set window icon
+    int width, height, channels;
+    unsigned char* pixels = stbi_load("lincantea_1024.png", &width, &height, &channels, 4);
+    if (pixels) {
+        GLFWimage image;
+        image.width = width;
+        image.height = height;
+        image.pixels = pixels;
+        glfwSetWindowIcon(window, 1, &image);
+        stbi_image_free(pixels);
+    }
+
     glfwMakeContextCurrent(window);
     glewInit();
     glEnable(GL_DEBUG_OUTPUT);

@@ -117,6 +117,9 @@
     <ClInclude Include="outsideSettings.h">
       <Filter>Header Files\Ui</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -325,5 +328,15 @@
     <Text Include="clFragments\coloringAlgorithms\smoothMandelbroth.cl">
       <Filter>OpenCL Files\coloring</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="lincatea_256.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="appicon.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
