@@ -26,7 +26,7 @@ void openCLF(clFractal& cf, clCore& cc)
 	std::string path;
 	bool success = false;
 
-	openFileDialog(path, success, L"clf", L"GPUtopia Fractals (*.clf)");
+	openFileDialog(path, success, "clf", "GPUtopia Fractals (*.clf)");
 	if (success)
 	{
 		std::ifstream inFile(path);
@@ -51,7 +51,7 @@ void saveCLF(clFractal& cf)
 {
 	bool success = false;
 	std::string path;
-	saveFileDialog(path, success, L"clf", L"GPUtopia Fractals (*.clf)");
+	saveFileDialog(path, success, "clf", "GPUtopia Fractals (*.clf)");
 	if (success)
 	{
 		json json = cf.toExport();
@@ -67,11 +67,11 @@ void saveCLF(clFractal& cf)
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
-void savePNG(const std::vector<color>& image_data, const size& size)
+void savePNG(const std::vector<color>& image_data, const clSize& size)
 {
 	bool success = false;
 	std::string fileName;
-	saveFileDialog(fileName, success, L"png", L"Portable Network Graphics (*.png)");
+	saveFileDialog(fileName, success, "png", "Portable Network Graphics (*.png)");
 	if (success)
 	{
 		std::vector<uint8_t> image_sRGB(3 * size.x * size.y);

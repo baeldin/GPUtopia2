@@ -13,7 +13,8 @@
       ]
     },
     "opencl",
-    "stb"
+    "stb",
+    "tinyfiledialogs"
   ],
   "overrides": [
     {
@@ -37,5 +38,5 @@
       "version": "2023-04-11"
     }
   ],
-  "builtin-baseline": "1f619be01b436b796dab797dd1e1721c5676f8ac"
+  "builtin-baseline": "0a434205c521ca43d66921271ae2a1d051e718a5"
 }

@@ -160,7 +160,7 @@ void addParam(parameterMaps& m,	const std::string name, const std::string type,
 	if (type == "int")
 	{ 
 		int p;
-		sscanf_s(value.c_str(), "%d", &p);
+		sscanf(value.c_str(), "%d", &p);
 		m.integerParameters[name] = std::make_pair(p, index);
 	}
 	else if (type == "real" || type == "double" || type == "float")

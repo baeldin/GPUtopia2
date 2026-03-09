@@ -10,7 +10,7 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc)
 	{
 		bool success = false;
 		std::string newFractalCLFragment;
-		openFileDialog(newFractalCLFragment, success, L"cl", L"GPUtopia CL Fragment (*.cl)");
+		openFileDialog(newFractalCLFragment, success, "cl", "GPUtopia CL Fragment (*.cl)");
 		if (success)
 		{
 			cf.fractalCLFragmentFileUi = newFractalCLFragment;

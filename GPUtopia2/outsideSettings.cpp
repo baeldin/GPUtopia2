@@ -10,7 +10,7 @@ void outsideSettingsWindow(clFractal& cf, clCore& cc)
 	{
 		bool success = false;
 		std::string newOutsideColoringCLFragment;
-		openFileDialog(newOutsideColoringCLFragment, success, L"cl", L"GPUtopia CL Fragment (*.cl)");
+		openFileDialog(newOutsideColoringCLFragment, success, "cl", "GPUtopia CL Fragment (*.cl)");
 		if (success)
 		{
 			cf.outsideColoringCLFragmentFileUi = newOutsideColoringCLFragment;

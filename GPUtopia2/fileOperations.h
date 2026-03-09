@@ -14,4 +14,4 @@ std::string getFileFromPath(std::string& fullPath);
 void newCLF(clFractal& cf, clCore& cc);
 void openCLF(clFractal& cf, clCore& cc);
 void saveCLF(clFractal& cf);
-void savePNG(const std::vector<color>& image_data, const size& size);
+void savePNG(const std::vector<color>& image_data, const clSize& size);

@@ -11,6 +11,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
+#include <filesystem>
+#include <unistd.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
@@ -27,7 +29,7 @@
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
 
-void __stdcall GLErrorCallback(GLenum source, GLenum type, GLuint id,
+static void GLErrorCallback(GLenum source, GLenum type, GLuint id,
     GLenum severity, GLsizei length,
     const GLchar* message,
     const void* userParam) {
@@ -42,7 +44,6 @@ void __stdcall GLErrorCallback(GLenum source, GLenum type, GLuint id,
     fprintf(stderr, " -- GL: %s type = 0x%x, severity = %s, \n message = %s\n",
         (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type,
         severityStr, message);
-    __debugbreak();
 }
 
 static void glfw_error_callback(int error, const char* description)
@@ -52,6 +53,14 @@ static void glfw_error_callback(int error, const char* description)
 
 int main(int, char**)
 {
+    // Change working directory to the executable's directory so relative asset paths work.
+    char exePath[4096];
+    ssize_t len = readlink("/proc/self/exe", exePath, sizeof(exePath) - 1);
+    if (len > 0) {
+        exePath[len] = '\0';
+        std::filesystem::current_path(std::filesystem::path(exePath).parent_path());
+    }
+
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
@@ -81,9 +90,9 @@ int main(int, char**)
 #endif
 
     // Create window with graphics context
-    const std::string mainTitle = "Lincantëa";
+    const std::string mainTitle = "LincatÃ«a";
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-    GLFWwindow* window = glfwCreateWindow(1280, 720, reinterpret_cast<const char*>(u8"Lincantëa"), NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, reinterpret_cast<const char*>(u8"LincatÃ«a"), NULL, NULL);
     if (window == NULL)
         return 1;
 

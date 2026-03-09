@@ -28,8 +28,8 @@ public:
 	constexpr Complex round() const { return Complex<T>(std::round(x), std::round(y)); }
 	constexpr double angle() const { return std::atan2(y, x); }
 	//TODO: can I const this somehow?
-	template <typename T>
-	friend ostream& operator<<(ostream& os, const Complex<T>& z);
+	template <typename U>
+	friend ostream& operator<<(ostream& os, const Complex<U>& z);
 	Complex operator= (const Complex& rhs) {
 		x = rhs.x;
 		y = rhs.y;

@@ -10,7 +10,7 @@ void insideSettingsWindow(clFractal& cf, clCore& cc)
 	{
 		bool success = false;
 		std::string newInsideColoringCLFragment;
-		openFileDialog(newInsideColoringCLFragment, success, L"cl", L"GPUtopia CL Fragment (*.cl)");
+		openFileDialog(newInsideColoringCLFragment, success, "cl", "GPUtopia CL Fragment (*.cl)");
 		if (success)
 		{
 			cf.insideColoringCLFragmentFileUi = newInsideColoringCLFragment;

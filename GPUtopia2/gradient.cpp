@@ -321,7 +321,7 @@ color Gradient::get_color(float xidx) const
 			if (xidx_scaled == (float)idx)
 			{
 				//cout << "Perfect hit, xidx_scaled: " << xidx_scaled << ", idx: " << idx << "\n";
-				return this->fineColors[(const unsigned __int64)search_index];
+				return this->fineColors[(size_t)search_index];
 			}
 			else if ((float)idx > xidx_scaled)
 			{

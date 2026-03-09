@@ -15,7 +15,7 @@ void asyncOpenCL::clShepherd(const clFractal& cf, const clCore& co)
     {
         cl::NDRange globalRange = cl::NDRange(globalSize);
         cl::NDRange localRange = cl::NDRange(localSize);
-        err = co.queue.enqueueNDRangeKernel(co.kernel, cl::NullRange, globalRange, localRange);
+        err = co.queue.enqueueNDRangeKernel(co.fractalKernel.kernel, cl::NullRange, globalRange, localRange);
         if (err != CL_SUCCESS) {
             std::cerr << "Failed to enqueue kernel. Error code: " << err << std::endl;
         }

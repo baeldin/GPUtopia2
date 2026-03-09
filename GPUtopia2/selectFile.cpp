@@ -1,205 +1,45 @@
 #include "selectFile.h"
-
-
+#include <tinyfiledialogs.h>
 
 void openFileDialog(std::string& fileName,
-    bool& success, const std::wstring& defaultExt, 
-    const std::wstring& filterDescription)
+    bool& success,
+    const std::string& defaultExt,
+    const std::string& filterDescription)
 {
     success = false;
-    HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-    if (FAILED(hr))
-    {
-        OutputDebugStringW(L"CoInitializeEx failed.\n");
-        return;
+    std::string pattern = "*." + defaultExt;
+    const char* filterPatterns[] = { pattern.c_str() };
+    const char* result = tinyfd_openFileDialog(
+        "Open File",
+        "",
+        1,
+        filterPatterns,
+        filterDescription.c_str(),
+        0   // single select
+    );
+    if (result) {
+        fileName = result;
+        success = true;
     }
-
-    IFileOpenDialog* pFileOpen = nullptr;
-    // Create the FileOpenDialog object.
-    hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
-        IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
-    if (FAILED(hr))
-    {
-        OutputDebugStringW(L"CoCreateInstance for FileOpenDialog failed.\n");
-        CoUninitialize();
-        return;
-    }
-
-    // Build a filter pattern from the default extension.
-    // E.g. if defaultExt is L"txt", then filterPattern becomes L"*.txt"
-    std::wstring filterPattern = L"*." + defaultExt;
-
-    // Setup file type filters.
-    COMDLG_FILTERSPEC rgSpec[] =
-    {
-        { filterDescription.c_str(), filterPattern.c_str() },
-        { L"All Files (*.*)", L"*.*" }
-    };
-
-    hr = pFileOpen->SetFileTypes(ARRAYSIZE(rgSpec), rgSpec);
-    if (FAILED(hr))
-    {
-        std::wstringstream ws;
-        ws << L"SetFileTypes failed with hr = 0x" << std::hex << hr << L"\n";
-        OutputDebugStringW(ws.str().c_str());
-        pFileOpen->Release();
-        CoUninitialize();
-        return;
-    }
-
-    hr = pFileOpen->SetDefaultExtension(defaultExt.c_str());
-    if (FAILED(hr))
-    {
-        std::wstringstream ws;
-        ws << L"SetDefaultExtension failed with hr = 0x" << std::hex << hr << L"\n";
-        OutputDebugStringW(ws.str().c_str());
-        pFileOpen->Release();
-        CoUninitialize();
-        return;
-    }
-
-    // Show the Open dialog box.
-    hr = pFileOpen->Show(NULL);
-    if (FAILED(hr))
-    {
-        std::wstringstream ws;
-        ws << L"FileOpenDialog::Show failed with hr = 0x" << std::hex << hr << L"\n";
-        OutputDebugStringW(ws.str().c_str());
-        pFileOpen->Release();
-        CoUninitialize();
-        return;
-    }
-
-    // Get the file name from the dialog box.
-    IShellItem* pItem = nullptr;
-    hr = pFileOpen->GetResult(&pItem);
-    if (SUCCEEDED(hr))
-    {
-        PWSTR pszFilePath = nullptr;
-        hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-        if (SUCCEEDED(hr))
-        {
-            std::wstring tmpFilePath(pszFilePath);
-            size_t sizeConverted = 0;
-            fileName.resize(tmpFilePath.length());
-            // Convert wide-character string to multibyte string.
-            wcstombs_s(&sizeConverted, &fileName[0], fileName.size() + 1,
-                tmpFilePath.c_str(), tmpFilePath.size());
-            success = true;
-        }
-        else
-        {
-            OutputDebugStringW(L"GetDisplayName failed.\n");
-        }
-        CoTaskMemFree(pszFilePath);
-        pItem->Release();
-    }
-    else
-    {
-        OutputDebugStringW(L"GetResult failed.\n");
-    }
-
-    pFileOpen->Release();
-    CoUninitialize();
 }
 
 void saveFileDialog(std::string& fileName,
-    bool& success, const std::wstring& defaultExt,
-    const std::wstring& filterDescription)
-
+    bool& success,
+    const std::string& defaultExt,
+    const std::string& filterDescription)
 {
     success = false;
-    HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
-        COINIT_DISABLE_OLE1DDE);
-    if (SUCCEEDED(hr))
-    {
-        IFileSaveDialog* pFileSave = nullptr;
-        // Create the FileSaveDialog object.
-        hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL,
-            IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave));
-        if (FAILED(hr))
-        {
-            OutputDebugStringW(L"CoCreateInstance for FileSaveDialog failed.\n");
-            CoUninitialize();
-            return;
-        }
-
-        // Build a filter pattern from the default extension.
-        // E.g. if defaultExt is L"txt", then filterPattern becomes L"*.txt"
-        std::wstring filterPattern = L"*." + defaultExt;
-
-        // Setup file type filters.
-        COMDLG_FILTERSPEC rgSpec[] =
-        {
-            { filterDescription.c_str(), filterPattern.c_str() },
-            { L"All Files (*.*)", L"*.*" }
-        };
-
-        hr = pFileSave->SetFileTypes(ARRAYSIZE(rgSpec), rgSpec);
-        if (FAILED(hr))
-        {
-            std::wstringstream ws;
-            ws << L"SetFileTypes failed with hr = 0x" << std::hex << hr << L"\n";
-            OutputDebugStringW(ws.str().c_str());
-            pFileSave->Release();
-            CoUninitialize();
-            return;
-        }
-
-        hr = pFileSave->SetDefaultExtension(defaultExt.c_str());
-        if (FAILED(hr))
-        {
-            std::wstringstream ws;
-            ws << L"SetDefaultExtension failed with hr = 0x" << std::hex << hr << L"\n";
-            OutputDebugStringW(ws.str().c_str());
-            pFileSave->Release();
-            CoUninitialize();
-            return;
-        }
-
-        // Show the Save dialog box.
-        hr = pFileSave->Show(NULL);
-        if (FAILED(hr))
-        {
-            std::wstringstream ws;
-            ws << L"FileSaveDialog::Show failed with hr = 0x" << std::hex << hr << L"\n";
-            OutputDebugStringW(ws.str().c_str());
-            pFileSave->Release();
-            CoUninitialize();
-            return;
-        }
-
-        // Get the file name from the dialog box.
-        IShellItem* pItem = nullptr;
-        hr = pFileSave->GetResult(&pItem);
-        if (SUCCEEDED(hr))
-        {
-            PWSTR pszFilePath = nullptr;
-            hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-            if (SUCCEEDED(hr))
-            {
-                std::wstring tmpFilePath(pszFilePath);
-                size_t sizeConverted = 0;
-                fileName.resize(tmpFilePath.length());
-                // Convert wide-character string to multibyte string.
-                wcstombs_s(&sizeConverted, &fileName[0], fileName.size() + 1,
-                    tmpFilePath.c_str(), tmpFilePath.size());
-                success = true;
-            }
-            else
-            {
-                OutputDebugStringW(L"GetDisplayName failed.\n");
-            }
-            CoTaskMemFree(pszFilePath);
-            pItem->Release();
-        }
-        else
-        {
-            OutputDebugStringW(L"GetResult failed.\n");
-        }
-
-        pFileSave->Release();
-        CoUninitialize();
+    std::string pattern = "*." + defaultExt;
+    const char* filterPatterns[] = { pattern.c_str() };
+    const char* result = tinyfd_saveFileDialog(
+        "Save File",
+        ("untitled." + defaultExt).c_str(),
+        1,
+        filterPatterns,
+        filterDescription.c_str()
+    );
+    if (result) {
+        fileName = result;
+        success = true;
     }
-    // return 0;
 }

@@ -98,26 +98,26 @@ inline const bool operator==(const paramCollector& lhs, const paramCollector& rh
 		lhs.outsideColoringParameterMaps == rhs.outsideColoringParameterMaps);
 }
 
-struct size
+struct clSize
 {
 	int x;
 	int y;
-	size() : x(1280), y(720) {}
-	size(const float x_, const float y_) : x(x_), y(y_) {}
-	NLOHMANN_DEFINE_TYPE_INTRUSIVE(size, x, y);
+	clSize() : x(1280), y(720) {}
+	clSize(const float x_, const float y_) : x(x_), y(y_) {}
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(clSize, x, y);
 };
 
-inline const bool operator==(const size& lhs, const size& rhs)
+inline const bool operator==(const clSize& lhs, const clSize& rhs)
 {
 	return (lhs.x == rhs.x && lhs.y == rhs.y);
 }
 
-inline const bool operator!=(const size& lhs, const size& rhs) { return !(lhs == rhs); }
+inline const bool operator!=(const clSize& lhs, const clSize& rhs) { return !(lhs == rhs); }
 
 // settings for the image generated from the fractal, including default values
 struct clFractalImage
 {
-	size size = { 1280, 720 };
+	clSize size = { 1280, 720 };
 	double aspectRatio = (double)size.x / (double)size.y;
 	Complex<double> center = Complex<double>(0., 0.);
 	Complex<double> span = Complex<double>(4., 4. / aspectRatio);
@@ -211,6 +211,8 @@ inline const bool operator==(const flameRenderSettings& lhs, const flameRenderSe
 		lhs.gamma == rhs.gamma &&
 		lhs.vibrancy == rhs.vibrancy);
 }
+
+inline const bool operator!=(const flameRenderSettings& lhs, const flameRenderSettings& rhs) { return !(lhs == rhs); }
 
 class gradientContainer;
 
