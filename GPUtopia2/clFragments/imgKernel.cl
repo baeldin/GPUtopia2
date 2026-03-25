@@ -46,7 +46,7 @@ __kernel void imgProcessing(
         const float invFactor = 1.f / (float)(256 * sampling.x);
         outColors[i] = linearToSRGB(invFactor * convert_float4(inColorsRGBA[i]));
     }
-    else if (mode == 1) // something something log
+    else if (mode >= 1) // flame / flame gaussian - log density
     {
 
         float4 tmpColor = inv256 * convert_float4(inColorsRGBA[i]);

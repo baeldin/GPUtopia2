@@ -26,7 +26,50 @@ real2 disc(const real2 v) {
     return (real2)(r * cos(phi), r * sin(phi));
 }
 
-// Hash function for 64 bit uint    
+// Rational approximation of the inverse error function
+// Based on the approximation by J.M. Blair (1976)
+real erfinv(real x) {
+    real w = -log((1.f - x) * (1.f + x));
+    real p;
+    if (w < 5.f) {
+        w = w - 2.5f;
+        p = 2.81022636e-08f;
+        p = 3.43273939e-07f + p * w;
+        p = -3.5233877e-06f + p * w;
+        p = -4.39150654e-06f + p * w;
+        p = 0.00021858087f + p * w;
+        p = -0.00125372503f + p * w;
+        p = -0.00417768164f + p * w;
+        p = 0.246640727f + p * w;
+        p = 1.50140941f + p * w;
+    } else {
+        w = sqrt(w) - 3.f;
+        p = -0.000200214257f;
+        p = 0.000100950558f + p * w;
+        p = 0.00134934322f + p * w;
+        p = -0.00367342844f + p * w;
+        p = 0.00573950773f + p * w;
+        p = -0.0076224613f + p * w;
+        p = 0.00943887047f + p * w;
+        p = 1.00167406f + p * w;
+        p = 2.83297682f + p * w;
+    }
+    return p * x;
+}
+
+// Maps uniform [0,1] to a standard normal sample via inverse CDF
+// Analogous to tent() but produces gaussian-distributed samples
+real __attribute__((overloadable)) gaussian_tent(real x) {
+    x = clamp(2.f * x - 1.f, (real)-0.9999f, (real)0.9999f);
+    if (x == 0.f) { return 0.f; }
+    return 1.41421356237f * erfinv(x); // sqrt(2) * erfinv(x)
+}
+
+real2 __attribute__((overloadable)) gaussian_tent(const real2 v) {
+    return (real2)(gaussian_tent(v.x), gaussian_tent(v.y));
+}
+
+// Hash function for 64 bit uint
 // Found here: https://gist.github.com/degski/6e2069d6035ae04d5d6f64981c995ec2
 ulong lowbias64(ulong x)
 {

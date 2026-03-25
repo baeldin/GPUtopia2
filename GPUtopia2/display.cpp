@@ -270,13 +270,14 @@ namespace mainView
 						ImGui::OpenPopup("Could not open fragments");
 					}
 				}
-				if (cf.useDouble != cf_old.useDouble)
+				if (cf.useDouble != cf_old.useDouble ||
+					(cf.mode >= 1) != (cf_old.mode >= 1))
 				{
 					cf.makeCLCode(SAME_FILES);
 					core.resetCore();
 					compilingFractalKernel = true;
 					//std::thread tComp(core.compileFractalKernel(cf.fullCLcode);
-					ct = std::jthread(&compileFractalKernelAsync, std::ref(core), 
+					ct = std::jthread(&compileFractalKernelAsync, std::ref(core),
 						std::ref(cf.fullCLcode), std::ref(compilingFractalKernel),
 						std::ref(cf.status.runKernel));
 					ct.detach();

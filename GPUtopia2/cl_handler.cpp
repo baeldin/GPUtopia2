@@ -542,7 +542,7 @@ bool clFractal::makeCLCode(const bool newFiles)
 	// std::cout << "BEFORE:\n" << fullTemplateStr << std::endl;
 	if (this->useDouble)
 		fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(DPFlag), DPString);
-	if (this->mode == 1)
+	if (this->mode >= 1)
 		fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(FLFlag), FLString);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(AAFlag), antiAliasingStr);
 	fullTemplateStr = std::regex_replace(fullTemplateStr, std::regex(CoFlag), colorStr);

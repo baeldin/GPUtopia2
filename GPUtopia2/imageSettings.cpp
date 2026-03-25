@@ -26,7 +26,7 @@ void imageSettingsWindow(clFractal& cf)
 	ImGui::SliderInt("Target Quality", &cf.image.targetQuality, 1, 30);
 	ImGui::InputInt("Width", &cf.image.size.x);
 	ImGui::InputInt("Height", &cf.image.size.y);
-	const char* tonemappingItems[] = { "Escape Time", "Flame" };
+	const char* tonemappingItems[] = { "Escape Time", "Flame", "Flame (Gaussian)" };
 	ImGui::Combo("Tonemapping Mode", &cf.mode, tonemappingItems, IM_ARRAYSIZE(tonemappingItems));
 	static std::string outName = "out.png";
 	ImGui::InputText("File Name:", (char*)outName.c_str(), 256);

@@ -63,18 +63,41 @@ __kernel void computeLoop(
     const int sample_count = sampling.y - sampling.x;
     const int offset_fac = min(1, sampling.z - 1);
     bool use_point = true;
+#ifdef FLAME
+    // Precompute gaussian sampling parameters for mode 2
+    // sigma = image diagonal in pixels (which equals diagonal in complex space,
+    // since the pixel-to-complex scale is uniform)
+    const real gaussian_sigma = sqrt((real)(image_size.x * image_size.x + image_size.y * image_size.y));
+    const real2 image_center_px = (real2)(image_size.x * 0.5f, image_size.y * 0.5f);
+#endif
     // check if point is to be used
     {
         int4 outColor = { 0, 0, 0, 0 };
         for (int s = sampling.x; s < sampling.y; s++)
         {
             const real2 R2 = R2_offset(pixelIdx, s);
+#ifdef FLAME
+            real2 sample_position;
+            if (mode == 2)
+            {
+                // Gaussian importance sampling: sample from a single gaussian
+                // centered on the image, with sigma = image diagonal length
+                sample_position = image_center_px + gaussian_sigma * gaussian_tent(R2);
+            }
+            else
+            {
+                sample_position = (real2)(x, y) + offset_fac * (real2)(
+                    tent(R2.x),
+                    tent(R2.y));
+            }
+#else
+            real2 sample_position = (real2)(x, y) + offset_fac * (real2)(
+                tent(R2.x),
+                tent(R2.y));
+#endif
             if (flamePointSelection > 0)
             {
                 int iter = 0;
-                real2 sample_position = (real2)(x, y) + offset_fac * (real2)(
-                    tent(R2.x),
-                    tent(R2.y));
                 const real2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane, rot);
                 //@__formulaInit
                 bool bailedOut = false;
@@ -96,9 +119,6 @@ __kernel void computeLoop(
             if (use_point)
             {
                 int iter = 0;
-                real2 sample_position = (real2)(x, y) + offset_fac * (real2)(
-                    tent(R2.x),
-                    tent(R2.y));
                 const real2 z0 = get_complex_coordinates(sample_position, image_size, complex_subplane, rot);
                 //@__formulaInit
                 //@__coloringInsideInit
@@ -116,7 +136,7 @@ __kernel void computeLoop(
                 if (bailedOut)
                 {
                     //@__coloringOutsideFinal
-		        } 
+		        }
                 else
                 {
                     //@__coloringInsideFinal
