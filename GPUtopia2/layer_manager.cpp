@@ -105,21 +105,22 @@ namespace layers
 	void propagateNavigation(AppState& app, const FractalLayer& source, unsigned fields)
 	{
 		const clFractalImage& src = source.cf.image;
+		const clFractalImage& srcOld = source.cf_old.image;
 		for (auto& lp : app.layers) {
 			FractalLayer& li = *lp;
 			if (&li == &source || !li.linkedNavigation) continue;
-			// A layer that is already there must be left alone: re-running it
-			// would throw away every sample it has accumulated so far.
-			const bool changes =
-				((fields & Center) && li.cf.image.center != src.center) ||
-				((fields & Zoom) && li.cf.image.zoom != src.zoom) ||
-				((fields & Angle) && li.cf.image.angle != src.angle);
-			if (!changes) continue;
 			li.cf.stop = true;
-			if (fields & Center) li.cf.image.center = src.center;
-			if (fields & Zoom) li.cf.image.zoom = src.zoom;
-			if (fields & Angle) li.cf.image.angle = src.angle;
-			li.cf.image.updateComplexSubplane();
+			// Relative, not absolute: copying the source's position snapped every
+			// linked layer onto it, discarding any offset the layers were given
+			// while they were unlinked.
+			if (!applyNavigationDelta(li.cf.image, srcOld, src,
+				(fields & Center) != 0, (fields & Zoom) != 0, (fields & Angle) != 0))
+			{
+				// Nothing moved: leave this layer rendering rather than throwing
+				// away the samples it has accumulated.
+				li.cf.stop = false;
+				continue;
+			}
 			li.cf.image.resetStatus();
 			li.cf.status.runKernel = true;
 			li.cf.status.runImgKernel = false;

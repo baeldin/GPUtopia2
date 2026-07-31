@@ -179,6 +179,13 @@ inline const bool operator!=(const clFractalImage& lhs, const clFractalImage& rh
 	return !(lhs == rhs);
 }
 
+// Apply the navigation step `from` -> `to` to `dst`, converted into dst's own
+// frame so that layers sitting at different positions, zooms or orientations
+// keep their relative arrangement instead of being snapped onto `to`.
+// Returns false when nothing moved, so callers can leave dst rendering.
+bool applyNavigationDelta(clFractalImage& dst, const clFractalImage& from,
+	const clFractalImage& to, const bool doCenter, const bool doZoom, const bool doAngle);
+
 struct clFractalStatus
 {
 	bool kernelRunning = false;
