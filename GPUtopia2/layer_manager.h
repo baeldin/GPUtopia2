@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "app_state.h"
 
 namespace layers
@@ -28,6 +30,27 @@ namespace layers
 	// with linked navigation, and queue those layers for a re-render.
 	void propagateNavigation(AppState& app, const FractalLayer& source, unsigned fields);
 
-	// The "Layers" window: add/remove, select, visibility, link, opacity.
+	// `base`, or `base 2`, `base 3`, ... - whichever no layer is called yet.
+	std::string uniqueLayerName(const AppState& app, const std::string& base);
+
+	// Insert a fresh default layer directly above `index`, inheriting only the
+	// navigation of the layer it is placed on. Returns the new layer's index.
+	int addLayer(AppState& app, int index);
+
+	// Insert a copy of layer `index` directly above it. The copy gets its own
+	// kernels and buffers; only the fractal definition is shared by value.
+	// Returns the new layer's index.
+	int duplicateLayer(AppState& app, int index);
+
+	// Flag layer `index` for removal in the next layers::beginFrame(). Does
+	// nothing if it is the only layer left.
+	void requestRemoveLayer(AppState& app, int index);
+
+	// Move layer `index` one step through the stack: delta +1 towards the front,
+	// -1 towards the back. Does nothing at the ends.
+	void moveLayer(AppState& app, int index, int delta);
+
+	// The "Layers" window: add/duplicate/remove/reorder/rename, select,
+	// visibility, navigation link, opacity.
 	void drawLayerWindow(AppState& app);
 }

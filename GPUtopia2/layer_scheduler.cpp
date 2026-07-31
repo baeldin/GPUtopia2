@@ -52,6 +52,9 @@ namespace scheduler
 		for (auto& lp : app.layers) {
 			FractalLayer& li = *lp;
 			if (!li.visible) continue;
+			// Inserted this frame by addLayer/duplicateLayer: no CL code and no
+			// kernels yet, layers::beginFrame() builds them on the next frame.
+			if (li.needsStartup) continue;
 			// kernel rebuild for non-active layers
 			if (&li != &L && li.cf.buildKernel && li.kernelState.fractalKernel.errors.sum() == 0 && !anyLayerBusy) {
 				logErr(LogLevel::Trace) << "[LAYERS] " << li.name << ": compiling fractal kernel (non-active)\n";

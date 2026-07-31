@@ -31,6 +31,9 @@ struct AppState
 	// viewport texture and the images feeding it
 	GLuint textureID = 0;
 	bool updateTexture = false;
+	// Set by the Layers window when visibility, opacity or stacking order
+	// changed but no layer produced a new image; forces a re-blend anyway.
+	bool compositeDirty = false;
 	std::vector<color> textureColors;     // result of compositing all visible layers
 	std::vector<color> navPreviewImage;   // warped copy shown while dragging
 

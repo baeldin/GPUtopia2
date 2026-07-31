@@ -14,7 +14,8 @@ float flinearToSRGB(const float x) {
 }
 
 float4 linearToSRGB(const float4 v) {
-    return (float4)(flinearToSRGB(v.x), flinearToSRGB(v.y), flinearToSRGB(v.z), flinearToSRGB(v.w));
+    // Alpha is coverage, not a colour channel: clamp it, do not gamma it.
+    return (float4)(flinearToSRGB(v.x), flinearToSRGB(v.y), flinearToSRGB(v.z), clampZeroToOne(v.w));
 }
 
 //log density scaling

@@ -21,6 +21,10 @@ struct FractalLayer {
     std::jthread compileThread;
     std::jthread runThread;
     std::vector<color> layerImage;
+    // layerImage decoded to linear light, refreshed on every readback. The
+    // compositor blends these: mixing the display-encoded values would make a
+    // 50% blend land at ~21% of the light it should.
+    std::vector<color> layerImageLinear;
     std::string name = "Layer 0";
     bool visible = true;
     float opacity = 1.0f;
