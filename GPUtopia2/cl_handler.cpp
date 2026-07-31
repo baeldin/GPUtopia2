@@ -497,9 +497,9 @@ bool clFractal::makeCLCode(const bool newFiles)
 	std::string outsideColoringAlgorithmStr = readCLFragmentFromFile(outsideColoringCLFragmentFile) + eof;
 	this->status.fractalFragmentStatus = clFragmentSanityCheck(fractalFormulaStr, 0);
 	this->status.insideColoringFragmentStatus = clFragmentSanityCheck(insideColoringAlgorithmStr, 1);
-	this->status.outsideColoringFragment_status = clFragmentSanityCheck(outsideColoringAlgorithmStr, 2);
+	this->status.outsideColoringFragmentStatus = clFragmentSanityCheck(outsideColoringAlgorithmStr, 2);
 	if (this->status.fractalFragmentStatus + this->status.insideColoringFragmentStatus +
-		this->status.outsideColoringFragment_status > 0) 
+		this->status.outsideColoringFragmentStatus > 0) 
 		return false;
 	std::string antiAliasing("clFragments/full_template.cl");
 	std::string antiAliasingStr = readCLFragmentFromFile("clFragments/anti_aliasing.cl");
@@ -522,7 +522,7 @@ bool clFractal::makeCLCode(const bool newFiles)
 	outsideColoringAlgorithmStr = getVariableAndParameterNames(outsideColoringAlgorithmStr, coPrefixes, FOFlag, &parseError);
 	if (parseError > 0)
 	{
-		this->status.outsideColoringFragment_status = parseError;
+		this->status.outsideColoringFragmentStatus = parseError;
 		return false;
 	}
 	// UF-style separation

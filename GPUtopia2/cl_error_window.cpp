@@ -17,7 +17,7 @@ ImVec4 operator*(const float lhs, const ImVec4 rhs)
 	return ImVec4(lhs * rhs.x, lhs * rhs.y, lhs * rhs.z, lhs * rhs.w);
 }
 
-void showErrorLogWindow(clFractal& cf, const clCore& cc, ImFont* font_mono, bool hasError)
+void showErrorLogWindow(clFractal& cf, const clLayerState& ls, ImFont* font_mono, bool hasError)
 {
 	static bool undoStyleChange = false;
 	// Base colors
@@ -49,19 +49,19 @@ void showErrorLogWindow(clFractal& cf, const clCore& cc, ImFont* font_mono, bool
 	ImGui::PushFont(font_mono);
 	static std::istringstream issImgKernelBuildLog;
 	ImGui::Text("Img Kernel:");
-	if (cc.imgKernel.errors.compileError != CL_SUCCESS)
-		issImgKernelBuildLog = std::istringstream(cc.imgKernel.buildLog);
+	if (ls.imgKernel.errors.compileError != CL_SUCCESS)
+		issImgKernelBuildLog = std::istringstream(ls.imgKernel.buildLog);
 	else
 		ImGui::TextColored(colorOk, "Img Kernel Build sucessful.");
-	if (cc.imgKernel.errors.compileError != CL_SUCCESS)
+	if (ls.imgKernel.errors.compileError != CL_SUCCESS)
 	{
-		ImGui::TextColored(colorErr, "cc.imgKernel.errors.compileError = %d", cc.imgKernel.errors.compileError);
+		ImGui::TextColored(colorErr, "ls.imgKernel.errors.compileError = %d", ls.imgKernel.errors.compileError);
 		ImGui::Text("Img Kernel Build Log:");
 	}
-	if (cc.imgKernel.errors.kernelError != CL_SUCCESS)
-		ImGui::TextColored(colorErr, "cc.imgKernel.errors.kernelError = %d", cc.imgKernel.errors.kernelError);
-	if (cc.imgKernel.errors.programError != CL_SUCCESS)
-		ImGui::TextColored(colorErr, "cc.imgKernel.errors.programError = %d", cc.imgKernel.errors.programError);
+	if (ls.imgKernel.errors.kernelError != CL_SUCCESS)
+		ImGui::TextColored(colorErr, "ls.imgKernel.errors.kernelError = %d", ls.imgKernel.errors.kernelError);
+	if (ls.imgKernel.errors.programError != CL_SUCCESS)
+		ImGui::TextColored(colorErr, "ls.imgKernel.errors.programError = %d", ls.imgKernel.errors.programError);
 	for (std::string line; std::getline(issImgKernelBuildLog, line); )
 	{
 		ImGui::Text(line.c_str());
@@ -83,29 +83,29 @@ void showErrorLogWindow(clFractal& cf, const clCore& cc, ImFont* font_mono, bool
 	else
 		ImGui::TextColored(colorOk, parseErrorMessages[0].c_str());
 	ImGui::Text("Inside coloring fragment file parsing:");
-	if (cf.status.outsideColoringFragment_status > 0)
+	if (cf.status.outsideColoringFragmentStatus > 0)
 	{
-		ImGui::TextColored(colorErr, "Invalid inside coloring fragment file, error %d", cf.status.outsideColoringFragment_status);
-		ImGui::TextColored(colorErr, parseErrorMessages[cf.status.outsideColoringFragment_status].c_str());
+		ImGui::TextColored(colorErr, "Invalid inside coloring fragment file, error %d", cf.status.outsideColoringFragmentStatus);
+		ImGui::TextColored(colorErr, parseErrorMessages[cf.status.outsideColoringFragmentStatus].c_str());
 	}
 	else
 		ImGui::TextColored(colorOk, parseErrorMessages[0].c_str());
-	if (cc.fractalKernel.errors.compileError != CL_SUCCESS)
-		ImGui::TextColored(colorErr, "cc.fractalKernel.errors.compileError = %d", cc.fractalKernel.errors.compileError);
-	if (cc.fractalKernel.errors.kernelError != CL_SUCCESS)
-		ImGui::TextColored(colorErr, "cc.fractalKernel.errors.kernelError = %d", cc.fractalKernel.errors.kernelError);
-	if (cc.fractalKernel.errors.programError != CL_SUCCESS)
-		ImGui::TextColored(colorErr, "cc.fractalKernel.errors.programError = %d", cc.fractalKernel.errors.programError);
-	if (cc.fractalKernel.errors.parseError != CL_SUCCESS)
+	if (ls.fractalKernel.errors.compileError != CL_SUCCESS)
+		ImGui::TextColored(colorErr, "ls.fractalKernel.errors.compileError = %d", ls.fractalKernel.errors.compileError);
+	if (ls.fractalKernel.errors.kernelError != CL_SUCCESS)
+		ImGui::TextColored(colorErr, "ls.fractalKernel.errors.kernelError = %d", ls.fractalKernel.errors.kernelError);
+	if (ls.fractalKernel.errors.programError != CL_SUCCESS)
+		ImGui::TextColored(colorErr, "ls.fractalKernel.errors.programError = %d", ls.fractalKernel.errors.programError);
+	if (ls.fractalKernel.errors.parseError != CL_SUCCESS)
 		ImGui::TextColored(colorErr, "Error parsing CL code, no build was attempted. Please see above.");
 	static std::istringstream issFractalKernelBuildLog;
 	ImGui::Text("Fractal Kernel:");
-	if (cc.fractalKernel.errors.compileError != CL_SUCCESS)
+	if (ls.fractalKernel.errors.compileError != CL_SUCCESS)
 	{
-		issFractalKernelBuildLog = std::istringstream(cc.fractalKernel.buildLog);
+		issFractalKernelBuildLog = std::istringstream(ls.fractalKernel.buildLog);
 		ImGui::Text("Fractal Kernel Build Log:");
 	}
-	if (cc.fractalKernel.errors.sum() == 0)
+	if (ls.fractalKernel.errors.sum() == 0)
 		ImGui::TextColored(colorOk, "Fractal Kernel Build sucessful.");
 	for (std::string line; std::getline(issFractalKernelBuildLog, line); )
 	{

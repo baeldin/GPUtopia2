@@ -6,6 +6,6 @@
 #include "cl_core.h"
 #include "cl_fractal.h"
 
-class clCore;
+struct clLayerState;
 
-void showErrorLogWindow(clFractal& cf, const clCore& cc, ImFont* font_mono, bool hasError);
+void showErrorLogWindow(clFractal& cf, const clLayerState& ls, ImFont* font_mono, bool hasError);

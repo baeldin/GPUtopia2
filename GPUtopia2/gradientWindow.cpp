@@ -1,4 +1,6 @@
 #include "gradientWindow.h"
+#include "compositor.h" // makeTexture
+#include "test_gradients.h" // built-in gradients offered in the preset combo
 
 void gradientWindow(clFractal& cf)
 {

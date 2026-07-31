@@ -7,11 +7,12 @@
 
 
 // forward declaration needed to avoid syntax error!?
-class clCore; 
+class clCore;
+struct clLayerState;
 
 std::string getFileFromPath(std::string& fullPath);
 
-void newCLF(clFractal& cf, clCore& cc);
-void openCLF(clFractal& cf, clCore& cc);
+void newCLF(clFractal& cf, clCore& cc, clLayerState& ls);
+void openCLF(clFractal& cf, clCore& cc, clLayerState& ls);
 void saveCLF(clFractal& cf);
 void savePNG(const std::vector<color>& image_data, const clSize& size);

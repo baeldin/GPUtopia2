@@ -13,7 +13,7 @@
 #include <stdexcept>
 
 // Include settings and types from other parts of the project.
-#include "formulaSettings.h"
+#include "cl_fractal.h"
 #include "color.h"
 
 constexpr int WG_SIZE = 256; // Workgroup size
@@ -73,25 +73,26 @@ public:
     ~clKernelContainer() {}
 };
 
+// Per-layer kernel and buffer state (each layer gets its own)
+struct clLayerState {
+    clKernelContainer fractalKernel;
+    clKernelContainer imgKernel;
+    cl::Buffer gradientBuffer;
+    cl::Buffer imgIntRGBABuffer;
+    cl::Buffer imgFloatBuffer;
+    int currentRenderSize = 0;
+    bool stop = false;
+};
+
 class clCore
 {
 public:
-    // general stuff
+    // shared GPU infrastructure
     cl::Platform platform;
     cl::Device device;
     cl::Context context;
     cl::CommandQueue queue;
-    // kernel containers for fractal and image kernels
-    clKernelContainer fractalKernel;
-    clKernelContainer imgKernel;
-    // buffers
-    cl::Buffer gradientBuffer;
-    cl::Buffer imgIntRGBABuffer;
-    cl::Buffer imgFloatBuffer;
-    // other
     cl_int queueError = CL_SUCCESS;
-    int currentRenderSize = 0;
-    bool stop = false;
 
     clCore()
     {
@@ -103,10 +104,10 @@ public:
     // fractal kernel
     cl_int compileNewKernel(clKernelContainer& kc, const std::string& fullCLcode,
         const std::string kernelFunctionName);
-    void compileFractalKernel(const std::string fullCLcode);
-    void resetCore();
+    void compileFractalKernel(clLayerState& ls, const std::string fullCLcode);
+    void resetCore(clLayerState& ls);
     // image kernel
-    void compileImgKernel();
+    void compileImgKernel(clLayerState& ls);
 
     
     // Error checking helper
@@ -165,15 +166,14 @@ public:
     }
 
     template <typename T>
-    inline void setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::pair<Complex<T>, int>>& map, const int verbosity = 99)
+    inline void setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::pair<Complex<T>, int>>& map, int argOffset, const int verbosity = 99)
     {
         cl_int err = CL_SUCCESS;
         for (auto const& [key, val] : map)
         {
             if (verbosity >= 1)
                 std::cout << "Setting kernel argument " << key << " at position " << val.second << " with value " << val.first << std::endl;
-            // Use the kernel's existing argumentCount offset (if any)
-            const uint32_t currentArgumentIndex = val.second + this->fractalKernel.argumentCount;
+            const uint32_t currentArgumentIndex = val.second + argOffset;
             const real2 value(val.first.x, val.first.y);
             err = setKernelArg(currentKernel, currentArgumentIndex, value, key.c_str(), verbosity);
             if (err != CL_SUCCESS)
@@ -183,15 +183,14 @@ public:
         }
     }
 
-    inline void setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::pair<enumParameter, int>>& map, const int verbosity = 99)
+    inline void setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::pair<enumParameter, int>>& map, int argOffset, const int verbosity = 99)
     {
         cl_int err = CL_SUCCESS;
         for (auto const& [key, val] : map)
         {
             if (verbosity >= 1)
                 std::cout << "Setting kernel argument " << key << " at position " << val.second << " with value " << val.first.value << std::endl;
-            // Use the kernel's existing argumentCount offset (if any)
-            const uint32_t currentArgumentIndex = val.second + this->fractalKernel.argumentCount;
+            const uint32_t currentArgumentIndex = val.second + argOffset;
             err = setKernelArg(currentKernel, currentArgumentIndex, val.first.value, key.c_str(), verbosity);
             if (err != CL_SUCCESS)
             {
@@ -200,15 +199,14 @@ public:
         }
     }
     template <typename T>
-    inline void setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::pair<T, int>>& map, const int verbosity = 99)
+    inline void setMapOfArgs(cl::Kernel& currentKernel, std::map<std::string, std::pair<T, int>>& map, int argOffset, const int verbosity = 99)
     {
         cl_int err = CL_SUCCESS;
         for (auto const& [key, val] : map)
         {
             if (verbosity >= 1)
                 std::cout << "Setting kernel argument " << key << " at position " << val.second << " with value " << val.first << std::endl;
-            // Use the kernel's existing argumentCount offset (if any)
-            const uint32_t currentArgumentIndex = val.second + this->fractalKernel.argumentCount;
+            const uint32_t currentArgumentIndex = val.second + argOffset;
             err = setKernelArg(currentKernel, currentArgumentIndex, val.first, key.c_str(), verbosity);
             if (err != CL_SUCCESS)
             {
@@ -218,21 +216,21 @@ public:
     }
 
     // Setting fractal and image kernel arguments
-    void setFractalParameterArgs(clFractal& cf);
-    void setImgKernelArguments(clFractal& cf);
-    void setDefaultFractalArguments(clFractal& cf);
+    void setFractalParameterArgs(clLayerState& ls, clFractal& cf);
+    void setImgKernelArguments(clLayerState& ls, clFractal& cf);
+    void setDefaultFractalArguments(clLayerState& ls, clFractal& cf);
 
     // Run kernels
-    void runFractalKernel(clFractal& cf) const;
-    void runImgKernel(clFractal& cf) const;
+    void runFractalKernel(clLayerState& ls, clFractal& cf) const;
+    void runImgKernel(clLayerState& ls, clFractal& cf) const;
 
     // Read image data from buffer
-    void getImg(std::vector<color>& img, clFractal& cf) const;
+    void getImg(clLayerState& ls, std::vector<color>& img, clFractal& cf) const;
 };
 
-void runFractalKernelAsync(clFractal& cf, clCore& cc);
-void runImgKernelAsync(clFractal& cf, clCore& cc);
-void compileFractalKernelAsync(clCore& cc, std::string& code, bool& compiling, bool& runKernel);
+void runFractalKernelAsync(clFractal& cf, clCore& cc, clLayerState& ls);
+void runImgKernelAsync(clFractal& cf, clCore& cc, clLayerState& ls);
+void compileFractalKernelAsync(clCore& cc, clLayerState& ls, std::string& code, bool& compiling, bool& runKernel);
 
 // cast parameter map of double to float
 inline parameterMapFloat argumentMapFloatCast(parameterMapReal& realParameters)

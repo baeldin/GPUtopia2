@@ -11,7 +11,9 @@ using json = nlohmann::ordered_json;
 #include "gradient.h"
 #include "sampling.h"
 #include "complex_number.h"
-#include "test_gradients.h"
+
+// Default gradient for a new fractal; defined in test_gradients.cpp.
+extern const Gradient volcano_under_a_glacier2;
 
 #define NEW_FILES true
 #define SAME_FILES false
@@ -188,7 +190,7 @@ struct clFractalStatus
 	bool filesOK = false;
 	int fractalFragmentStatus = 0;
 	int insideColoringFragmentStatus = 0;
-	int outsideColoringFragment_status = 0;
+	int outsideColoringFragmentStatus = 0;
 };
 
 class clFractal;
@@ -384,11 +386,11 @@ public:
 	}
 	bool parseError()
 	{
-		return (this->status.fractalFragmentStatus + this->status.insideColoringFragmentStatus + this->status.outsideColoringFragment_status > 0);
+		return (this->status.fractalFragmentStatus + this->status.insideColoringFragmentStatus + this->status.outsideColoringFragmentStatus > 0);
 	}
 	void resetParseStatus() {
 		this->status.fractalFragmentStatus = 0;
-		this->status.outsideColoringFragment_status = 0;
+		this->status.outsideColoringFragmentStatus = 0;
 		this->status.insideColoringFragmentStatus = 0;
 	}
 	clFractalContainer toExport()

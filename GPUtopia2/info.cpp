@@ -1,4 +1,6 @@
 #include "info.h"
+#include "selectFile.h"
+#include "log.h"
 
 // Helper function to compute statistics
 void ComputeStatistics(const std::vector<float> timings, float& average, float& median, float& stddev)
@@ -75,6 +77,11 @@ void infoWindow(clFractal& cf, fractalNavigationParameters& nav, ImFont* font_mo
 		float progress = static_cast<float>(      cf.image.current_sample_count ) / cf.image.target_sample_count;
 		ImGui::Text("Execution progress: %d / %d",cf.image.current_sample_count , cf.image.target_sample_count);
 		ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
+	}
+	{
+		bool traceLogging = (g_logLevel >= LogLevel::Trace);
+		if (ImGui::Checkbox("Trace logging", &traceLogging))
+			g_logLevel = traceLogging ? LogLevel::Trace : LogLevel::Warn;
 	}
 	if (ImGui::TreeNode("Benchmarking"))
 	{

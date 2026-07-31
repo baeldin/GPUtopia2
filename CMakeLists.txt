@@ -16,28 +16,28 @@ find_package(Stb REQUIRED)
 set(SOURCES
     GPUtopia2/main.cpp
     GPUtopia2/display.cpp
+    GPUtopia2/app_menu.cpp
+    GPUtopia2/compositor.cpp
+    GPUtopia2/layer_manager.cpp
+    GPUtopia2/layer_scheduler.cpp
+    GPUtopia2/layer_sync.cpp
+    GPUtopia2/viewport_input.cpp
     GPUtopia2/cl_core.cpp
-    GPUtopia2/cl_async.cpp
     GPUtopia2/cl_fractal.cpp
     GPUtopia2/cl_handler.cpp
-    GPUtopia2/cl_erro_handling.cpp
     GPUtopia2/cl_error_window.cpp
     GPUtopia2/clipboard.cpp
     GPUtopia2/color.cpp
     GPUtopia2/cubic_spline.cpp
-    GPUtopia2/explorer.cpp
     GPUtopia2/fileOperations.cpp
     GPUtopia2/flameRenderSettings.cpp
-    GPUtopia2/formulaSettings.cpp
+    GPUtopia2/settingsPanels.cpp
     GPUtopia2/fractal_navigation.cpp
     GPUtopia2/gradient.cpp
     GPUtopia2/gradientWindow.cpp
     GPUtopia2/history.cpp
     GPUtopia2/imageSettings.cpp
     GPUtopia2/info.cpp
-    GPUtopia2/insideSettings.cpp
-    GPUtopia2/load_shaders.cpp
-    GPUtopia2/outsideSettings.cpp
     GPUtopia2/sampling.cpp
     GPUtopia2/selectFile.cpp
     GPUtopia2/test_gradients.cpp
@@ -66,8 +66,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 set(ASSET_FILES
     GPUtopia2/segoeui.ttf
     GPUtopia2/DroidSansMono.ttf
-    GPUtopia2/vertex_shader.glsl
-    GPUtopia2/fragment_shader.glsl
 )
 foreach(ASSET ${ASSET_FILES})
     get_filename_component(ASSET_NAME ${ASSET} NAME)

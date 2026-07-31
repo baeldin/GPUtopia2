@@ -1,4 +1,5 @@
 #include "fileOperations.h"
+#include "selectFile.h"
 
 
 
@@ -9,7 +10,7 @@ std::string getFileFromPath(std::string& fullPath) {
 	return p.filename().string(); // return full filename if not .clf}
 }
 
-void newCLF(clFractal& cf, clCore& cc)
+void newCLF(clFractal& cf, clCore& cc, clLayerState& ls)
 {
 	cf = clFractal();
 	cf.makeCLCode(NEW_FILES);
@@ -17,11 +18,11 @@ void newCLF(clFractal& cf, clCore& cc)
 	cf.image.size.y = 720;
 	cf.image.resetStatus();
 	cf.image.updateComplexSubplane();
-	cc.resetCore();
-	cc.compileFractalKernel(cf.fullCLcode);
+	cc.resetCore(ls);
+	cc.compileFractalKernel(ls, cf.fullCLcode);
 }
 
-void openCLF(clFractal& cf, clCore& cc)
+void openCLF(clFractal& cf, clCore& cc, clLayerState& ls)
 {
 	std::string path;
 	bool success = false;
@@ -40,8 +41,8 @@ void openCLF(clFractal& cf, clCore& cc)
 		cf_in.resetCLFragmentQueue();
 		cf_in.makeCLCode(SAME_FILES);
 		cf_in.name = getFileFromPath(path);
-		cc.resetCore();
-		cc.compileFractalKernel(cf_in.fullCLcode);
+		cc.resetCore(ls);
+		cc.compileFractalKernel(ls, cf_in.fullCLcode);
 		cf = cf_in;
 		cf.gradient.isNew = true;
 	}
