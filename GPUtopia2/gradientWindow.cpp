@@ -8,11 +8,39 @@ void gradientWindow(clFractal& cf)
     ImGuiIO& io = ImGui::GetIO();
     static Gradient workGradientOld = cf.gradient;
     static Gradient workGradient = cf.gradient;
-    if (cf.gradient.isNew)
-    {
+    // Node editing state indexes into workGradient, so it has to be declared
+    // alongside it and reset with it.
+    static color nodeColorEdit = cf.gradient.nodeColors[0];
+    static int nodeLocationEdit = cf.gradient.nodeLocations[0];
+    static color nodeColorEditOld = nodeColorEdit;
+    static int nodeLocationEditOld = nodeLocationEdit;
+    static int lastActiveNode = 0;
+    static bool needRGBlinePlots = true;
+    static std::vector<color> gradientImg;
+    static GLuint gradientTextureID;
+    static bool needGradientTexture;
+    bool gradientReplaced = false;
+    // Adopt cf's gradient and drop every cached edit: they belong to the
+    // gradient we were showing before. Resetting lastActiveNode also keeps the
+    // indexing further down in range when the new gradient has fewer nodes.
+    auto adoptFractalGradient = [&]() {
         workGradient = cf.gradient;
         workGradientOld = cf.gradient;
+        lastActiveNode = 0;
+        nodeColorEdit = cf.gradient.nodeColors[0];
+        nodeLocationEdit = cf.gradient.nodeLocations[0];
+        nodeColorEditOld = nodeColorEdit;
+        nodeLocationEditOld = nodeLocationEdit;
+        needRGBlinePlots = true;
+        gradientReplaced = true;
+    };
+    if (cf.gradient.isNew)
+    {
+        // Cleared before the copy: adopting it while the flag is still set
+        // would carry isNew into the working copy and back into cf on the
+        // write-back below, re-arming the resync every frame.
         cf.gradient.isNew = false;
+        adoptFractalGradient();
     }
     if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_V, false) && ImGui::IsWindowFocused())
     {
@@ -31,15 +59,28 @@ void gradientWindow(clFractal& cf)
         std::cout << json.dump(4);
         CopyStringToClipboard(json.dump());
     }
-    static std::vector<color> gradientImg;
-    static GLuint gradientTextureID;
-    static bool needGradientTexture;
-    if (cf.gradient != workGradient)
+    // Which way the gradient flows is decided by who actually changed, not by
+    // letting this window always win. "The UI wins" is what pushed the previous
+    // layer's gradient onto a newly selected one: on that frame cf holds the new
+    // gradient and the working copy still holds the old, and the old was copied
+    // over the new.
+    if (workGradient != workGradientOld)
     {
+        // Edited in this window: the widgets below write into workGradient, so
+        // the change lands in cf on the following frame.
         cf.gradient = workGradient;
-        // cf.status.runImgKernel = true;
+        workGradientOld = workGradient;
+        gradientReplaced = true;
+    }
+    else if (cf.gradient != workGradient)
+    {
+        // Replaced underneath us - layer switch, file load, undo.
+        adoptFractalGradient();
+    }
+    if (gradientReplaced)
+    {
         glDeleteTextures(1, &gradientTextureID);
-        gradientImg = cf.gradient.getGradientImg(400, 20); // cf.gradient.getGradientImg(400, 20);
+        gradientImg = cf.gradient.getGradientImg(400, 20);
         makeTexture(gradientTextureID, 400, 20, gradientImg);
         needGradientTexture = false;
     }
@@ -59,10 +100,6 @@ void gradientWindow(clFractal& cf)
     ImVec2 uv1 = ImVec2(1.f, 1.f);// UV coordinates for (32,32) in our texture
     static GLuint textureGradientImgR, textureGradientImgG, textureGradientImgB;
     static bool windowChangedSize = false;
-    static color nodeColorEdit = cf.gradient.nodeColors[0];
-    static int nodeLocationEdit = cf.gradient.nodeLocations[0];
-    static int lastActiveNode = 0;
-    static bool needRGBlinePlots = true;
     static Gradient cfOld = cf.gradient;
     static Gradient cfNew = cf.gradient;
     cfNew = cf.gradient;
@@ -270,8 +307,6 @@ void gradientWindow(clFractal& cf)
     }
     nodeColorEdit = workGradient.nodeColors[lastActiveNode];
     nodeLocationEdit = workGradient.nodeLocations[lastActiveNode];
-    static color nodeColorEditOld = nodeColorEdit;
-    static int nodeLocationEditOld = nodeLocationEdit;
     ImGui::SliderInt("Active Node Location", &nodeLocationEdit, 0, workGradient.length);
     ImGui::ColorEdit3("Active Node Color", (float*)&nodeColorEdit);
     ImGui::ColorEdit3("Active Node Color HSV", (float*)&nodeColorEdit);

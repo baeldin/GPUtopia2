@@ -27,6 +27,10 @@ struct AppState
 	// the Layers window changes activeLayer, but the rest of the frame keeps
 	// working on the layer it began with; the switch takes effect next frame.
 	FractalLayer* frameLayer = nullptr;
+	// True for the frame that starts on a different layer than the last one.
+	// Panels that cache layer state in statics must resync when this is set,
+	// or they write the previous layer's values into the new one.
+	bool layerChanged = false;
 
 	// viewport texture and the images feeding it
 	GLuint textureID = 0;

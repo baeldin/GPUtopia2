@@ -37,7 +37,17 @@ namespace layers
 			app.activeLayer = (int)app.layers.size() - 1;
 		if (app.activeLayer < 0)
 			app.activeLayer = 0;
+		FractalLayer* const previousFrameLayer = app.frameLayer;
 		app.frameLayer = app.layers[app.activeLayer].get();
+		app.layerChanged = (previousFrameLayer != app.frameLayer);
+		if (app.layerChanged)
+		{
+			// The gradient window keeps its working copy in statics; this is the
+			// flag it already watches for "the gradient underneath you was
+			// replaced, drop your edits and resync".
+			app.frameLayer->cf.gradient.isNew = true;
+			logErr(LogLevel::Trace) << "[LAYERS] active layer is now " << app.frameLayer->name << "\n";
+		}
 		// Per-layer startup and imgKernel compilation
 		for (size_t idx = 0; idx < app.layers.size(); idx++) {
 			FractalLayer& li = *app.layers[idx];

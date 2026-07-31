@@ -80,9 +80,10 @@ void formulaSettingsWindow(clFractal& cf, clCore& cc, clLayerState& ls)
 		cf.insideColoringCLFragmentFileUi = "clFragments/diag_AA_col.cl";
 		cf.outsideColoringCLFragmentFileUi = "clFragments/diag_AA_col.cl";
 	}
-	static bool useDouble = cf.useDouble;
-	ImGui::Checkbox("Double Precision", &useDouble);
-	if (!useDouble == cf.useDouble)
+	// Seeded from cf every frame on purpose: a static would carry the previous
+	// layer's setting over on a layer switch and force a kernel rebuild with it.
+	bool useDouble = cf.useDouble;
+	if (ImGui::Checkbox("Double Precision", &useDouble))
 	{
 		cf.useDouble = useDouble;
 		cf.makeCLCode(SAME_FILES);
